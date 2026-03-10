@@ -2,20 +2,23 @@ package dev.forgepack.library.api.exception.annotation;
 
 import dev.forgepack.library.api.service.ServiceRole;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationContext;
-
 import java.lang.reflect.Field;
 import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+/**
+ * Validator Unique
+ *
+ * @author	Marcelo Ribeiro Gadelha
+ * Email:	gadelha.ti@gmail.com
+ * Website:	www.forgepack.dev
+ **/
 
 @ExtendWith(MockitoExtension.class)
 class UniqueValidatorTest {

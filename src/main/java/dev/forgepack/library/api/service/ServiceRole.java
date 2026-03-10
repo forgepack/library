@@ -6,9 +6,11 @@ import org.springframework.stereotype.Service;
 import java.util.UUID;
 
 /**
+ * Implements Interface Service
+ *
  * @author	Marcelo Ribeiro Gadelha
- * @email	gadelha.ti@gmail.com
- * @website	www.forgepack.dev
+ * Email:	gadelha.ti@gmail.com
+ * Website:	www.forgepack.dev
  **/
 
 @Service

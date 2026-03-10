@@ -10,9 +10,11 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.RetentionPolicy;
 
 /**
+ * Unique Annotation
+ *
  * @author	Marcelo Ribeiro Gadelha
- * @email	gadelha.ti@gmail.com
- * @website	www.forgepack.dev
+ * Email:	gadelha.ti@gmail.com
+ * Website:	www.forgepack.dev
  **/
 
 @Target({ ElementType.TYPE })

@@ -8,9 +8,11 @@ import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 
 /**
+ * Request DTO for Role entity
+ *
  * @author	Marcelo Ribeiro Gadelha
- * @email	gadelha.ti@gmail.com
- * @website	www.forgepack.dev
+ * Email:	gadelha.ti@gmail.com
+ * Website:	www.forgepack.dev
  **/
 
 @Unique(service = ServiceRole.class, field = "name")

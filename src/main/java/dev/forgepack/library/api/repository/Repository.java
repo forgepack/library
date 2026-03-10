@@ -7,9 +7,11 @@ import org.springframework.data.repository.NoRepositoryBean;
 import java.util.UUID;
 
 /**
+ * Interface Repository
+ *
  * @author	Marcelo Ribeiro Gadelha
- * @email	gadelha.ti@gmail.com
- * @website	www.forgepack.dev
+ * Email:	gadelha.ti@gmail.com
+ * Website:	www.forgepack.dev
  **/
 
 @NoRepositoryBean

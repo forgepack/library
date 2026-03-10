@@ -6,9 +6,11 @@ import org.springframework.data.domain.Pageable;
 import java.util.UUID;
 
 /**
+ * Interface Service
+ *
  * @author	Marcelo Ribeiro Gadelha
- * @email	gadelha.ti@gmail.com
- * @website	www.forgepack.dev
+ * Email:	gadelha.ti@gmail.com
+ * Website:	www.forgepack.dev
  **/
 
 public interface ServiceInterface<T, I, O> {

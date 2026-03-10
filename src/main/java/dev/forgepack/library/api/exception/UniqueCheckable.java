@@ -3,9 +3,11 @@ package dev.forgepack.library.api.exception;
 import java.util.UUID;
 
 /**
+ * Interface to Unique Checkable
+ *
  * @author	Marcelo Ribeiro Gadelha
- * @email	gadelha.ti@gmail.com
- * @website	www.forgepack.dev
+ * Email:	gadelha.ti@gmail.com
+ * Website:	www.forgepack.dev
  **/
 
 public interface UniqueCheckable {
