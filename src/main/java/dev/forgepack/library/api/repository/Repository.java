@@ -7,12 +7,27 @@ import org.springframework.data.repository.NoRepositoryBean;
 import java.util.UUID;
 
 /**
- * Interface Repository
- *
- * @author	Marcelo Ribeiro Gadelha
- * Email:	gadelha.ti@gmail.com
- * Website:	www.forgepack.dev
- **/
+ * Interface base para repositórios da biblioteca ForgePack.
+ * <p>
+ * Esta interface estende {@link JpaRepository} fornecendo métodos adicionais
+ * comuns para operações com entidades que possuem campos de nome e suporte
+ * a consultas personalizadas com paginação.
+ * 
+ * Operações suportadas:
+ * <ul>
+ *     <li>Busca por nome exato e ignore case</li>
+ *     <li>Verificação de existência com exclusão por ID</li>
+ *     <li>Consultas paginadas e ordenadas</li>
+ *     <li>Busca com filtros que ignoram case</li>
+ * </ul>
+ * 
+ * @param <T> tipo da entidade gerenciada pelo repositório
+ * @author Marcelo Ribeiro Gadelha
+ * @version 1.0
+ * @since 1.0
+ * 
+ * @see org.springframework.data.jpa.repository.JpaRepository
+ */
 
 @NoRepositoryBean
 public abstract interface Repository<T> extends JpaRepository<T, UUID> {

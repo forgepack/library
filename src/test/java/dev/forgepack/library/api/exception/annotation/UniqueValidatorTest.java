@@ -1,6 +1,8 @@
 package dev.forgepack.library.api.exception.annotation;
 
-import dev.forgepack.library.api.service.ServiceRole;
+import dev.forgepack.library.api.annotation.Unique;
+import dev.forgepack.library.internal.validator.UniqueValidator;
+import dev.forgepack.library.internal.service.ServiceRole;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -16,7 +18,6 @@ import static org.mockito.Mockito.when;
  * Validator Unique
  *
  * @author	Marcelo Ribeiro Gadelha
- * Email:	gadelha.ti@gmail.com
  * Website:	www.forgepack.dev
  **/
 

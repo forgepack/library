@@ -1,24 +1,41 @@
-package dev.forgepack.library.api.exception.annotation;
+package dev.forgepack.library.internal.validator;
 
-import dev.forgepack.library.api.exception.UniqueCheckable;
+import dev.forgepack.library.api.annotation.Unique;
+import dev.forgepack.library.api.validator.UniqueCheckable;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
-
 import java.lang.reflect.Field;
 import java.util.UUID;
 
 /**
- * Validator Unique
- *
- * @author	Marcelo Ribeiro Gadelha
- * Email:	gadelha.ti@gmail.com
- * Website:	www.forgepack.dev
- **/
+ * Validador customizado para verificação de unicidade de campos.
+ * <p>
+ * Esta classe implementa a lógica de validação para a anotação {@code @Unique},
+ * verificando se um campo específico possui valor único na base de dados.
+ * Suporta tanto validação para criação quanto para atualização de entidades.
+ * 
+ * <h3>Funcionalidades:</h3>
+ * <ul>
+ *     <li>Validação de unicidade em criação de registros</li>
+ *     <li>Validação de unicidade em atualização (excluindo o próprio registro)</li>
+ *     <li>Integração com Spring Context para injeção de dependências</li>
+ *     <li>Acesso reflexivo a campos privados</li>
+ *     <li>Tratamento de valores nulos e em branco</li>
+ * </ul>
+ * 
+ * @author Marcelo Ribeiro Gadelha
+ * @version 1.0
+ * @since 1.0
+ * Website: www.forgepack.dev
+ * 
+ * @see dev.forgepack.library.api.annotation.Unique
+ * @see dev.forgepack.library.api.validator.UniqueCheckable
+ */
 
 @Component
-class UniqueValidator implements ConstraintValidator<Unique, Object> {
+public class UniqueValidator implements ConstraintValidator<Unique, Object> {
 
     private String field;
     private String idField;
