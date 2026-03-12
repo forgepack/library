@@ -48,5 +48,5 @@ public record DTORequestUser (
     @NotBlank(message = "{not.blank}") @Size(max = 50) @Email
     String email,
 
-    Set<DTORequestRole> role
+    Set<DTOResponseRole> role
 ) implements DTORequestIdentifiable {}

@@ -10,9 +10,9 @@ import java.util.UUID;
  * Esta interface define o contrato padrão para serviços que realizam operações
  * CRUD (Create, Read, Update, Delete) com suporte a paginação e filtragem.
  * 
- * @param <T> tipo da entidade de domínio
- * @param <I> tipo do DTO de entrada (request)
- * @param <O> tipo do DTO de saída (response)
+ * @param <Entity> tipo da entidade de domínio
+ * @param <DTORequest> tipo do DTO de entrada (request)
+ * @param <DTOResponse> tipo do DTO de saída (response)
  * 
  * Operações suportadas:
  * <ul>
@@ -31,7 +31,7 @@ import java.util.UUID;
  * @see org.springframework.data.domain.Pageable
  */
 
-public interface ServiceInterface<T, I, O> {
+public interface ServiceInterface<Entity, DTORequest, DTOResponse> {
     
     /**
      * Cria um novo registro baseado nos dados fornecidos.
@@ -39,7 +39,7 @@ public interface ServiceInterface<T, I, O> {
      * @param created DTO contendo os dados para criação
      * @return DTO de resposta con o registro criado
      */
-    O create(I created);
+    DTOResponse create(DTORequest created);
     
     /**
      * Recupera uma página de registros com filtragem opcional.
@@ -49,7 +49,7 @@ public interface ServiceInterface<T, I, O> {
      * @param entityClass classe da entidade para referência de tipo
      * @return página contendo os registros encontrados
      */
-    Page<O> retrieve(Pageable pageable, String value, Class<T> entityClass);
+    Page<DTOResponse> retrieve(Pageable pageable, String value, Class<Entity> entityClass);
     
     /**
      * Recupera um registro específico pelo seu identificador.
@@ -58,17 +58,16 @@ public interface ServiceInterface<T, I, O> {
      * @return DTO de resposta com o registro encontrado
      * @throws jakarta.persistence.EntityNotFoundException se o registro não for encontrado
      */
-    O retrieve(UUID id);
+    DTOResponse retrieve(UUID id, Class<Entity> entityClass);
     
     /**
      * Atualiza um registro existente com os novos dados fornecidos.
      * 
-     * @param id identificador do registro a ser atualizado
      * @param updated DTO contendo os novos dados
      * @return DTO de resposta com o registro atualizado
      * @throws jakarta.persistence.EntityNotFoundException se o registro não for encontrado
      */
-    O update(UUID id, I updated);
+    DTOResponse update(DTORequest updated);
     
     /**
      * Exclui um registro pelo seu identificador.
@@ -79,5 +78,5 @@ public interface ServiceInterface<T, I, O> {
      * @return DTO de resposta com o registro excluído
      * @throws jakarta.persistence.EntityNotFoundException se o registro não for encontrado
      */
-    O delete(UUID id);
+    DTOResponse delete(UUID id);
 }

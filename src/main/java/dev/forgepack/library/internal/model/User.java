@@ -62,6 +62,11 @@ public class User extends GenericAuditEntity {
 
     public User() {
     }
+    public User(String username, String email, Set<Role> role) {
+        this.username = username;
+        this.email = email;
+        this.role = role;
+    }
     public User(String username, String email, String password, Integer attempt, Boolean active, String secret, Set<Role> role) {
         this.username = username;
         this.email = email;
