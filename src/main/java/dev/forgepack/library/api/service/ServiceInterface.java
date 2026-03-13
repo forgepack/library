@@ -58,7 +58,7 @@ public interface ServiceInterface<Entity, DTORequest, DTOResponse> {
      * @return DTO de resposta com o registro encontrado
      * @throws jakarta.persistence.EntityNotFoundException se o registro não for encontrado
      */
-    DTOResponse retrieve(UUID id, Class<Entity> entityClass);
+    DTOResponse retrieve(UUID id);
     
     /**
      * Atualiza um registro existente com os novos dados fornecidos.

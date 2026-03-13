@@ -72,7 +72,7 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
         }
     }
     @Transactional
-    public DTOResponse retrieve(UUID id, Class<Entity> entityClass){
+    public DTOResponse retrieve(UUID id){
 //        log.debug("Retrieving {} with ID: {}", entityClass.getSimpleName(), id);
         Entity entity = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
