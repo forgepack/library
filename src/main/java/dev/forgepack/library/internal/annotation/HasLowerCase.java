@@ -1,5 +1,6 @@
 package dev.forgepack.library.internal.annotation;
 
+import dev.forgepack.library.internal.validator.Validator;
 import jakarta.validation.Constraint;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
@@ -9,12 +10,12 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Documented;
-import static dev.forgepack.library.internal.Validator.hasLowerCase;
+import static dev.forgepack.library.internal.validator.Validator.hasLowerCase;
 
 /**
  * Anotação de validação que verifica se uma string contém pelo menos um caractere minúsculo.
  * <p>
- * Esta anotação utiliza a classe {@link dev.forgepack.library.internal.Validator}
+ * Esta anotação utiliza a classe {@link Validator}
  * para verificar se o valor da string possui pelo menos um caractere em minúsculo (a-z).
  * 
  * Configuração:
@@ -34,7 +35,7 @@ import static dev.forgepack.library.internal.Validator.hasLowerCase;
  * @version 1.0
  * @since 1.0
  * 
- * @see dev.forgepack.library.internal.Validator#hasLowerCase(String)
+ * @see Validator#hasLowerCase(String)
  */
 
 @Target(ElementType.FIELD)

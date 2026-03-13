@@ -1,4 +1,4 @@
-package dev.forgepack.library.internal;
+package dev.forgepack.library.internal.validator;
 
 /**
  * Classe utilitária com métodos estáticos para validações comuns.
