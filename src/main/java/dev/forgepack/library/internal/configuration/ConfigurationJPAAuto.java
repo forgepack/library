@@ -1,9 +1,19 @@
 package dev.forgepack.library.internal.configuration;
 
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.persistence.autoconfigure.EntityScan;
+import org.springframework.boot.persistence.autoconfigure.EntityScanPackages;
 
 @AutoConfiguration
-@EntityScan("dev.forgepack.library.internal.model")
-public class ConfigurationJPAAuto {
+public class ConfigurationJPAAuto implements BeanDefinitionRegistryPostProcessor {
+
+    @Override
+    public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) {
+        EntityScanPackages.register(registry, "dev.forgepack.library.internal.model");
+    }
+
+    @Override
+    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {}
 }
