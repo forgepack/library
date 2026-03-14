@@ -17,11 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/privilege")
 public class ControllerPrivilege extends ControllerGeneric<Privilege, DTORequestPrivilege, DTOResponsePrivilege> {
 
-    private final ServicePrivilege servicePrivilege;
-
     public ControllerPrivilege(ServicePrivilege servicePrivilege) {
         super(servicePrivilege);
-        this.servicePrivilege = servicePrivilege;
     }
     protected Class<Privilege> getEntityClass() {
         return Privilege.class;

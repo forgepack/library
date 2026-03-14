@@ -15,11 +15,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/role")
 public class ControllerRole extends ControllerGeneric<Role, DTORequestRole, DTOResponseRole> {
 
-    private final ServiceRole serviceRole;
-
     public ControllerRole(ServiceRole serviceRole) {
         super(serviceRole);
-        this.serviceRole = serviceRole;
     }
     protected Class<Role> getEntityClass() {
         return Role.class;
