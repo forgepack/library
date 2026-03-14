@@ -26,6 +26,11 @@
             <id>Gadelha</id>
             <name>Marcelo Gadelha</name>
             <email>gadelha.ti@gmail.com</email>
+            <url>www.gadelha.eti.br</url>
+            <roles>
+                <role>architect</role>
+                <role>developer</role>
+            </roles>
         </developer>
 	</developers>
 	<scm>
