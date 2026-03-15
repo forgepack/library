@@ -1,8 +1,8 @@
 package dev.forgepack.library.internal.service;
 
 import dev.forgepack.library.api.mapper.Mapper;
+import dev.forgepack.library.api.repository.RepositoryInterface;
 import dev.forgepack.library.api.validator.UniqueCheckable;
-import dev.forgepack.library.api.repository.Repository;
 import dev.forgepack.library.api.service.ServiceInterface;
 import dev.forgepack.library.internal.model.Privilege;
 import dev.forgepack.library.internal.payload.DTORequestPrivilege;
@@ -41,8 +41,8 @@ public class ServicePrivilege extends ServiceGeneric<Privilege, DTORequestPrivil
 
     private final RepositoryPrivilege repositoryPrivilege;
 
-    public ServicePrivilege(Repository<Privilege> repository, Mapper<Privilege, DTORequestPrivilege, DTOResponsePrivilege> mapperInterface, RepositoryPrivilege repositoryPrivilege) {
-        super(Privilege.class, repository, mapperInterface);
+    public ServicePrivilege(RepositoryInterface<Privilege> repositoryInterface, Mapper<Privilege, DTORequestPrivilege, DTOResponsePrivilege> mapperInterface, RepositoryPrivilege repositoryPrivilege) {
+        super(Privilege.class, repositoryInterface, mapperInterface);
         this.repositoryPrivilege = repositoryPrivilege;
     }
     @Override

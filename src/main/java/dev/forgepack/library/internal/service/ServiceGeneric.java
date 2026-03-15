@@ -2,7 +2,7 @@ package dev.forgepack.library.internal.service;
 
 import dev.forgepack.library.api.mapper.Mapper;
 import dev.forgepack.library.api.payload.DTORequestIdentifiable;
-import dev.forgepack.library.api.repository.Repository;
+import dev.forgepack.library.api.repository.RepositoryInterface;
 import dev.forgepack.library.api.service.ServiceInterface;
 import dev.forgepack.library.internal.model.GenericAuditEntity;
 import jakarta.persistence.EntityNotFoundException;
@@ -25,18 +25,18 @@ import static org.springframework.data.domain.ExampleMatcher.matching;
 public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTORequest extends DTORequestIdentifiable, DTOResponse extends RepresentationModel<DTOResponse>> implements ServiceInterface<Entity, DTORequest, DTOResponse> {
 
     private final Class<Entity> entityClass;
-    private final Repository<Entity> repository;
+    private final RepositoryInterface<Entity> repositoryInterface;
     private final Mapper<Entity, DTORequest, DTOResponse> mapper;
 
-    public ServiceGeneric(Class<Entity> entityClass, Repository<Entity> repository, Mapper<Entity, DTORequest, DTOResponse> mapper) {
+    public ServiceGeneric(Class<Entity> entityClass, RepositoryInterface<Entity> repositoryInterface, Mapper<Entity, DTORequest, DTOResponse> mapper) {
         this.entityClass = entityClass;
-        this.repository = repository;
+        this.repositoryInterface = repositoryInterface;
         this.mapper = mapper;
     }
 
     @Transactional
     public DTOResponse create(DTORequest created){
-        return addHateoas(repository.save(mapper.toEntity(created)));
+        return addHateoas(repositoryInterface.save(mapper.toEntity(created)));
     }
     @Transactional
     public Page<DTOResponse> retrieve(Pageable pageable, String value, Class<Entity> entityClass) {
@@ -47,7 +47,7 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
 //        log.debug("Retrieving {} with property: {}, value: {}", entityClass.getSimpleName(), propertyName, value);
         if ("id".equalsIgnoreCase(propertyName) && StringUtils.hasText(value)) {
             try {
-                return repository.findById(UUID.fromString(value), pageable)
+                return repositoryInterface.findById(UUID.fromString(value), pageable)
                         .map(this::addHateoas);
             } catch (IllegalArgumentException e){
 //                log.debug("Value '{}' is not a valid UUID, falling back to property search", value);
@@ -65,16 +65,16 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
             Object convertedValue = ConvertUtils.convert(value, field.getType());
             setter.invoke(object, convertedValue);
             Example<Entity> example = Example.of(object, exampleMatcher);
-            return repository.findAll(example, pageable).map(this::addHateoas);
+            return repositoryInterface.findAll(example, pageable).map(this::addHateoas);
         } catch (Exception exception) {
 //            log.warn("Error searching {} by {}: {}", entityClass.getSimpleName(), propertyName, exception.getMessage());
-            return repository.findAll(pageable).map(this::addHateoas);
+            return repositoryInterface.findAll(pageable).map(this::addHateoas);
         }
     }
     @Transactional
     public DTOResponse retrieve(UUID id){
 //        log.debug("Retrieving {} with ID: {}", entityClass.getSimpleName(), id);
-        Entity entity = repository.findById(id)
+        Entity entity = repositoryInterface.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
                         String.format("%s not found with ID: %s", entityClass.getSimpleName(), id)));
         return addHateoas(entity);
@@ -82,16 +82,16 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
     @Transactional
     public DTOResponse update(DTORequest updated){
 //        log.info("{} updating entity with ID: {}", information.getCurrentUser().orElse("Unknown User"), updated.id());
-        Entity entity = repository.save(mapper.toEntity(updated));
+        Entity entity = repositoryInterface.save(mapper.toEntity(updated));
         return addHateoas(entity);
     }
     @Transactional
     public DTOResponse delete(UUID id){
 //        log.info("{} deleting entity with ID: {}", information.getCurrentUser().orElse("Unknown User"), id);
-        Entity entity = repository.findById(id)
+        Entity entity = repositoryInterface.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
                         String.format("Cannot delete: %s not found with ID: %s", entityClass.getSimpleName(), id)));
-        repository.delete(entity);
+        repositoryInterface.delete(entity);
         return addHateoas(entity);
     }
     @Transactional

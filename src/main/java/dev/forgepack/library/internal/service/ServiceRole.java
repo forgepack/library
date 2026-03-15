@@ -2,7 +2,7 @@ package dev.forgepack.library.internal.service;
 
 import dev.forgepack.library.api.mapper.Mapper;
 import dev.forgepack.library.api.validator.UniqueCheckable;
-import dev.forgepack.library.api.repository.Repository;
+import dev.forgepack.library.api.repository.RepositoryInterface;
 import dev.forgepack.library.api.service.ServiceInterface;
 import dev.forgepack.library.internal.model.Role;
 import dev.forgepack.library.internal.payload.DTORequestRole;
@@ -41,8 +41,8 @@ public class ServiceRole extends ServiceGeneric<Role, DTORequestRole, DTORespons
 
     private final RepositoryRole repositoryRole;
 
-    public ServiceRole(Repository<Role> repository, Mapper<Role, DTORequestRole, DTOResponseRole> mapperInterface, RepositoryRole repositoryRole) {
-        super(Role.class, repository, mapperInterface);
+    public ServiceRole(RepositoryInterface<Role> repositoryInterface, Mapper<Role, DTORequestRole, DTOResponseRole> mapperInterface, RepositoryRole repositoryRole) {
+        super(Role.class, repositoryInterface, mapperInterface);
         this.repositoryRole = repositoryRole;
     }
     @Override

@@ -31,7 +31,7 @@ import java.util.UUID;
  */
 
 @NoRepositoryBean
-public interface Repository<T> extends JpaRepository<T, UUID> {
+public interface RepositoryInterface<T> extends JpaRepository<T, UUID> {
 
     Set<T> findByName(String name);
     boolean existsByName(String name);
