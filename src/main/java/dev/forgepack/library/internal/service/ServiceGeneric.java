@@ -81,12 +81,12 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
     }
     @Transactional
     public DTOResponse update(DTORequest updated){
-//        log.info("{} updating entity with ID: {}", information.getCurrentUser().orElse("Unknown User"), updated.id());
-        Entity entity = repositoryInterface.findById(updated.id())
+        repositoryInterface.findById(updated.id())
                 .orElseThrow(() -> new EntityNotFoundException(
                         String.format("Cannot update: %s not found with ID: %s", entityClass.getSimpleName(), updated.id())));
-        repositoryInterface.save(mapper.toEntity(updated));
-        return addHateoas(entity);
+        Entity entity = mapper.toEntity(updated);
+        entity.setId(updated.id());
+        return addHateoas(repositoryInterface.save(entity));
     }
     @Transactional
     public DTOResponse delete(UUID id){
