@@ -2,7 +2,7 @@ package dev.forgepack.library.internal.repository;
 
 import dev.forgepack.library.api.repository.Repository;
 import dev.forgepack.library.internal.model.Privilege;
-import org.springframework.data.domain.Page;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -14,7 +14,7 @@ import java.util.UUID;
 
 public interface RepositoryPrivilege extends Repository<Privilege> {
 
-    Page<Privilege> findByName(String name);
+    Set<Privilege> findByName(String name);
     boolean existsByNameIgnoreCaseAndIdNot(String value, UUID id);
     boolean existsByNameIgnoreCase(String value);
 }

@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.NoRepositoryBean;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -30,13 +31,13 @@ import java.util.UUID;
  */
 
 @NoRepositoryBean
-public abstract interface Repository<T> extends JpaRepository<T, UUID> {
+public interface Repository<T> extends JpaRepository<T, UUID> {
 
-    Page<T> findByName(String name);
+    Set<T> findByName(String name);
     boolean existsByName(String name);
     boolean existsByNameIgnoreCase(String name);
     boolean existsByNameIgnoreCaseAndIdNot(String name, UUID id);
     Page<T> findByNameContainingIgnoreCaseOrderByNameAsc(Pageable pageable, String name);
-    Page<T> findById(Pageable pageable, UUID uuid);
-    Page<T> findByIdOrderByIdAsc(Pageable pageable, UUID id);
+    Page<T> findById(UUID uuid, Pageable pageable);
+    Page<T> findByIdOrderByIdAsc(UUID id, Pageable pageable);
 }

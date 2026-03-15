@@ -47,7 +47,7 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
 //        log.debug("Retrieving {} with property: {}, value: {}", entityClass.getSimpleName(), propertyName, value);
         if ("id".equalsIgnoreCase(propertyName) && StringUtils.hasText(value)) {
             try {
-                return repository.findById(pageable, UUID.fromString(value))
+                return repository.findById(UUID.fromString(value), pageable)
                         .map(this::addHateoas);
             } catch (IllegalArgumentException e){
 //                log.debug("Value '{}' is not a valid UUID, falling back to property search", value);
