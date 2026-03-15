@@ -8,7 +8,7 @@ import org.springframework.boot.persistence.autoconfigure.EntityScanPackages;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @AutoConfiguration
-@EnableJpaRepositories(basePackages = "dev.forgepack.library.internal.repository")
+@EnableJpaRepositories(basePackages = {"dev.forgepack.library.api.repository", "dev.forgepack.library.internal.repository"})
 public class ConfigurationJPAAuto implements BeanDefinitionRegistryPostProcessor {
 
     @Override
