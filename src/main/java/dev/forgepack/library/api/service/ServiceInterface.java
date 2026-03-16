@@ -1,82 +1,119 @@
 package dev.forgepack.library.api.service;
 
+import dev.forgepack.library.api.mapper.Mapper;
+import dev.forgepack.library.api.repository.RepositoryInterface;
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import java.util.UUID;
 
 /**
- * Interface genérica para serviços CRUD.
- * <p>
- * Esta interface define o contrato padrão para serviços que realizam operações
- * CRUD (Create, Read, Update, Delete) com suporte a paginação e filtragem.
- * 
- * @param <Entity> tipo da entidade de domínio
- * @param <DTORequest> tipo do DTO de entrada (request)
- * @param <DTOResponse> tipo do DTO de saída (response)
- * 
- * Operações suportadas:
+ * Defines the contract for application services responsible for managing
+ * domain entities and their corresponding DTO representations.
+ *
+ * <p>This interface declares the standard CRUD operations expected from
+ * service layer components. Implementations are responsible for handling
+ * business logic, coordinating persistence operations, and converting
+ * between entities and Data Transfer Objects (DTOs).</p>
+ *
+ * <p>The service operates with three generic types:</p>
  * <ul>
- *     <li>Criação de novos registros</li>
- *     <li>Consulta paginada com filtros</li>
- *     <li>Consulta por ID específico</li>
- *     <li>Atualização de registros existentes</li>
- *     <li>Exclusão de registros</li>
+ *     <li>The domain entity</li>
+ *     <li>The request DTO used for create and update operations</li>
+ *     <li>The response DTO returned by service methods</li>
  * </ul>
- * 
+ *
+ * <p>Implementations may also enrich responses with additional metadata,
+ * such as HATEOAS links.</p>
+ *
+ * @param <Entity> domain entity type
+ * @param <DTORequest> DTO used for create and update operations
+ * @param <DTOResponse> DTO returned in service responses
+ *
  * @author Marcelo Ribeiro Gadelha
- * @version 1.0
  * @since 1.0
- * 
- * @see org.springframework.data.domain.Page
- * @see org.springframework.data.domain.Pageable
+ *
+ * @see Mapper
+ * @see RepositoryInterface
  */
 
 public interface ServiceInterface<Entity, DTORequest, DTOResponse> {
-    
+
     /**
-     * Cria um novo registro baseado nos dados fornecidos.
-     * 
-     * @param created DTO contendo os dados para criação
-     * @return DTO de resposta con o registro criado
+     * Creates and persists a new entity based on the provided {@link DTORequest}.
+     *
+     * <p>The {@link DTORequest} is converted into a domain entity using the configured
+     * {@link Mapper}. The entity is then persisted through the
+     * {@link RepositoryInterface}. After persistence, the entity is converted
+     * back into a {@link DTOResponse} enriched with HATEOAS links.</p>
+     *
+     * @param created {@link DTORequest} containing the data required to create the entity
+     * @return {@link DTOResponse} representing the persisted entity with HATEOAS links
      */
     DTOResponse create(DTORequest created);
-    
+
     /**
-     * Recupera uma página de registros com filtragem opcional.
-     * 
-     * @param pageable informações de paginação (tamanho da página, ordenação, etc.)
-     * @param value valor para filtrar os resultados (opcional)
-     * @param entityClass classe da entidade para referência de tipo
-     * @return página contendo os registros encontrados
+     * Retrieves entities using pagination and dynamic filtering.
+     *
+     * <p>The filtering behavior is determined by the property specified in the
+     * {@link Pageable} sort configuration. If the sorted property is {@code id}
+     * and the provided value is a valid {@link UUID}, the search will be performed
+     * directly by identifier.</p>
+     *
+     * <p>Otherwise, the method dynamically builds a query using Spring Data
+     * {@link Example} and {@link ExampleMatcher}, performing case-insensitive
+     * and partial string matching.</p>
+     *
+     * <p>If the property cannot be resolved or an error occurs during query
+     * construction, the method falls back to returning all entities using the
+     * provided pagination.</p>
+     *
+     * @param pageable pagination and sorting configuration
+     * @param value value used as search filter
+     * @param entityClass class of the entity being queried
+     * @return a paginated list of response DTOs with HATEOAS links
      */
     Page<DTOResponse> retrieve(Pageable pageable, String value, Class<Entity> entityClass);
-    
+
     /**
-     * Recupera um registro específico pelo seu identificador.
-     * 
-     * @param id identificador único do registro
-     * @return DTO de resposta com o registro encontrado
-     * @throws jakarta.persistence.EntityNotFoundException se o registro não for encontrado
+     * Retrieves a single entity by its unique identifier.
+     *
+     * <p>If no entity exists with the specified identifier, an
+     * {@link EntityNotFoundException} is thrown.</p>
+     *
+     * @param id {@link UUID} unique identifier of the entity
+     * @return {@link DTOResponse} representing the found entity with HATEOAS links
+     * @throws EntityNotFoundException if the entity does not exist
      */
     DTOResponse retrieve(UUID id);
     
     /**
-     * Atualiza um registro existente com os novos dados fornecidos.
-     * 
-     * @param updated DTO contendo os novos dados
-     * @return DTO de resposta com o registro atualizado
-     * @throws jakarta.persistence.EntityNotFoundException se o registro não for encontrado
+     * Updates an existing entity using the provided request DTO.
+     *
+     * <p>The method first verifies if an entity with the specified identifier
+     * exists. If the entity does not exist, an {@link EntityNotFoundException}
+     * is thrown.</p>
+     *
+     * <p>The DTO is converted to an entity using the configured {@link Mapper},
+     * persisted, and then returned as a {@link DTOResponse} enriched with HATEOAS links.</p>
+     *
+     * @param updated {@link DTORequest} containing updated entity data
+     * @return {@link DTOResponse} representing the updated entity
+     * @throws EntityNotFoundException if the entity does not exist
      */
     DTOResponse update(DTORequest updated);
     
     /**
-     * Exclui um registro pelo seu identificador.
-     * <p>
-     * Dependendo da implementação, pode realizar exclusão física ou lógica (soft delete).
-     * 
-     * @param id identificador do registro a ser excluído
-     * @return DTO de resposta com o registro excluído
-     * @throws jakarta.persistence.EntityNotFoundException se o registro não for encontrado
+     * Deletes an entity identified by the specified identifier.
+     *
+     * <p>If the entity does not exist, an {@link EntityNotFoundException}
+     * is thrown.</p>
+     *
+     * @param id {@link UUID} unique identifier of the entity to be deleted
+     * @return {@link DTOResponse} representing the deleted entity with HATEOAS links
+     * @throws EntityNotFoundException if the entity does not exist
      */
     DTOResponse delete(UUID id);
 }

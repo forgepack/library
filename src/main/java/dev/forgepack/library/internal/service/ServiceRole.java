@@ -12,26 +12,33 @@ import org.springframework.stereotype.Service;
 import java.util.UUID;
 
 /**
- * Serviço responsável pelo gerenciamento de privilégios.
- * <p>
- * Esta classe implementa as operações CRUD para a entidade Role e fornece
- * funcionalidades de verificação de unicidade necessárias para validação.
+ * Service responsible for managing {@link Role} entities.
  *
- * <h3>Funcionalidades principais:</h3>
+ * <p>Extends {@link ServiceGeneric} by inheriting the full CRUD operations
+ * for the entity {@link Role}, and implements {@link UniqueCheckable}
+ * to provide uniqueness checks used during data validation.</p>
+ *
+ * <h3>Main responsibilities:</h3>
  * <ul>
- *     <li>Operações CRUD completas para privilégios</li>
- *     <li>Verificação de unicidade de nome</li>
- *     <li>Consultas paginadas e filtradas</li>
- *     <li>Integração com sistema de validação</li>
+ *     <li>Provide CRUD operations for {@link Role}</li>
+ *     <li>Validate uniqueness constraints for role attributes</li>
+ *     <li>Support paginated and filtered queries</li>
+ *     <li>Integrate entity–DTO mapping through {@link Mapper}</li>
+ * </ul>
+ *
+ * <h3>Supported uniqueness fields</h3>
+ * <ul>
+ *     <li>{@code name} - Checks for duplicates, ignoring case.</li>
  * </ul>
  *
  * @author Marcelo Ribeiro Gadelha
  * @version 1.0
  * @since 1.0
- * Website: www.forgepack.dev
  *
+ * @see ServiceGeneric
  * @see ServiceInterface
  * @see UniqueCheckable
+ * @see RepositoryRole
  * @see Role
  * @see DTORequestRole
  * @see DTOResponseRole
@@ -45,6 +52,21 @@ public class ServiceRole extends ServiceGeneric<Role, DTORequestRole, DTORespons
         super(Role.class, repositoryInterface, mapperInterface);
         this.repositoryRole = repositoryRole;
     }
+    /**
+     * Checks if a record exists with the specified value in a given field.
+     *
+     * @param field {@link String} name of the field to be checked.
+     * @param value {@link Object} The value that will be compared in the specified field.
+     * @return  {@code true} if another record exists with the same value in the specified field;
+     *          {@code false} otherwise.
+     * @throws IllegalArgumentException if the specified field is not supported.
+     * @author Marcelo Ribeiro Gadelha
+     *
+     * <p><b>Example:</b></p>
+     * <pre>{@code
+     * boolean exists = service.existsByField("name", "Admin");
+     * }</pre>
+     */
     @Override
     public boolean existsByField(String field, Object value) {
         if ("name".equals(field)) {
@@ -54,10 +76,26 @@ public class ServiceRole extends ServiceGeneric<Role, DTORequestRole, DTORespons
             throw new IllegalArgumentException("Invalid argument");
         }
     }
+    /**
+     * Checks if a record exists with the specified value in a given field, excluding the record with the given {@code id} from the check.
+     *
+     * @param field {@link String} name of the field to be checked.
+     * @param value {@link Object} The value that will be compared in the specified field.
+     * @param id {@link UUID} Identifier of the record that should be ignored in the verification.
+     * @return  {@code true} if another record exists with the same value in the specified field;
+     *          {@code false} otherwise.
+     * @throws IllegalArgumentException if the specified field is not supported.
+     * @author Marcelo Ribeiro Gadelha
+     *
+     * <p><b>Example:</b></p>
+     * <pre>{@code
+     * boolean exists = service.existsByFieldAndIdNot("name", "Admin", someUUID);
+     * }</pre>
+     */
     @Override
     public boolean existsByFieldAndIdNot(String field, Object value, UUID id) {
         if ("name".equals(field)){
-            return repositoryRole.existsByNameIgnoreCaseAndIdNot(field, id);
+            return repositoryRole.existsByNameIgnoreCaseAndIdNot((String) value, id);
         } else {
             throw new IllegalArgumentException("Field must not be null or empty.");
         }
