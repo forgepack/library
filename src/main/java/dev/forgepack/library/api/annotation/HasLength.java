@@ -1,4 +1,4 @@
-package dev.forgepack.library.internal.annotation;
+package dev.forgepack.library.api.annotation;
 
 import dev.forgepack.library.internal.validator.Validator;
 import jakarta.validation.Constraint;
@@ -10,15 +10,15 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Documented;
-import static dev.forgepack.library.internal.validator.Validator.hasLowerCase;
+import static dev.forgepack.library.internal.validator.Validator.hasLength;
 
 /**
  * Bean Validation constraint that verifies whether a string contains
- * at least one lowercase letter.
+ * at least one numeric digit.
  *
- * <p>This constraint validates that the annotated field includes at least
- * one lowercase letter ({@code a-zA-Z}). The validation logic delegates the
- * verification to {@link Validator#hasLetter(String)}.</p>
+ * <p>This constraint validates that the annotated field includes the minimum required length.
+ * The validation logic delegates the
+ * verification to {@link Validator#hasLength(int, String)}.</p>
  *
  * <p>This constraint can be applied to string fields that require the
  * presence of numeric characters, such as passwords, identifiers,
@@ -26,29 +26,29 @@ import static dev.forgepack.library.internal.validator.Validator.hasLowerCase;
  *
  * <h3>Validation rules</h3>
  * <ul>
- *     <li>The value must contain at least one lowercase letter</li>
+ *     <li>The value must has the minimum required length</li>
  *     <li>{@code null} values are considered valid</li>
  * </ul>
  *
  * <h3>Example</h3>
  * <pre>{@code
- * @HasLetter
+ * @HasLength
  * private String password;
  * }</pre>
  *
  * @author Marcelo Ribeiro Gadelha
  * @since 1.0
  *
- * @see Validator#hasLetter(String)
+ * @see Validator#hasLength(int, String)
  * @see Constraint
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = { HasLowerCase.ValidatorHasLowerCase.class })
+@Constraint(validatedBy = { HasLength.ValidatorHasLength.class })
 @Documented
-public @interface HasLowerCase {
+public @interface HasLength {
 
-    String message() default "{has.lower.case}";
+    String message() default "{has.length}";
     Class<?>[] groups() default { };
     Class<? extends Payload>[] payload() default { };
 
@@ -56,13 +56,13 @@ public @interface HasLowerCase {
      * This inner class implements the interface {@link ConstraintValidator}
      * <p>
      * Validator implementation that checks whether a string
-     * contains at least one lowercase letter.
+     * has the minimum required length.
      * </p>
      */
-    class ValidatorHasLowerCase implements ConstraintValidator<HasLowerCase, String> {
+    class ValidatorHasLength implements ConstraintValidator<HasLength, String> {
 
         /**
-         * Validates whether the provided string contains at least one lowercase letter.
+         * Validates whether the provided string has the minimum required length.
          *
          * @param value string to be validated
          * @param context validation context
@@ -71,7 +71,7 @@ public @interface HasLowerCase {
          */
         @Override
         public boolean isValid(String value, ConstraintValidatorContext context) {
-            return hasLowerCase(value);
+            return hasLength(8, value);
         }
     }
 }

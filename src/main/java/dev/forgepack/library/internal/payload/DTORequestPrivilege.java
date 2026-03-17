@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import dev.forgepack.library.api.annotation.Unique;
 import dev.forgepack.library.api.payload.DTORequestIdentifiable;
-import dev.forgepack.library.internal.service.ServiceRole;
+import dev.forgepack.library.internal.service.ServicePrivilege;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -15,7 +15,7 @@ import jakarta.validation.constraints.NotNull;
  * Website:	www.forgepack.dev
  **/
 
-@Unique(service = ServiceRole.class, field = "name")
+@Unique(service = ServicePrivilege.class, field = "name")
 public record DTORequestPrivilege(
 
         UUID id,

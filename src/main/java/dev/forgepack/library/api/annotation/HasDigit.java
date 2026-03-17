@@ -1,4 +1,4 @@
-package dev.forgepack.library.internal.annotation;
+package dev.forgepack.library.api.annotation;
 
 import dev.forgepack.library.internal.validator.Validator;
 import jakarta.validation.Constraint;
@@ -10,15 +10,15 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Documented;
-import static dev.forgepack.library.internal.validator.Validator.hasLength;
+import static dev.forgepack.library.internal.validator.Validator.hasDigit;
 
 /**
  * Bean Validation constraint that verifies whether a string contains
  * at least one numeric digit.
  *
- * <p>This constraint validates that the annotated field includes the minimum required length.
- * The validation logic delegates the
- * verification to {@link Validator#hasLength(int, String)}.</p>
+ * <p>This constraint validates that the annotated field includes at least
+ * one numeric character ({@code 0-9}). The validation logic delegates the
+ * verification to {@link Validator#hasDigit(String)}.</p>
  *
  * <p>This constraint can be applied to string fields that require the
  * presence of numeric characters, such as passwords, identifiers,
@@ -26,29 +26,29 @@ import static dev.forgepack.library.internal.validator.Validator.hasLength;
  *
  * <h3>Validation rules</h3>
  * <ul>
- *     <li>The value must has the minimum required length</li>
+ *     <li>The value must contain at least one numeric digit</li>
  *     <li>{@code null} values are considered valid</li>
  * </ul>
  *
  * <h3>Example</h3>
  * <pre>{@code
- * @HasLength
+ * @HasDigit
  * private String password;
  * }</pre>
  *
  * @author Marcelo Ribeiro Gadelha
  * @since 1.0
  *
- * @see Validator#hasLength(int, String)
+ * @see Validator#hasDigit(String)
  * @see Constraint
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = { HasLength.ValidatorHasLength.class })
+@Constraint(validatedBy = { HasDigit.ValidatorHasDigit.class })
 @Documented
-public @interface HasLength {
+public @interface HasDigit {
 
-    String message() default "{has.length}";
+    String message() default "{has.digit}";
     Class<?>[] groups() default { };
     Class<? extends Payload>[] payload() default { };
 
@@ -56,13 +56,13 @@ public @interface HasLength {
      * This inner class implements the interface {@link ConstraintValidator}
      * <p>
      * Validator implementation that checks whether a string
-     * has the minimum required length.
+     * contains at least one numeric digit.
      * </p>
      */
-    class ValidatorHasLength implements ConstraintValidator<HasLength, String> {
+    class ValidatorHasDigit implements ConstraintValidator<HasDigit, String> {
 
         /**
-         * Validates whether the provided string has the minimum required length.
+         * Validates whether the provided string contains at least one digit.
          *
          * @param value string to be validated
          * @param context validation context
@@ -71,7 +71,8 @@ public @interface HasLength {
          */
         @Override
         public boolean isValid(String value, ConstraintValidatorContext context) {
-            return hasLength(8, value);
+            if (value == null) return true;
+            return hasDigit(value);
         }
     }
 }

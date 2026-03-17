@@ -1,4 +1,4 @@
-package dev.forgepack.library.internal.annotation;
+package dev.forgepack.library.api.annotation;
 
 import dev.forgepack.library.internal.validator.Validator;
 import jakarta.validation.Constraint;

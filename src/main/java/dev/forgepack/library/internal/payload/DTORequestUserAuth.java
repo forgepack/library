@@ -1,10 +1,10 @@
 package dev.forgepack.library.internal.payload;
 
-import dev.forgepack.library.internal.annotation.HasDigit;
-import dev.forgepack.library.internal.annotation.HasLetter;
-import dev.forgepack.library.internal.annotation.HasUpperCase;
-import dev.forgepack.library.internal.annotation.HasLowerCase;
-import dev.forgepack.library.internal.annotation.HasLength;
+import dev.forgepack.library.api.annotation.HasDigit;
+import dev.forgepack.library.api.annotation.HasLetter;
+import dev.forgepack.library.api.annotation.HasUpperCase;
+import dev.forgepack.library.api.annotation.HasLowerCase;
+import dev.forgepack.library.api.annotation.HasLength;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.NotBlank;
 
