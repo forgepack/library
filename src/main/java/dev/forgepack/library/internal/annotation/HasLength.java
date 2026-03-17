@@ -13,72 +13,61 @@ import java.lang.annotation.Documented;
 import static dev.forgepack.library.internal.validator.Validator.hasLength;
 
 /**
- * Anotação de validação que verifica se uma string possui comprimento mínimo.
- * <p>
- * Esta anotação utiliza a classe {@link Validator}
- * para verificar se o valor da string possui pelo menos 8 caracteres.
- * 
- * Configuração:
+ * Bean Validation constraint that verifies whether a string contains
+ * at least one numeric digit.
+ *
+ * <p>This constraint validates that the annotated field includes the minimum required length.
+ * The validation logic delegates the
+ * verification to {@link Validator#hasLength(int, String)}.</p>
+ *
+ * <p>This constraint can be applied to string fields that require the
+ * presence of numeric characters, such as passwords, identifiers,
+ * or formatted codes.</p>
+ *
+ * <h3>Validation rules</h3>
  * <ul>
- *     <li>Comprimento mínimo: 8 caracteres (fixo)</li>
- *     <li>Aplicação: apenas em campos (FIELD)</li>
- *     <li>Mensagem padrão: "{has.length}"</li>
+ *     <li>The value must has the minimum required length</li>
+ *     <li>{@code null} values are considered valid</li>
  * </ul>
- * 
- * Exemplo de uso:
- * <pre>
- * {@code @HasLength}
+ *
+ * <h3>Example</h3>
+ * <pre>{@code
+ * @HasLength
  * private String password;
- * </pre>
- * 
+ * }</pre>
+ *
  * @author Marcelo Ribeiro Gadelha
- * @version 1.0
  * @since 1.0
- * 
+ *
  * @see Validator#hasLength(int, String)
+ * @see Constraint
  */
-
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = { HasLength.ValidatorHasLength.class })
 @Documented
 public @interface HasLength {
 
-    /**
-     * Mensagem de erro a ser exibida quando a validação falhar.
-     * 
-     * @return mensagem de erro padrão
-     */
     String message() default "{has.length}";
-    
-    /**
-     * Grupos de validação aos quais esta constraint pertence.
-     * 
-     * @return grupos de validação
-     */
     Class<?>[] groups() default { };
-    
-    /**
-     * Payload personalizado para esta constraint.
-     * 
-     * @return payload da constraint
-     */
     Class<? extends Payload>[] payload() default { };
 
     /**
-     * Validador interno que implementa a lógica de verificação de comprimento mínimo.
+     * This inner class implements the interface {@link ConstraintValidator}
      * <p>
-     * Esta classe interna implementa a interface {@link ConstraintValidator}
-     * para realizar a validação de comprimento mínimo de strings.
+     * Validator implementation that checks whether a string
+     * has the minimum required length.
+     * </p>
      */
     class ValidatorHasLength implements ConstraintValidator<HasLength, String> {
 
         /**
-         * Valida se a string possui o comprimento mínimo requerido.
-         * 
-         * @param value string a ser validada
-         * @param context contexto da validação
-         * @return true se a string possui pelo menos 8 caracteres, false caso contrário
+         * Validates whether the provided string has the minimum required length.
+         *
+         * @param value string to be validated
+         * @param context validation context
+         * @return {@code true} if the string contains a numeric digit;
+         *         {@code false} otherwise
          */
         @Override
         public boolean isValid(String value, ConstraintValidatorContext context) {

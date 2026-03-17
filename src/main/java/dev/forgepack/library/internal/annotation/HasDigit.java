@@ -13,75 +13,65 @@ import java.lang.annotation.Documented;
 import static dev.forgepack.library.internal.validator.Validator.hasDigit;
 
 /**
- * Anotação de validação que verifica se uma string contém pelo menos um dígito numérico.
- * <p>
- * Esta anotação utiliza a classe {@link Validator}
- * para verificar se o valor da string possui pelo menos um caractere numérico (0-9).
- * 
- * Configuração:
+ * Bean Validation constraint that verifies whether a string contains
+ * at least one numeric digit.
+ *
+ * <p>This constraint validates that the annotated field includes at least
+ * one numeric character ({@code 0-9}). The validation logic delegates the
+ * verification to {@link Validator#hasDigit(String)}.</p>
+ *
+ * <p>This constraint can be applied to string fields that require the
+ * presence of numeric characters, such as passwords, identifiers,
+ * or formatted codes.</p>
+ *
+ * <h3>Validation rules</h3>
  * <ul>
- *     <li>Validação: presença de pelo menos um dígito</li>
- *     <li>Aplicação: apenas em campos (FIELD)</li>
- *     <li>Mensagem padrão: "{has.digit}"</li>
+ *     <li>The value must contain at least one numeric digit</li>
+ *     <li>{@code null} values are considered valid</li>
  * </ul>
- * 
- * Exemplo de uso:
- * <pre>
- * {@code @HasDigit}
+ *
+ * <h3>Example</h3>
+ * <pre>{@code
+ * @HasDigit
  * private String password;
- * </pre>
- * 
+ * }</pre>
+ *
  * @author Marcelo Ribeiro Gadelha
- * @version 1.0
  * @since 1.0
- * 
+ *
  * @see Validator#hasDigit(String)
+ * @see Constraint
  */
-
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = { HasDigit.ValidatorHasDigit.class })
 @Documented
 public @interface HasDigit {
 
-    /**
-     * Mensagem de erro a ser exibida quando a validação falhar.
-     * 
-     * @return mensagem de erro padrão
-     */
     String message() default "{has.digit}";
-    
-    /**
-     * Grupos de validação aos quais esta constraint pertence.
-     * 
-     * @return grupos de validação
-     */
     Class<?>[] groups() default { };
-    
-    /**
-     * Payload personalizado para esta constraint.
-     * 
-     * @return payload da constraint
-     */
     Class<? extends Payload>[] payload() default { };
 
     /**
-     * Validador interno que implementa a lógica de verificação de dígitos.
+     * This inner class implements the interface {@link ConstraintValidator}
      * <p>
-     * Esta classe interna implementa a interface {@link ConstraintValidator}
-     * para realizar a validação da presença de pelo menos um dígito numérico.
+     * Validator implementation that checks whether a string
+     * contains at least one numeric digit.
+     * </p>
      */
     class ValidatorHasDigit implements ConstraintValidator<HasDigit, String> {
 
         /**
-         * Valida se a string contém pelo menos um dígito numérico.
-         * 
-         * @param value string a ser validada
-         * @param context contexto da validação
-         * @return true se a string contém pelo menos um dígito, false caso contrário
+         * Validates whether the provided string contains at least one digit.
+         *
+         * @param value string to be validated
+         * @param context validation context
+         * @return {@code true} if the string contains a numeric digit;
+         *         {@code false} otherwise
          */
         @Override
         public boolean isValid(String value, ConstraintValidatorContext context) {
+            if (value == null) return true;
             return hasDigit(value);
         }
     }

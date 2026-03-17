@@ -11,35 +11,48 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Anotação para validação de unicidade de campos em entidades.
- * <p>
- * Esta anotação pode ser aplicada a classes para validar se um campo específico
- * possui valor único na base de dados. Suporta tanto validação para criação
- * quanto para atualização de entidades.
+ * Bean Validation constraint used to verify the uniqueness of a field value.
+ *
+ * <p>This annotation can be applied to a class to ensure that the value of a
+ * specified field is unique within the persistence layer. The validation
+ * process delegates the uniqueness check to a service that implements
+ * {@link UniqueCheckable}.</p>
  * 
- * Parâmetros configuráveis:
+ * <p>This constraint supports both creation and update scenarios. During update
+ * operations, the current entity identifier can be excluded from the check
+ * using the {@code idField} parameter.</p>
+ *
+ * <h3>Configuration parameters</h3>
  * <ul>
- *     <li>{@code field}: Nome do campo a ser verificado (padrão: "name")</li>
- *     <li>{@code idField}: Nome do campo ID para exclusão na atualização (padrão: "id")</li>
- *     <li>{@code service}: Classe do serviço que implementa UniqueCheckable</li>
- *     <li>{@code message}: Mensagem de erro customizada</li>
+ *     <li>{@code field} – name of the field whose value must be unique</li>
+ *     <li>{@code idField} – identifier field used to exclude the current entity during updates</li>
+ *     <li>{@code service} – service responsible for performing the uniqueness check</li>
+ *     <li>{@code message} – validation error message</li>
  * </ul>
  * 
- * Exemplo de uso:
- * <pre>
- * {@code @Unique(service = UserService.class, field = "email")}
- * public class UserDTO {
- *     private String email;
- *     // ...
+ * <p><b>Example:</b></p>
+ * <pre>{@code
+ * @Unique(service = RoleService.class, field = "name")
+ * public class DTORequestRole {
+ *     private String name;
  * }
- * </pre>
+ * }</pre>
+ *
+ * <pre>{@code
+ * @Unique(service = RoleService.class, field = "name", idField = "id")
+ * public class DTORequestRole {
+ *     private UUID id;
+ *     private String name;
+ * }
+ * }</pre>
  * 
  * @author Marcelo Ribeiro Gadelha
  * @version 1.0
  * @since 1.0
  * 
- * @see dev.forgepack.library.internal.validator.UniqueValidator
- * @see dev.forgepack.library.api.validator.UniqueCheckable
+ * @see UniqueValidator
+ * @see UniqueCheckable
+ * @see Constraint
  */
 
 @Target({ ElementType.TYPE })

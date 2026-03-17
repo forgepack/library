@@ -13,72 +13,61 @@ import java.lang.annotation.Documented;
 import static dev.forgepack.library.internal.validator.Validator.hasLetter;
 
 /**
- * Anotação de validação que verifica se uma string contém pelo menos uma letra.
- * <p>
- * Esta anotação utiliza a classe {@link Validator}
- * para verificar se o valor da string possui pelo menos um caractere alfabético (a-z ou A-Z).
- * 
- * Configuração:
+ * Bean Validation constraint that verifies whether a string contains
+ * at least one letter.
+ *
+ * <p>This constraint validates that the annotated field includes at least
+ * one letter ({@code a-zA-Z}). The validation logic delegates the
+ * verification to {@link Validator#hasLetter(String)}.</p>
+ *
+ * <p>This constraint can be applied to string fields that require the
+ * presence of numeric characters, such as passwords, identifiers,
+ * or formatted codes.</p>
+ *
+ * <h3>Validation rules</h3>
  * <ul>
- *     <li>Validação: presença de pelo menos uma letra</li>
- *     <li>Aplicação: apenas em campos (FIELD)</li>
- *     <li>Mensagem padrão: "{has.letter}"</li>
+ *     <li>The value must contain at least one letter</li>
+ *     <li>{@code null} values are considered valid</li>
  * </ul>
- * 
- * Exemplo de uso:
- * <pre>
- * {@code @HasLetter}
+ *
+ * <h3>Example</h3>
+ * <pre>{@code
+ * @HasLetter
  * private String password;
- * </pre>
- * 
+ * }</pre>
+ *
  * @author Marcelo Ribeiro Gadelha
- * @version 1.0
  * @since 1.0
- * 
+ *
  * @see Validator#hasLetter(String)
+ * @see Constraint
  */
-
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = { HasLetter.ValidatorHasLetter.class })
 @Documented
 public @interface HasLetter {
 
-    /**
-     * Mensagem de erro a ser exibida quando a validação falhar.
-     * 
-     * @return mensagem de erro padrão
-     */
     String message() default "{has.letter}";
-    
-    /**
-     * Grupos de validação aos quais esta constraint pertence.
-     * 
-     * @return grupos de validação
-     */
     Class<?>[] groups() default { };
-    
-    /**
-     * Payload personalizado para esta constraint.
-     * 
-     * @return payload da constraint
-     */
     Class<? extends Payload>[] payload() default { };
 
     /**
-     * Validador interno que implementa a lógica de verificação de letras.
+     * This inner class implements the interface {@link ConstraintValidator}
      * <p>
-     * Esta classe interna implementa a interface {@link ConstraintValidator}
-     * para realizar a validação da presença de pelo menos uma letra.
+     * Validator implementation that checks whether a string
+     * contains at least one letter.
+     * </p>
      */
     class ValidatorHasLetter implements ConstraintValidator<HasLetter, String> {
 
         /**
-         * Valida se a string contém pelo menos uma letra.
-         * 
-         * @param value string a ser validada
-         * @param context contexto da validação
-         * @return true se a string contém pelo menos uma letra, false caso contrário
+         * Validates whether the provided string contains at least one letter.
+         *
+         * @param value string to be validated
+         * @param context validation context
+         * @return {@code true} if the string contains a numeric digit;
+         *         {@code false} otherwise
          */
         @Override
         public boolean isValid(String value, ConstraintValidatorContext context) {

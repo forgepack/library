@@ -10,30 +10,44 @@ import java.lang.reflect.Field;
 import java.util.UUID;
 
 /**
- * Validador customizado para verificação de unicidade de campos.
- * <p>
- * Esta classe implementa a lógica de validação para a anotação {@code @Unique},
- * verificando se um campo específico possui valor único na base de dados.
- * Suporta tanto validação para criação quanto para atualização de entidades.
- * 
- * <h3>Funcionalidades:</h3>
+ * Bean Validation validator responsible for enforcing the {@link Unique} constraint.
+ *
+ * <p>This validator checks whether the value of a specified field is unique in the
+ * persistence layer. The validation logic delegates the uniqueness verification
+ * to a service that implements {@link UniqueCheckable}.</p>
+ *
+ * <p>The validator supports both entity creation and update scenarios:</p>
  * <ul>
- *     <li>Validação de unicidade em criação de registros</li>
- *     <li>Validação de unicidade em atualização (excluindo o próprio registro)</li>
- *     <li>Integração com Spring Context para injeção de dependências</li>
- *     <li>Acesso reflexivo a campos privados</li>
- *     <li>Tratamento de valores nulos e em branco</li>
+ *     <li><b>Create operation</b>: verifies that no record exists with the same field value</li>
+ *     <li><b>Update operation</b>: verifies that no other record exists with the same field
+ *     value excluding the current entity identifier</li>
  * </ul>
- * 
+ *
+ * <p>The service responsible for performing the uniqueness check is obtained
+ * from the Spring {@link ApplicationContext} based on the configuration provided
+ * in the {@link Unique} annotation.</p>
+ *
+ * <p>Field values are accessed via reflection, allowing the validator to read
+ * private fields without requiring public getters.</p>
+ *
+ * <p>Null or blank values are considered valid and will not trigger a uniqueness
+ * verification.</p>
+ *
+ * <h3>Validation flow</h3>
+ * <ol>
+ *     <li>Retrieve the field value configured in {@link Unique#field()}</li>
+ *     <li>If present, retrieve the identifier configured in {@link Unique#idField()}</li>
+ *     <li>Resolve the configured {@link UniqueCheckable} service</li>
+ *     <li>Execute the appropriate uniqueness verification</li>
+ * </ol>
+ *
  * @author Marcelo Ribeiro Gadelha
- * @version 1.0
  * @since 1.0
- * Website: www.forgepack.dev
- * 
- * @see dev.forgepack.library.api.annotation.Unique
- * @see dev.forgepack.library.api.validator.UniqueCheckable
+ *
+ * @see Unique
+ * @see UniqueCheckable
+ * @see ConstraintValidator
  */
-
 @Component
 public class UniqueValidator implements ConstraintValidator<Unique, Object> {
 
@@ -51,6 +65,7 @@ public class UniqueValidator implements ConstraintValidator<Unique, Object> {
     public void initialize(Unique annotation) {
         this.field = annotation.field();
         this.idField = annotation.idField();
+        this.serviceClass = annotation.service();
         this.service = (UniqueCheckable) context.getBean(annotation.service());
     }
     @Override
@@ -87,7 +102,7 @@ public class UniqueValidator implements ConstraintValidator<Unique, Object> {
             return f.get(target);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new IllegalArgumentException(
-                    "Campo '" + fieldName + "' não encontrado em " + target.getClass().getSimpleName()
+                    "Field '" + fieldName + "' not found in " + target.getClass().getSimpleName()
             );
         }
     }

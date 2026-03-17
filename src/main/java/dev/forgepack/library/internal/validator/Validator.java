@@ -1,85 +1,93 @@
 package dev.forgepack.library.internal.validator;
 
 /**
- * Classe utilitária com métodos estáticos para validações comuns.
- * <p>
- * Esta classe oferece um conjunto de métodos de validação frequentemente utilizados
- * para verificar propriedades de objetos e strings, como presença de caracteres
- * específicos, comprimento mínimo e valores nulos.
- * 
- * Validações disponíveis:
+ * Utility class providing common validation helper methods.
+ *
+ * <p>This class contains a set of static methods used to validate
+ * common properties of objects and strings, such as null checks,
+ * character presence, and minimum length requirements.</p>
+ *
+ * <p>The methods are designed to be lightweight and reusable across
+ * validation components within the library.</p>
+ *
+ * <h3>Available validations</h3>
  * <ul>
- *     <li>Verificação de valores nulos</li>
- *     <li>Presença de dígitos em strings</li>
- *     <li>Presença de letras em strings</li>
- *     <li>Presença de caracteres minúsculos</li>
- *     <li>Presença de caracteres maiúsculos</li>
- *     <li>Verificação de comprimento mínimo</li>
+ *     <li>Null value verification</li>
+ *     <li>Digit presence in strings</li>
+ *     <li>Letter presence in strings</li>
+ *     <li>Lowercase character presence</li>
+ *     <li>Uppercase character presence</li>
+ *     <li>Minimum length verification</li>
  * </ul>
- * 
+ *
+ * <p>This class cannot be instantiated.</p>
+ *
  * @author Marcelo Ribeiro Gadelha
- * @version 1.0
  * @since 1.0
  */
-
 public final class Validator {
 
+    private Validator() {
+        throw new UnsupportedOperationException("Utility class");
+    }
+
     /**
-     * Verifica se o valor fornecido é nulo.
-     * 
-     * @param value o objeto a ser verificado
-     * @return true se o valor for nulo, false caso contrário
+     * Checks whether the provided value is {@code null}.
+     *
+     * @param value object to be checked
+     * @return {@code true} if the value is {@code null}; {@code false} otherwise
      */
     public static boolean isNull(Object value) {
         return value == null;
     }
-    
+
     /**
-     * Verifica se a string contém pelo menos um dígito numérico.
-     * 
-     * @param value a string a ser verificada
-     * @return true se a string contém pelo menos um dígito, false caso contrário
+     * Checks whether the given string contains at least one numeric digit.
+     *
+     * @param value string to be evaluated
+     * @return {@code true} if the string contains a digit; {@code false} otherwise
      */
     public static boolean hasDigit(String value) {
         return !isNull(value) && value.chars().anyMatch(Character::isDigit);
     }
-    
+
     /**
-     * Verifica se a string contém pelo menos uma letra.
-     * 
-     * @param value a string a ser verificada
-     * @return true se a string contém pelo menos uma letra, false caso contrário
+     * Checks whether the given string contains at least one letter.
+     *
+     * @param value string to be evaluated
+     * @return {@code true} if the string contains a letter; {@code false} otherwise
      */
     public static boolean hasLetter(String value) {
         return !isNull(value) && value.chars().anyMatch(Character::isLetter);
     }
-    
+
     /**
-     * Verifica se a string contém pelo menos um caractere minúsculo.
-     * 
-     * @param value a string a ser verificada
-     * @return true se a string contém pelo menos um caractere minúsculo, false caso contrário
+     * Checks whether the given string contains at least one lowercase character.
+     *
+     * @param value string to be evaluated
+     * @return {@code true} if the string contains a lowercase character; {@code false} otherwise
      */
     public static boolean hasLowerCase(String value) {
         return !isNull(value) && value.chars().anyMatch(Character::isLowerCase);
     }
-    
+
     /**
-     * Verifica se a string contém pelo menos um caractere maiúsculo.
-     * 
-     * @param value a string a ser verificada
-     * @return true se a string contém pelo menos um caractere maiúsculo, false caso contrário
+     * Checks whether the given string contains at least one uppercase character.
+     *
+     * @param value string to be evaluated
+     * @return {@code true} if the string contains an uppercase character; {@code false} otherwise
      */
     public static boolean hasUpperCase(String value) {
         return !isNull(value) && value.chars().anyMatch(Character::isUpperCase);
     }
-    
+
     /**
-     * Verifica se a string possui pelo menos o comprimento mínimo especificado.
-     * 
-     * @param length comprimento mínimo requerido
-     * @param value a string a ser verificada
-     * @return true se a string possui pelo menos o comprimento especificado, false caso contrário
+     * Checks whether the given string has at least the specified minimum length.
+     *
+     * @param length minimum required length
+     * @param value string to be evaluated
+     * @return {@code true} if the string length is greater than or equal to
+     *         the specified length; {@code false} otherwise
      */
     public static boolean hasLength(int length, String value) {
         return !isNull(value) && value.length() >= length;
