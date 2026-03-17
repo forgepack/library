@@ -1,16 +1,14 @@
 package dev.forgepack.library.api.annotation;
 
 import dev.forgepack.library.internal.validator.Validator;
+import dev.forgepack.library.internal.validator.ValidatorHasLength;
 import jakarta.validation.Constraint;
-import jakarta.validation.ConstraintValidator;
-import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.Payload;
 import java.lang.annotation.Target;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Documented;
-import static dev.forgepack.library.internal.validator.Validator.hasLength;
 
 /**
  * Bean Validation constraint that verifies whether a string contains
@@ -44,34 +42,11 @@ import static dev.forgepack.library.internal.validator.Validator.hasLength;
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = { HasLength.ValidatorHasLength.class })
+@Constraint(validatedBy = { ValidatorHasLength.class })
 @Documented
 public @interface HasLength {
 
     String message() default "{has.length}";
     Class<?>[] groups() default { };
     Class<? extends Payload>[] payload() default { };
-
-    /**
-     * This inner class implements the interface {@link ConstraintValidator}
-     * <p>
-     * Validator implementation that checks whether a string
-     * has the minimum required length.
-     * </p>
-     */
-    class ValidatorHasLength implements ConstraintValidator<HasLength, String> {
-
-        /**
-         * Validates whether the provided string has the minimum required length.
-         *
-         * @param value string to be validated
-         * @param context validation context
-         * @return {@code true} if the string contains a numeric digit;
-         *         {@code false} otherwise
-         */
-        @Override
-        public boolean isValid(String value, ConstraintValidatorContext context) {
-            return hasLength(8, value);
-        }
-    }
 }

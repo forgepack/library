@@ -49,7 +49,7 @@ import java.util.UUID;
  * @see ConstraintValidator
  */
 @Component
-public class UniqueValidator implements ConstraintValidator<Unique, Object> {
+public class ValidatorUnique implements ConstraintValidator<Unique, Object> {
 
     private String field;
     private String idField;
@@ -57,7 +57,7 @@ public class UniqueValidator implements ConstraintValidator<Unique, Object> {
     private UniqueCheckable service;
     private final ApplicationContext context;
 
-    public UniqueValidator(ApplicationContext context) {
+    public ValidatorUnique(ApplicationContext context) {
         this.context = context;
     }
 

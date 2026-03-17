@@ -1,7 +1,7 @@
 package dev.forgepack.library.api.annotation;
 
 import dev.forgepack.library.api.validator.UniqueCheckable;
-import dev.forgepack.library.internal.validator.UniqueValidator;
+import dev.forgepack.library.internal.validator.ValidatorUnique;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import java.lang.annotation.Target;
@@ -50,14 +50,14 @@ import java.lang.annotation.RetentionPolicy;
  * @version 1.0
  * @since 1.0
  * 
- * @see UniqueValidator
+ * @see ValidatorUnique
  * @see UniqueCheckable
  * @see Constraint
  */
 
 @Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = { UniqueValidator.class })
+@Constraint(validatedBy = { ValidatorUnique.class })
 @Documented
 public @interface Unique {
 

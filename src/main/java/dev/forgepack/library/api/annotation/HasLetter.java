@@ -1,16 +1,14 @@
 package dev.forgepack.library.api.annotation;
 
 import dev.forgepack.library.internal.validator.Validator;
+import dev.forgepack.library.internal.validator.ValidatorHasLetter;
 import jakarta.validation.Constraint;
-import jakarta.validation.ConstraintValidator;
-import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.Payload;
 import java.lang.annotation.Target;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Documented;
-import static dev.forgepack.library.internal.validator.Validator.hasLetter;
 
 /**
  * Bean Validation constraint that verifies whether a string contains
@@ -44,34 +42,11 @@ import static dev.forgepack.library.internal.validator.Validator.hasLetter;
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = { HasLetter.ValidatorHasLetter.class })
+@Constraint(validatedBy = { ValidatorHasLetter.class })
 @Documented
 public @interface HasLetter {
 
     String message() default "{has.letter}";
     Class<?>[] groups() default { };
     Class<? extends Payload>[] payload() default { };
-
-    /**
-     * This inner class implements the interface {@link ConstraintValidator}
-     * <p>
-     * Validator implementation that checks whether a string
-     * contains at least one letter.
-     * </p>
-     */
-    class ValidatorHasLetter implements ConstraintValidator<HasLetter, String> {
-
-        /**
-         * Validates whether the provided string contains at least one letter.
-         *
-         * @param value string to be validated
-         * @param context validation context
-         * @return {@code true} if the string contains a numeric digit;
-         *         {@code false} otherwise
-         */
-        @Override
-        public boolean isValid(String value, ConstraintValidatorContext context) {
-            return hasLetter(value);
-        }
-    }
 }

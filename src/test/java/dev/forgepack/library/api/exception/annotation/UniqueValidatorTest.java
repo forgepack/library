@@ -1,7 +1,7 @@
 package dev.forgepack.library.api.exception.annotation;
 
 import dev.forgepack.library.api.annotation.Unique;
-import dev.forgepack.library.internal.validator.UniqueValidator;
+import dev.forgepack.library.internal.validator.ValidatorUnique;
 import dev.forgepack.library.internal.service.ServiceRole;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,7 +30,7 @@ class UniqueValidatorTest {
     @Mock
     private ServiceRole serviceRole;
 
-    private UniqueValidator validator;
+    private ValidatorUnique validator;
     private jakarta.validation.ConstraintValidatorContext ctx;
 
     // DTO auxiliar para testes isolados
@@ -43,7 +43,7 @@ class UniqueValidatorTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        validator = new UniqueValidator(applicationContext);
+        validator = new ValidatorUnique(applicationContext);
         initValidator(validator, "name", "id");
 
         when(applicationContext.getBean(ServiceRole.class)).thenReturn(serviceRole);
@@ -59,7 +59,7 @@ class UniqueValidatorTest {
     }
 
     // --- utilidade para inicializar via reflexão ---
-    private void initValidator(UniqueValidator v, String field, String idField) throws Exception {
+    private void initValidator(ValidatorUnique v, String field, String idField) throws Exception {
         setField(v, "fieldName", field);
         setField(v, "idFieldName", idField);
         setField(v, "serviceClass", ServiceRole.class);
@@ -67,7 +67,7 @@ class UniqueValidatorTest {
     }
 
     private void setField(Object target, String name, Object value) throws Exception {
-        Field f = UniqueValidator.class.getDeclaredField(name);
+        Field f = ValidatorUnique.class.getDeclaredField(name);
         f.setAccessible(true);
         f.set(target, value);
     }
