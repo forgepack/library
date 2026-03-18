@@ -83,7 +83,7 @@ public class ValidatorUnique implements ConstraintValidator<Unique, Object> {
             context.disableDefaultConstraintViolation();
             context.buildConstraintViolationWithTemplate(
                             context.getDefaultConstraintMessageTemplate()
-                                    .replace("{label}", field)
+                                    .replace("{field}", field)
                     ).addPropertyNode(field)
                     .addConstraintViolation();
         }
