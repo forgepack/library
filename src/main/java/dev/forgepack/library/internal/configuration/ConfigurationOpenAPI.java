@@ -8,7 +8,6 @@ import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
 import java.util.List;
 
 @Configuration
@@ -19,12 +18,6 @@ public class ConfigurationOpenAPI {
     private String name;
     @Value("${application.version}")
     private String version;
-
-    public ConfigurationOpenAPI(String url, String name, String version) {
-        this.url = url;
-        this.name = name;
-        this.version = version;
-    }
 
     @Bean
     public OpenAPI openAPI() {
