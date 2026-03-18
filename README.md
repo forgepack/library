@@ -186,11 +186,58 @@ Examples:
 Dependency declaration:
 
 ```xml
-<dependency>
-    <groupId>dev.forgepack</groupId>
-    <artifactId>library</artifactId>
-    <version>1.0.0</version>
-</dependency>
+
+<dependencies>
+    <dependency>
+        <groupId>dev.forgepack</groupId>
+        <artifactId>library</artifactId>
+        <version>1.0.19</version>
+    </dependency>
+    <dependency>
+        <groupId>tools.jackson.core</groupId>
+        <artifactId>jackson-core</artifactId>
+        <version>3.1.0</version>
+    </dependency>
+    <!--  ===== HIBERNATE EXTENSIONS =====  -->
+    <dependency>
+        <groupId>org.hibernate.orm</groupId>
+        <artifactId>hibernate-spatial</artifactId>
+    </dependency>
+    <!--  ===== DATABASE =====  -->
+    <dependency>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <scope>runtime</scope>
+    </dependency>
+    <dependency>
+        <groupId>net.postgis</groupId>
+        <artifactId>postgis-jdbc</artifactId>
+        <version>2025.1.1</version>
+    </dependency>
+</dependencies>
 ```
 
+Custom application properties:
+```
+# ==========================================
+# DATABASE CONFIGURATIONS - LOCAL POSTGRESQL
+# ==========================================
+# Configurations for local PostgreSQL database connection
+# Used for development and local testing
+spring.datasource.url = jdbc:postgresql://localhost:5432/demo
+spring.datasource.username = postgres
+spring.datasource.password = G@delha
+spring.datasource.platform = postgres
+spring.datasource.driver-class-name = org.postgresql.Driver
+
+# ==========================================
+# HIBERNATE/JPA CONFIGURATIONS - DEVELOPMENT
+# ==========================================
+# Hibernate configurations optimized for development
+# DDL-AUTO = create: recreates database on each startup (careful in production!)
+spring.jpa.hibernate.ddl-auto = create
+spring.jpa.properties.hibernate.dialect = org.hibernate.spatial.dialect.postgis.PostgisPG95Dialect
+spring.jpa.properties.hibernate.default_schema = demo
+spring.jpa.show-sql = true
+```
 ---
