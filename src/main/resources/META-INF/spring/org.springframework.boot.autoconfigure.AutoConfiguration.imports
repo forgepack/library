@@ -1,1 +1,5 @@
+dev.forgepack.library.internal.configuration.ConfigurationAudit
+dev.forgepack.library.internal.configuration.ConfigurationHateoas
 dev.forgepack.library.internal.configuration.ConfigurationJPAAuto
+dev.forgepack.library.internal.configuration.ConfigurationMessages
+dev.forgepack.library.internal.configuration.ConfigurationOpenAPI
