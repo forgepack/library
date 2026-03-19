@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
  **/
 
 @RestController
-@RequestMapping("/privilege")
+@RequestMapping("/user")
 public class ControllerUser extends ControllerGeneric<User, DTORequestUser, DTOResponseUser> {
 
     public ControllerUser(ServiceUser serviceUser) {
