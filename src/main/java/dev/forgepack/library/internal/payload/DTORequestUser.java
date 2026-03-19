@@ -1,7 +1,9 @@
 package dev.forgepack.library.internal.payload;
 
+import dev.forgepack.library.api.annotation.Unique;
 import dev.forgepack.library.api.payload.DTORequestIdentifiable;
 import dev.forgepack.library.api.annotation.HasLength;
+import dev.forgepack.library.internal.service.ServiceUser;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -37,7 +39,7 @@ import java.util.UUID;
  * @see DTORequestRole
  */
 
-//@Unique(service = ServiceUser.class, field = "email")
+@Unique(service = ServiceUser.class, field = "email")
 //@Unique(service = ServiceUser.class, field = "username")
 public record DTORequestUser (
 
