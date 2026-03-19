@@ -4,6 +4,8 @@ import dev.forgepack.library.internal.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.NoRepositoryBean;
+
 import java.util.Optional;
 import java.util.UUID;
 
@@ -14,6 +16,7 @@ import java.util.UUID;
  * Website:	www.forgepack.dev
  **/
 
+@NoRepositoryBean
 public interface RepositoryUser extends JpaRepository<User, UUID> {
 
     Optional<User> findByUsername(String name);
