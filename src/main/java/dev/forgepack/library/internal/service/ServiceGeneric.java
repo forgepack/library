@@ -5,6 +5,10 @@ import dev.forgepack.library.api.payload.DTORequestIdentifiable;
 import dev.forgepack.library.api.repository.RepositoryInterface;
 import dev.forgepack.library.api.service.ServiceInterface;
 import dev.forgepack.library.internal.model.GenericAuditEntity;
+import dev.forgepack.library.internal.model.Log;
+import dev.forgepack.library.internal.model.User;
+import dev.forgepack.library.internal.repository.RepositoryLog;
+import dev.forgepack.library.internal.repository.RepositoryUser;
 import dev.forgepack.library.internal.utils.Information;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -18,6 +22,7 @@ import org.apache.commons.beanutils.ConvertUtils;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Optional;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,6 +73,8 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
     private final RepositoryInterface<Entity> repositoryInterface;
     private final Mapper<Entity, DTORequest, DTOResponse> mapper;
     private static final Logger log = LoggerFactory.getLogger(Information.class);
+    private RepositoryUser repositoryUser;
+    private RepositoryLog repositoryLog;
 
     public ServiceGeneric(Class<Entity> entityClass, RepositoryInterface<Entity> repositoryInterface, Mapper<Entity, DTORequest, DTOResponse> mapper) {
         this.entityClass = entityClass;
@@ -88,7 +95,7 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
      */
     @Transactional
     public DTOResponse create(DTORequest created){
-        log.info("{} creating a new resource", new Information().getCurrentUser().orElse("Unknown User"));
+        addLog("create", null, null, null);
         return addHateoas(repositoryInterface.save(mapper.toEntity(created)));
     }
 
@@ -119,7 +126,7 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
                 .findFirst()
                 .map(Sort.Order::getProperty)
                 .orElse("id");
-        log.debug("Retrieving {} with property: {}, value: {}", entityClass.getSimpleName(), propertyName, value);
+        addLog("retrieve", null, propertyName, value);
         if ("id".equalsIgnoreCase(propertyName) && StringUtils.hasText(value)) {
             try {
                 return repositoryInterface.findById(UUID.fromString(value), pageable)
@@ -159,7 +166,7 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
      */
     @Transactional
     public DTOResponse retrieve(UUID id){
-        log.debug("Retrieving {} with ID: {}", entityClass.getSimpleName(), id);
+        addLog("retrieve", id, null, null);
         Entity entity = repositoryInterface.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
                         String.format("%s not found with ID: %s", entityClass.getSimpleName(), id)));
@@ -182,7 +189,7 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
      */
     @Transactional
     public DTOResponse update(DTORequest updated){
-        log.info("{} updating entity with ID: {}", new Information().getCurrentUser().orElse("Unknown User"), updated.id());
+        addLog("update", updated.id(), null, null);
         repositoryInterface.findById(updated.id())
                 .orElseThrow(() -> new EntityNotFoundException(
                         String.format("Cannot update: %s not found with ID: %s", entityClass.getSimpleName(), updated.id())));
@@ -203,7 +210,7 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
      */
     @Transactional
     public DTOResponse delete(UUID id){
-        log.info("{} deleting entity with ID: {}", new Information().getCurrentUser().orElse("Unknown User"), id);
+        addLog("delete", id, null, null);
         Entity entity = repositoryInterface.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
                         String.format("Cannot delete: %s not found with ID: %s", entityClass.getSimpleName(), id)));
@@ -233,5 +240,17 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
                 .pathSegment(entityName, String.valueOf(object.getId()))
                 .toUriString();
         return mapper.toResponse(object).add(Link.of(selfUri, IanaLinkRelations.SELF));
+    }
+
+    public void addLog(String action, UUID id, Object propertyName, Object value) {
+        if(propertyName != null){
+            log.debug("Retrieving {} with property: {}, value: {}", entityClass.getSimpleName(), propertyName, value);
+        } else if (id != null) {
+            log.info("{} {} a new resource", new Information().getCurrentUser().orElse("Unknown User"), action);
+        } else {
+            log.info("{} {} entity with ID: {}", new Information().getCurrentUser().orElse("Unknown User"), action, id);
+        }
+        Optional<User> user = repositoryUser.findByUsername(new Information().getCurrentUser().orElseThrow());
+        repositoryLog.save(new Log(action, user));
     }
 }
