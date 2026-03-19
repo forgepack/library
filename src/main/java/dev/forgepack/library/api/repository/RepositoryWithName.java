@@ -13,7 +13,7 @@ import java.util.UUID;
  * Esta interface estende {@link JpaRepository} fornecendo métodos adicionais
  * comuns para operações com entidades que possuem campos de nome e suporte
  * a consultas personalizadas com paginação.
- * 
+ *
  * Operações suportadas:
  * <ul>
  *     <li>Busca por nome exato e ignore case</li>
@@ -21,18 +21,21 @@ import java.util.UUID;
  *     <li>Consultas paginadas e ordenadas</li>
  *     <li>Busca com filtros que ignoram case</li>
  * </ul>
- * 
+ *
  * @param <T> tipo da entidade gerenciada pelo repositório
  * @author Marcelo Ribeiro Gadelha
  * @version 1.0
  * @since 1.0
- * 
+ *
  * @see org.springframework.data.jpa.repository.JpaRepository
  */
 
 @NoRepositoryBean
-public interface RepositoryInterface<T> extends JpaRepository<T, UUID> {
+public interface RepositoryWithName<T> extends RepositoryInterface<T> {
 
-    Page<T> findById(UUID uuid, Pageable pageable);
-    Page<T> findByIdOrderByIdAsc(UUID id, Pageable pageable);
+    Set<T> findByName(String name);
+    boolean existsByName(String name);
+    boolean existsByNameIgnoreCase(String name);
+    boolean existsByNameIgnoreCaseAndIdNot(String name, UUID id);
+    Page<T> findByNameContainingIgnoreCaseOrderByNameAsc(Pageable pageable, String name);
 }

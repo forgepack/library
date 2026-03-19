@@ -69,7 +69,7 @@ public class ServiceUser extends ServiceGeneric<User, DTORequestUser, DTORespons
      */
     @Override
     public boolean existsByField(String field, Object value) {
-        if ("name".equals(field)) {
+        if ("username".equals(field)) {
             return repositoryUser.existsByUsernameIgnoreCase((String) value);
         }
         else {

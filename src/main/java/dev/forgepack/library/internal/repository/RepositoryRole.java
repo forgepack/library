@@ -1,6 +1,6 @@
 package dev.forgepack.library.internal.repository;
 
-import dev.forgepack.library.api.repository.RepositoryInterface;
+import dev.forgepack.library.api.repository.RepositoryWithName;
 import dev.forgepack.library.internal.model.Role;
 import java.util.Set;
 import java.util.UUID;
@@ -12,7 +12,7 @@ import java.util.UUID;
  * Website:	www.forgepack.dev
  **/
 
-public interface RepositoryRole extends RepositoryInterface<Role> {
+public interface RepositoryRole extends RepositoryWithName<Role> {
 
     Set<Role> findByName(String name);
     boolean existsByNameIgnoreCaseAndIdNot(String value, UUID id);
