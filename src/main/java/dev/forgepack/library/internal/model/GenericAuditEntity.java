@@ -17,7 +17,7 @@ import java.util.UUID;
  * <p>
  * Esta classe fornece campos comuns para auditoria (criação, atualização, exclusão lógica)
  * e deve ser estendida por todas as entidades que necessitam de rastreamento de alterações.
- * Implementa soft delete através da anotação {@code @SQLDelete} e filtro {@code deletedFilter}.
+ * Implementa soft delete.
  * 
  * Funcionalidades:
  * <ul>
@@ -93,7 +93,6 @@ public abstract class GenericAuditEntity implements Serializable {
      * O filtro {@code deletedFilter} oculta automaticamente registros com
      * este campo preenchido nas consultas.
      */
-    @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
     public void setId(UUID id) {

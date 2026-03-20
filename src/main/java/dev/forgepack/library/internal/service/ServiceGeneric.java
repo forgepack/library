@@ -208,16 +208,16 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
      * <p>If the entity does not exist, an {@link EntityNotFoundException}
      * is thrown.</p>
      *
-     * @param id {@link UUID} unique identifier of the entity to be deleted
-     * @return {@link DTOResponse} representing the deleted entity with HATEOAS links
+     * @param id {@link UUID} unique identifier of the entity to be soft deleted
+     * @return {@link DTOResponse} representing the soft deleted entity with HATEOAS links
      * @throws EntityNotFoundException if the entity does not exist
      */
     @Transactional
     public DTOResponse softDelete(UUID id){
-        addLog("delete", id, null, null);
+        addLog("soft delete", id, null, null);
         Entity entity = repositoryInterface.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        String.format("Cannot delete: %s not found with ID: %s", entityClass.getSimpleName(), id)));
+                        String.format("Cannot soft delete: %s not found with ID: %s", entityClass.getSimpleName(), id)));
         entity.setDeletedAt(LocalDateTime.now());
         repositoryInterface.save(entity);
         return addHateoas(entity);
