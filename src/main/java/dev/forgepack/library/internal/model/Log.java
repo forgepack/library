@@ -1,5 +1,6 @@
 package dev.forgepack.library.internal.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import org.hibernate.envers.Audited;
@@ -16,6 +17,7 @@ import org.hibernate.envers.Audited;
 public class Log extends GenericAuditEntity {
 
     private String action;
+    @Column(name = "user_id")
     private User user;
 
     public Log() {
