@@ -22,7 +22,6 @@ import org.apache.commons.beanutils.ConvertUtils;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Optional;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -255,6 +254,6 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
             log.info("{} {} a new resource", currentUser, action);
         }
         User user = repositoryUser.findByUsername(currentUser).orElse(null);
-        repositoryLog.save(new Log(action, user));
+        repositoryLog.save(new Log(action, id, entityClass.getSimpleName(), user));
     }
 }
