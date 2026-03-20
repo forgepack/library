@@ -106,6 +106,18 @@ public interface ServiceInterface<Entity, DTORequest, DTOResponse> {
     DTOResponse update(DTORequest updated);
     
     /**
+     * Soft Deletes an entity identified by the specified identifier.
+     *
+     * <p>If the entity does not exist, an {@link EntityNotFoundException}
+     * is thrown.</p>
+     *
+     * @param id {@link UUID} unique identifier of the entity to be soft deleted
+     * @return {@link DTOResponse} representing the soft deleted entity with HATEOAS links
+     * @throws EntityNotFoundException if the entity does not exist
+     */
+    DTOResponse softDelete(UUID id);
+
+    /**
      * Deletes an entity identified by the specified identifier.
      *
      * <p>If the entity does not exist, an {@link EntityNotFoundException}

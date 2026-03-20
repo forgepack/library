@@ -60,6 +60,6 @@ public abstract class ControllerGeneric<T extends GenericAuditEntity, I extends 
     @DeleteMapping("/{id}")
 //    @PreAuthorize("hasAnyRole('ADMIN') and hasAnyAuthority('user:delete')")
     public ResponseEntity<O> delete(@PathVariable UUID id){
-        return ResponseEntity.accepted().body(serviceInterface.delete(id));
+        return ResponseEntity.accepted().body(serviceInterface.softDelete(id));
     }
 }

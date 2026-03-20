@@ -35,15 +35,6 @@ import java.util.UUID;
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-@SQLDelete(sql = "UPDATE #{#entityName} SET deleted_at = now() WHERE id = ?")
-@FilterDef(
-        name = "deletedFilter",
-        parameters = @ParamDef(name = "isDeleted", type = Boolean.class)
-)
-@Filter(
-        name = "deletedFilter",
-        condition = "deleted_at IS NULL"
-)
 public abstract class GenericAuditEntity implements Serializable {
 
     /**
