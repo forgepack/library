@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import jakarta.persistence.CascadeType;
 import org.hibernate.annotations.*;
+import org.hibernate.envers.Audited;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -32,7 +33,7 @@ import java.util.UUID;
  * @version 1.0
  * @since 1.0
  */
-
+@Audited
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 public abstract class GenericAuditEntity implements Serializable {
