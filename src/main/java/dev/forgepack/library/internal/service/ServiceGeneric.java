@@ -126,9 +126,9 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
                 .findFirst()
                 .map(Sort.Order::getProperty)
                 .orElse("id");
-        addLog("retrieve", null, propertyName, value);
         if ("id".equalsIgnoreCase(propertyName) && StringUtils.hasText(value)) {
             try {
+                addLog("retrieve", null, propertyName, value);
                 return repositoryInterface.findById(UUID.fromString(value), pageable)
                         .map(this::addHateoas);
             } catch (IllegalArgumentException e){
@@ -147,6 +147,7 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
             Object convertedValue = ConvertUtils.convert(value, field.getType());
             setter.invoke(object, convertedValue);
             Example<Entity> example = Example.of(object, exampleMatcher);
+            addLog("retrieve", null, propertyName, value);
             return repositoryInterface.findAll(example, pageable).map(this::addHateoas);
         } catch (Exception exception) {
             log.warn("Error searching {} by {}: {}", entityClass.getSimpleName(), propertyName, exception.getMessage());
@@ -243,14 +244,15 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
     }
 
     public void addLog(String action, UUID id, Object propertyName, Object value) {
+        String currentUser = new Information().getCurrentUser().orElse("Unknown User");
         if(propertyName != null){
             log.debug("Retrieving {} with property: {}, value: {}", entityClass.getSimpleName(), propertyName, value);
         } else if (id != null) {
-            log.info("{} {} a new resource", new Information().getCurrentUser().orElse("Unknown User"), action);
+            log.info("{} {} entity with ID: {}", currentUser, action, id);
         } else {
-            log.info("{} {} entity with ID: {}", new Information().getCurrentUser().orElse("Unknown User"), action, id);
+            log.info("{} {} a new resource", currentUser, action);
         }
-        Optional<User> user = repositoryUser.findByUsername(new Information().getCurrentUser().orElseThrow());
+        User user = repositoryUser.findByUsername(currentUser).orElse(null);
         repositoryLog.save(new Log(action, user));
     }
 }

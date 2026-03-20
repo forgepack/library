@@ -4,8 +4,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import org.hibernate.envers.Audited;
 
-import java.util.Optional;
-
 /**
  * Implements Log Repository
  *
@@ -18,11 +16,11 @@ import java.util.Optional;
 public class Log extends GenericAuditEntity {
 
     private String action;
-    private Optional<User> user;
+    private User user;
 
     public Log() {
     }
-    public Log(String action, Optional<User> user) {
+    public Log(String action, User user) {
         this.action = action;
         this.user = user;
     }
@@ -30,14 +28,14 @@ public class Log extends GenericAuditEntity {
     public void setAction(String action) {
         this.action = action;
     }
-    public void setUser(Optional<User> user) {
+    public void setUser(User user) {
         this.user = user;
     }
 
     public String getAction() {
         return action;
     }
-    public Optional<User> getUser() {
+    public User getUser() {
         return user;
     }
 }

@@ -16,6 +16,7 @@ import java.util.UUID;
 
 public interface RepositoryUser extends RepositoryInterface<User> {
 
+    User findByUsernameIgnoreCase(String name);
     Optional<User> findByUsername(String name);
     boolean existsByUsername(String name);
     boolean existsByUsernameIgnoreCase(String name);
