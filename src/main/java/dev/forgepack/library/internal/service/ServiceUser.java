@@ -7,6 +7,7 @@ import dev.forgepack.library.api.service.ServiceInterface;
 import dev.forgepack.library.internal.model.User;
 import dev.forgepack.library.internal.payload.DTORequestUser;
 import dev.forgepack.library.internal.payload.DTOResponseUser;
+import dev.forgepack.library.internal.repository.RepositoryLog;
 import dev.forgepack.library.internal.repository.RepositoryUser;
 import org.springframework.stereotype.Service;
 import java.util.UUID;
@@ -48,8 +49,8 @@ public class ServiceUser extends ServiceGeneric<User, DTORequestUser, DTORespons
 
     private final RepositoryUser repositoryUser;
 
-    public ServiceUser(RepositoryInterface<User> repositoryInterface, Mapper<User, DTORequestUser, DTOResponseUser> mapperInterface, RepositoryUser repositoryUser) {
-        super(User.class, repositoryInterface, mapperInterface);
+    public ServiceUser(RepositoryInterface<User> repositoryInterface, Mapper<User, DTORequestUser, DTOResponseUser> mapperInterface, RepositoryUser repositoryUser, RepositoryLog repositoryLog) {
+        super(User.class, repositoryInterface, mapperInterface, repositoryUser, repositoryLog);
         this.repositoryUser = repositoryUser;
     }
     /**

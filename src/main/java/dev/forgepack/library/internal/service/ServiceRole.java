@@ -7,7 +7,9 @@ import dev.forgepack.library.api.service.ServiceInterface;
 import dev.forgepack.library.internal.model.Role;
 import dev.forgepack.library.internal.payload.DTORequestRole;
 import dev.forgepack.library.internal.payload.DTOResponseRole;
+import dev.forgepack.library.internal.repository.RepositoryLog;
 import dev.forgepack.library.internal.repository.RepositoryRole;
+import dev.forgepack.library.internal.repository.RepositoryUser;
 import org.springframework.stereotype.Service;
 import java.util.UUID;
 
@@ -48,8 +50,8 @@ public class ServiceRole extends ServiceGeneric<Role, DTORequestRole, DTORespons
 
     private final RepositoryRole repositoryRole;
 
-    public ServiceRole(RepositoryInterface<Role> repositoryInterface, Mapper<Role, DTORequestRole, DTOResponseRole> mapperInterface, RepositoryRole repositoryRole) {
-        super(Role.class, repositoryInterface, mapperInterface);
+    public ServiceRole(RepositoryInterface<Role> repositoryInterface, Mapper<Role, DTORequestRole, DTOResponseRole> mapperInterface, RepositoryRole repositoryRole, RepositoryUser repositoryUser, RepositoryLog repositoryLog) {
+        super(Role.class, repositoryInterface, mapperInterface, repositoryUser, repositoryLog);
         this.repositoryRole = repositoryRole;
     }
     /**

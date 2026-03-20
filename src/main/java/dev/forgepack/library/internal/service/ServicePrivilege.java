@@ -7,7 +7,9 @@ import dev.forgepack.library.api.service.ServiceInterface;
 import dev.forgepack.library.internal.model.Privilege;
 import dev.forgepack.library.internal.payload.DTORequestPrivilege;
 import dev.forgepack.library.internal.payload.DTOResponsePrivilege;
+import dev.forgepack.library.internal.repository.RepositoryLog;
 import dev.forgepack.library.internal.repository.RepositoryPrivilege;
+import dev.forgepack.library.internal.repository.RepositoryUser;
 import org.springframework.stereotype.Service;
 import java.util.UUID;
 
@@ -48,8 +50,8 @@ public class ServicePrivilege extends ServiceGeneric<Privilege, DTORequestPrivil
 
     private final RepositoryPrivilege repositoryPrivilege;
 
-    public ServicePrivilege(RepositoryInterface<Privilege> repositoryInterface, Mapper<Privilege, DTORequestPrivilege, DTOResponsePrivilege> mapperInterface, RepositoryPrivilege repositoryPrivilege) {
-        super(Privilege.class, repositoryInterface, mapperInterface);
+    public ServicePrivilege(RepositoryInterface<Privilege> repositoryInterface, Mapper<Privilege, DTORequestPrivilege, DTOResponsePrivilege> mapperInterface, RepositoryPrivilege repositoryPrivilege, RepositoryUser repositoryUser, RepositoryLog repositoryLog) {
+        super(Privilege.class, repositoryInterface, mapperInterface, repositoryUser, repositoryLog);
         this.repositoryPrivilege = repositoryPrivilege;
     }
     /**
