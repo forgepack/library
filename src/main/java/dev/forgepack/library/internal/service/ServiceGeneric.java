@@ -96,8 +96,9 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
      */
     @Transactional
     public DTOResponse create(DTORequest created){
-        addLog("create", null, null, null);
-        return addHateoas(repositoryInterface.save(mapper.toEntity(created)));
+        Entity entity = repositoryInterface.save(mapper.toEntity(created));
+        addLog("create", entity.getId(), null, null);
+        return addHateoas(entity);
     }
 
     /**
@@ -248,10 +249,8 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
         String currentUser = new Information().getCurrentUser().orElse("Unknown User");
         if(propertyName != null){
             log.debug("Retrieving {} with property: {}, value: {}", entityClass.getSimpleName(), propertyName, value);
-        } else if (id != null) {
-            log.info("{} {} entity with ID: {}", currentUser, action, id);
         } else {
-            log.info("{} {} a new resource", currentUser, action);
+            log.info("{} {} entity with ID: {}", currentUser, action, id);
         }
         User user = repositoryUser.findByUsername(currentUser).orElse(null);
         repositoryLog.save(new Log(action, id, entityClass.getSimpleName(), user));
