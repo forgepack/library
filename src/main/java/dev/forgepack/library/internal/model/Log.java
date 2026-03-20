@@ -6,6 +6,12 @@ import org.hibernate.envers.Audited;
 
 import java.util.Optional;
 
+/**
+ * Implements Log Repository
+ *
+ * @author	Marcelo Ribeiro Gadelha
+ * Website:	www.forgepack.dev
+ **/
 @Entity
 @Audited
 @Table
