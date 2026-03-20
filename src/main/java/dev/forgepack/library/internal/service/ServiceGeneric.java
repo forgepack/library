@@ -73,13 +73,15 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
     private final RepositoryInterface<Entity> repositoryInterface;
     private final Mapper<Entity, DTORequest, DTOResponse> mapper;
     private static final Logger log = LoggerFactory.getLogger(Information.class);
-    private RepositoryUser repositoryUser;
-    private RepositoryLog repositoryLog;
+    private final RepositoryUser repositoryUser;
+    private final RepositoryLog repositoryLog;
 
-    public ServiceGeneric(Class<Entity> entityClass, RepositoryInterface<Entity> repositoryInterface, Mapper<Entity, DTORequest, DTOResponse> mapper) {
+    public ServiceGeneric(Class<Entity> entityClass, RepositoryInterface<Entity> repositoryInterface, Mapper<Entity, DTORequest, DTOResponse> mapper, RepositoryUser repositoryUser, RepositoryLog repositoryLog) {
         this.entityClass = entityClass;
         this.repositoryInterface = repositoryInterface;
         this.mapper = mapper;
+        this.repositoryUser = repositoryUser;
+        this.repositoryLog = repositoryLog;
     }
 
     /**
