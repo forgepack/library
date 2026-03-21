@@ -75,7 +75,7 @@ public interface ServiceInterface<Entity, DTORequest, DTOResponse> {
      * @param entityClass class of the entity being queried
      * @return a paginated list of response DTOs with HATEOAS links
      */
-    Page<DTOResponse> retrieve(Pageable pageable, String value, Class<Entity> entityClass);
+    Page<DTOResponse> findAll(Pageable pageable, String value, Class<Entity> entityClass);
 
     /**
      * Retrieves a single entity by its unique identifier.
@@ -87,7 +87,7 @@ public interface ServiceInterface<Entity, DTORequest, DTOResponse> {
      * @return {@link DTOResponse} representing the found entity with HATEOAS links
      * @throws EntityNotFoundException if the entity does not exist
      */
-    DTOResponse retrieve(UUID id);
+    DTOResponse findById(UUID id);
     
     /**
      * Updates an existing entity using the provided request DTO.
@@ -106,7 +106,7 @@ public interface ServiceInterface<Entity, DTORequest, DTOResponse> {
     DTOResponse update(DTORequest updated);
     
     /**
-     * Soft Deletes an entity identified by the specified identifier.
+     * Soft deletes an entity identified by the specified identifier.
      *
      * <p>If the entity does not exist, an {@link EntityNotFoundException}
      * is thrown.</p>
@@ -118,14 +118,26 @@ public interface ServiceInterface<Entity, DTORequest, DTOResponse> {
     DTOResponse softDelete(UUID id);
 
     /**
-     * Deletes an entity identified by the specified identifier.
+     * Restores an entity identified by the specified identifier.
      *
      * <p>If the entity does not exist, an {@link EntityNotFoundException}
      * is thrown.</p>
      *
-     * @param id {@link UUID} unique identifier of the entity to be deleted
-     * @return {@link DTOResponse} representing the deleted entity with HATEOAS links
+     * @param id {@link UUID} unique identifier of the entity to be soft restored
+     * @return {@link DTOResponse} representing the soft restored entity with HATEOAS links
      * @throws EntityNotFoundException if the entity does not exist
      */
-    DTOResponse delete(UUID id);
+    DTOResponse restore(UUID id);
+
+    /**
+     * Hard deletes an entity identified by the specified identifier.
+     *
+     * <p>If the entity does not exist, an {@link EntityNotFoundException}
+     * is thrown.</p>
+     *
+     * @param id {@link UUID} unique identifier of the entity to be hard deleted
+     * @return {@link DTOResponse} representing the hard deleted entity with HATEOAS links
+     * @throws EntityNotFoundException if the entity does not exist
+     */
+    DTOResponse hardDelete(UUID id);
 }

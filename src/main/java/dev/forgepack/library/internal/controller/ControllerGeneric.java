@@ -45,12 +45,12 @@ public abstract class ControllerGeneric<T extends GenericAuditEntity, I extends 
     @GetMapping("")
 //    @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR', 'USER') and hasAnyAuthority('user:retrieve')")
     public ResponseEntity<Page<O>> retrieve(@RequestParam(name = "value", defaultValue = "", required = false) String value, Pageable pageable){
-        return ResponseEntity.ok().body(serviceInterface.retrieve(pageable, value, getEntityClass()));
+        return ResponseEntity.ok().body(serviceInterface.findAll(pageable, value, getEntityClass()));
     }
     @GetMapping("/{id}")
 //    @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR', 'USER') and hasAnyAuthority('user:retrieve')")
     public ResponseEntity<O> retrieve(@PathVariable UUID id){
-        return ResponseEntity.ok().body(serviceInterface.retrieve(id));
+        return ResponseEntity.ok().body(serviceInterface.findById(id));
     }
     @PutMapping("/{id}")
 //    @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR') and hasAnyAuthority('user:update')")

@@ -124,7 +124,7 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
      * @return a paginated list of response DTOs with HATEOAS links
      */
     @Transactional
-    public Page<DTOResponse> retrieve(Pageable pageable, String value, Class<Entity> entityClass) {
+    public Page<DTOResponse> findAll(Pageable pageable, String value, Class<Entity> entityClass) {
         String propertyName = pageable.getSort().stream()
                 .findFirst()
                 .map(Sort.Order::getProperty)
@@ -169,7 +169,7 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
      * @throws EntityNotFoundException if the entity does not exist
      */
     @Transactional
-    public DTOResponse retrieve(UUID id){
+    public DTOResponse findById(UUID id){
         addLog("retrieve", id, null, null);
         Entity entity = repositoryInterface.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
@@ -224,21 +224,42 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
     }
 
     /**
+     * Restores an entity identified by the specified identifier.
+     *
+     * <p>If the entity does not exist, an {@link EntityNotFoundException}
+     * is thrown.</p>
+     *
+     * @param id {@link UUID} unique identifier of the entity to be restored
+     * @return {@link DTOResponse} representing the soft restored entity with HATEOAS links
+     * @throws EntityNotFoundException if the entity does not exist
+     */
+    @Transactional
+    public DTOResponse restore(UUID id){
+        addLog("restore", id, null, null);
+        Entity entity = repositoryInterface.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        String.format("Cannot restore: %s not found with ID: %s", entityClass.getSimpleName(), id)));
+        entity.setDeletedAt(null);
+        repositoryInterface.save(entity);
+        return addHateoas(entity);
+    }
+
+    /**
      * Deletes an entity identified by the specified identifier.
      *
      * <p>If the entity does not exist, an {@link EntityNotFoundException}
      * is thrown.</p>
      *
-     * @param id {@link UUID} unique identifier of the entity to be deleted
-     * @return {@link DTOResponse} representing the deleted entity with HATEOAS links
+     * @param id {@link UUID} unique identifier of the entity to be hard deleted
+     * @return {@link DTOResponse} representing the hard deleted entity with HATEOAS links
      * @throws EntityNotFoundException if the entity does not exist
      */
     @Transactional
-    public DTOResponse delete(UUID id){
+    public DTOResponse hardDelete(UUID id){
         addLog("delete", id, null, null);
         Entity entity = repositoryInterface.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        String.format("Cannot delete: %s not found with ID: %s", entityClass.getSimpleName(), id)));
+                        String.format("Cannot hard delete: %s not found with ID: %s", entityClass.getSimpleName(), id)));
         repositoryInterface.delete(entity);
         return addHateoas(entity);
     }
