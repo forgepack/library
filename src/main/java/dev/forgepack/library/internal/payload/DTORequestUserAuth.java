@@ -24,8 +24,8 @@ public record DTORequestUserAuth(
     @HasUpperCase
     @HasLowerCase
     @HasLength
-    String password,
-    @NotNull(message = "{not.null}")
-    Integer totpKey,
-    String captchaToken
+    String password
+//    @NotNull(message = "{not.null}")
+//    Integer totpKey,
+//    String captchaToken
 ) {}

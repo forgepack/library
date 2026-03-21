@@ -27,7 +27,9 @@ public class ControllerAuth {
         return ResponseEntity.ok().body(serviceAuth.login(value));
     }
     @PostMapping("/signup")
-    public ResponseEntity<ApiError> signUp(@RequestBody @Valid DTORequestUser value) {
+    public ResponseEntity<ApiError> signUp(@RequestBody DTORequestUser value) {
+        System.out.println("Username:" + value.username());
+        System.out.println("Email:" + value.email());
         serviceAuth.register(value.username(), value.email());
         return ResponseEntity.accepted().body(new ApiError(HttpStatus.CREATED, "", ""));
     }
