@@ -31,7 +31,7 @@ import java.util.UUID;
  *
  * @see UUID
  */
-public interface DTORequestIdentifiable {
+public interface DTORequestIdentifiable<T> {
 
     /**
      * Returns the unique identifier of the target entity.
@@ -39,5 +39,5 @@ public interface DTORequestIdentifiable {
      * @return entity identifier, or {@code null} if the request represents
      *         a creation operation
      */
-    UUID id();
+    T id();
 }

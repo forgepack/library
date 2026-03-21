@@ -19,7 +19,7 @@ public record DTORequestToken (
     String accessToken,
     @NotNull
     UUID refreshToken
-) implements DTORequestIdentifiable {
+) implements DTORequestIdentifiable<UUID> {
 
     public DTORequestToken(UUID id, String accessToken, UUID refreshToken) {
         this(id, "Bearer ", accessToken, refreshToken);

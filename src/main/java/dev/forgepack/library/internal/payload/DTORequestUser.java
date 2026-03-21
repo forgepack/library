@@ -44,10 +44,10 @@ import java.util.UUID;
 public record DTORequestUser (
 
     UUID id,
-    @NotNull(message = "{not.null}") @NotBlank(message = "{not.blank}") @HasLength
+    @NotNull(message = "{not.null}") @NotBlank(message = "{not.blank}")
     String username,
-    @NotBlank(message = "{not.blank}") @Size(max = 50) @Email
+    @NotNull(message = "{not.null}") @NotBlank(message = "{not.blank}") @Size(max = 50) @Email
     String email,
 
     Set<DTOResponseRole> role
-) implements DTORequestIdentifiable {}
+) implements DTORequestIdentifiable<UUID> {}

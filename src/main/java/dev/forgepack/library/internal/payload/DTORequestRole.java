@@ -23,5 +23,5 @@ public record DTORequestRole(
         @NotNull(message = "{not.null}") @NotBlank(message = "{not.blank}")
         String name,
         Set<DTOResponsePrivilege> privilege
-) implements DTORequestIdentifiable {
+) implements DTORequestIdentifiable<UUID> {
 }

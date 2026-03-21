@@ -21,5 +21,5 @@ public record DTORequestPrivilege(
         UUID id,
         @NotNull(message = "{not.null}") @NotBlank(message = "{not.blank}")
         String name
-) implements DTORequestIdentifiable {
+) implements DTORequestIdentifiable<UUID> {
 }

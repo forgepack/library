@@ -19,7 +19,7 @@ import java.util.UUID;
  * Website	www.forgepack.dev
  **/
 
-public abstract class ControllerGeneric<T extends GenericAuditEntity, I extends DTORequestIdentifiable, O extends RepresentationModel<O>> implements ControllerInterface<I, O> {
+public abstract class ControllerGeneric<T extends GenericAuditEntity, I extends DTORequestIdentifiable<UUID>, O extends RepresentationModel<O>> implements ControllerInterface<I, O> {
 
     private final ServiceGeneric<T, I, O> serviceInterface;
 

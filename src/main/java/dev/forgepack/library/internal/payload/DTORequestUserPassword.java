@@ -27,4 +27,4 @@ public record DTORequestUserPassword (
     @HasLowerCase
     @HasLength
     String password
-) implements DTORequestIdentifiable {}
+) implements DTORequestIdentifiable<UUID> {}

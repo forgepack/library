@@ -67,7 +67,7 @@ import static org.springframework.data.domain.ExampleMatcher.matching;
  * @see GenericAuditEntity
  * @see RepresentationModel
  */
-public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTORequest extends DTORequestIdentifiable, DTOResponse extends RepresentationModel<DTOResponse>> implements ServiceInterface<Entity, DTORequest, DTOResponse> {
+public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTORequest extends DTORequestIdentifiable<UUID>, DTOResponse extends RepresentationModel<DTOResponse>> implements ServiceInterface<Entity, DTORequest, DTOResponse> {
 
     private final Class<Entity> entityClass;
     private final RepositoryInterface<Entity> repositoryInterface;
