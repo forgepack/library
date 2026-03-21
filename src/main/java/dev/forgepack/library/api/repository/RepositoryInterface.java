@@ -8,31 +8,59 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Interface base para repositórios da biblioteca ForgePack.
- * <p>
- * Esta interface estende {@link JpaRepository} fornecendo métodos adicionais
- * comuns para operações com entidades que possuem campos de nome e suporte
- * a consultas personalizadas com paginação.
- * 
- * Operações suportadas:
+ * Base repository interface for ForgePack data access layer.
+ *
+ * <p>This interface extends {@link JpaRepository} to provide a common
+ * abstraction for all repositories in the library, standardizing the use
+ * of {@link UUID} as the entity identifier type.</p>
+ *
+ * <p>The {@link NoRepositoryBean} annotation indicates that this interface
+ * is not intended to be instantiated directly, but rather to be extended
+ * by concrete repository interfaces.</p>
+ *
+ * <h3>Responsibilities</h3>
  * <ul>
- *     <li>Busca por nome exato e ignore case</li>
- *     <li>Verificação de existência com exclusão por ID</li>
- *     <li>Consultas paginadas e ordenadas</li>
- *     <li>Busca com filtros que ignoram case</li>
+ *     <li>Provide standard CRUD operations via {@link JpaRepository}</li>
+ *     <li>Enforce UUID as the identifier type</li>
+ *     <li>Offer additional convenience methods for paginated queries by ID</li>
  * </ul>
- * 
- * @param <T> tipo da entidade gerenciada pelo repositório
+ *
+ * <p>Custom repositories should extend this interface to inherit common
+ * behavior and maintain consistency across the data access layer.</p>
+ *
+ * @param <T> entity type managed by the repository
+ *
  * @author Marcelo Ribeiro Gadelha
- * @version 1.0
  * @since 1.0
- * 
- * @see org.springframework.data.jpa.repository.JpaRepository
+ *
+ * @see JpaRepository
+ * @see NoRepositoryBean
  */
-
 @NoRepositoryBean
 public interface RepositoryInterface<T> extends JpaRepository<T, UUID> {
 
+    /**
+     * Retrieves a paginated result containing entities that match the given ID.
+     *
+     * <p>This method is useful when combining ID filtering with pagination,
+     * although typically only one result is expected due to ID uniqueness.</p>
+     *
+     * @param uuid identifier to filter by
+     * @param pageable pagination and sorting information
+     * @return page containing matching entities
+     */
     Page<T> findById(UUID uuid, Pageable pageable);
+
+    /**
+     * Retrieves a paginated result filtered by ID and ordered by ID ascending.
+     *
+     * <p>Although ordering is redundant when filtering by a unique identifier,
+     * this method ensures deterministic ordering when used in broader queries
+     * or extended implementations.</p>
+     *
+     * @param id identifier to filter by
+     * @param pageable pagination and sorting information
+     * @return page containing matching entities ordered by ID
+     */
     Page<T> findByIdOrderByIdAsc(UUID id, Pageable pageable);
 }

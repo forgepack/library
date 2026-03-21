@@ -3,27 +3,41 @@ package dev.forgepack.library.api.payload;
 import java.util.UUID;
 
 /**
- * Interface marcadora para DTOs de requisição que possuem identificação.
- * <p>
- * Esta interface deve ser implementada por todos os DTOs de requisição que
- * representam entidades identificáveis por um UUID. Facilita o processamento
- * genérico de requisições que necessitam acessar o identificador da entidade.
- * 
- * Casos de uso:
+ * Contract for request DTOs that carry an entity identifier.
+ *
+ * <p>This interface defines a common abstraction for request payloads that
+ * reference an existing entity through a {@link UUID} identifier. It enables
+ * generic handling of operations that depend on entity identification,
+ * such as updates and validation logic.</p>
+ *
+ * <p>Implementations are typically used in service and validation layers
+ * to access the identifier in a uniform and type-safe manner.</p>
+ *
+ * <h3>Usage scenarios</h3>
  * <ul>
- *     <li>Operações de atualização que precisam do ID da entidade</li>
- *     <li>Validações de unicidade que excluem o próprio registro</li>
- *     <li>Processamento genérico de DTOs com identificação</li>
+ *     <li>Update operations where the target entity must be identified</li>
+ *     <li>Uniqueness validation excluding the current entity instance</li>
+ *     <li>Generic service processing for identifiable request DTOs</li>
  * </ul>
- * 
+ *
+ * <h3>Identifier semantics</h3>
+ * <ul>
+ *     <li>The {@code id} may be {@code null} for create operations</li>
+ *     <li>The {@code id} must be present for update operations</li>
+ * </ul>
+ *
  * @author Marcelo Ribeiro Gadelha
- * @version 1.0
  * @since 1.0
- * 
- * @see java.util.UUID
+ *
+ * @see UUID
  */
-
 public interface DTORequestIdentifiable {
 
+    /**
+     * Returns the unique identifier of the target entity.
+     *
+     * @return entity identifier, or {@code null} if the request represents
+     *         a creation operation
+     */
     UUID id();
 }
