@@ -45,7 +45,7 @@ public interface RepositoryWithName<T> extends RepositoryInterface<T> {
      * @param name name to search for
      * @return set of entities matching the provided name
      */
-    Set<T> findByName(String name);
+    T findByName(String name);
 
     /**
      * Checks if any entity exists with the given name.
