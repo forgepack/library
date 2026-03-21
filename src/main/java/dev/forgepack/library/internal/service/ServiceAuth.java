@@ -30,6 +30,10 @@ import java.util.stream.Collectors;
 @Service
 public class ServiceAuth {
 
+//    private final ServiceTOTP serviceTOTP;
+//    private final ServiceEmail serviceEmail;
+//    private final ServiceRecaptcha serviceRecaptcha;
+//    private final E2EE e2EE;
     private final AuthenticationManager authenticationManager;
     private final ConfigurationJWT configurationJwt;
     private final RepositoryToken repositoryToken;
@@ -48,10 +52,6 @@ public class ServiceAuth {
         this.serviceCustomUserDetails = serviceCustomUserDetails;
         this.serviceUser = serviceUser;
     }
-//    private final ServiceTOTP serviceTOTP;
-//    private final ServiceEmail serviceEmail;
-//    private final ServiceRecaptcha serviceRecaptcha;
-//    private final E2EE e2EE;
 
     public DTOResponseToken login(DTORequestUserAuth dtoRequestUserAuth) {
 //        captchaTest(dtoRequestUserAuth.getCaptchaToken());
@@ -112,11 +112,11 @@ public class ServiceAuth {
 //        captchaTest(captchaToken);
         serviceUser.create(new DTORequestUser(null, username, email, null));
     }
-//    public void resetPassword(String username/*, String captchaToken*/) {
-////        captchaTest(captchaToken);
-//        User entity = repositoryUser.findByUsername(username).orElseThrow(() -> new RuntimeException("Resource not found"));
+    public void resetPassword(String username/*, String captchaToken*/) {
+//        captchaTest(captchaToken);
+        User entity = repositoryUser.findByUsername(username).orElseThrow(() -> new RuntimeException("Resource not found"));
 //        serviceEmail.sendSimpleMessage(entity.getEmail(), "Recovery password", entity.getPassword());
-//    }
+    }
 //    public void resetTotp(String username/*, String captchaToken*/) throws Exception {
 ////        captchaTest(captchaToken);
 //        User entity = repositoryUser.findByUsername(username).orElseThrow(() -> new RuntimeException("Resource not found"));
