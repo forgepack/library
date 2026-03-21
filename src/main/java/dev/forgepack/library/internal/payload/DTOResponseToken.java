@@ -17,6 +17,9 @@ public class DTOResponseToken extends RepresentationModel<DTOResponseToken> {
     private UUID refreshToken;
     private Set<String> role;
 
+    public DTOResponseToken(UUID refreshToken) {
+        this.refreshToken = refreshToken;
+    }
     public DTOResponseToken(String accessToken, UUID refreshToken, Set<String> role) {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;

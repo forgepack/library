@@ -20,6 +20,9 @@ public class Token extends GenericAuditEntity {
 
     public Token() {
     }
+    public Token(UUID refreshToken) {
+        this.refreshToken = refreshToken;
+    }
     public Token(UUID refreshToken, boolean active) {
         this.refreshToken = refreshToken;
         this.active = active;
