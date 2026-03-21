@@ -28,8 +28,8 @@ public class ConfigurationSecurity {
 
     public final ConfigurationJWT configurationJwt;
     public final ServiceCustomUserDetails serviceCustomUserDetails;
-    @Value("${application.path}")
-    private boolean csrfEnabled;
+//    @Value("${application.path}")
+//    private boolean endpoints;
 
     public ConfigurationSecurity(ConfigurationJWT configurationJwt, ServiceCustomUserDetails serviceCustomUserDetails) {
         this.configurationJwt = configurationJwt;
