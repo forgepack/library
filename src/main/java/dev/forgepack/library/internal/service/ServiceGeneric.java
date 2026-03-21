@@ -274,7 +274,7 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
         } else {
             log.info("{} {} entity with ID: {}", currentUser, action, id);
         }
-        User user = repositoryUser.findByUsername(currentUser).orElse(null);
-        repositoryLog.save(new Log(action, id, entityClass.getSimpleName(), user));
+//        User user = repositoryUser.findByUsername(currentUser).orElse(null);
+//        repositoryLog.save(new Log(action, id, entityClass.getSimpleName(), user));
     }
 }
