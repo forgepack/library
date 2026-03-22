@@ -28,8 +28,8 @@ public class ConfigurationSecurity {
 
     public final ConfigurationJWT configurationJwt;
     public final ServiceCustomUserDetails serviceCustomUserDetails;
-//    @Value("${application.path}")
-//    private boolean endpoints;
+    @Value("${application.endpoints}")
+    private String[] endpoints;
 
     public ConfigurationSecurity(ConfigurationJWT configurationJwt, ServiceCustomUserDetails serviceCustomUserDetails) {
         this.configurationJwt = configurationJwt;
@@ -61,7 +61,7 @@ public class ConfigurationSecurity {
                         .requestMatchers(HttpMethod.POST, "/auth/signup").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/auth/resetPassword").permitAll()
                         .requestMatchers("/api/v1/auth/**", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
-                        .requestMatchers("/privilege/**", "/role/**", "/user/**").permitAll()
+                        .requestMatchers(endpoints).permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
