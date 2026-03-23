@@ -62,4 +62,14 @@ public abstract class ControllerGeneric<T extends GenericAuditEntity, I extends 
     public ResponseEntity<O> delete(@PathVariable UUID id){
         return ResponseEntity.accepted().body(serviceInterface.softDelete(id));
     }
+    @DeleteMapping("/permanent/{id}")
+//    @PreAuthorize("hasAnyRole('ADMIN') and hasAnyAuthority('user:delete')")
+    public ResponseEntity<O> hardDelete(@PathVariable UUID id){
+        return ResponseEntity.accepted().body(serviceInterface.hardDelete(id));
+    }
+    @PatchMapping("/{id}")
+//    @PreAuthorize("hasAnyRole('ADMIN') and hasAnyAuthority('user:delete')")
+    public ResponseEntity<O> restore(@PathVariable UUID id){
+        return ResponseEntity.accepted().body(serviceInterface.restore(id));
+    }
 }
