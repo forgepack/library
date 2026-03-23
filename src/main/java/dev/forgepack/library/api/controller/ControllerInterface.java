@@ -55,7 +55,7 @@ public interface ControllerInterface<DTORequest, DTOResponse> {
      * @param pageable pagination and sorting information
      * @return {@link ResponseEntity} containing a page of resources
      */
-    ResponseEntity<Page<DTOResponse>> retrieve(String value, Pageable pageable);
+    ResponseEntity<Page<DTOResponse>> findAll(String value, Pageable pageable);
 
     /**
      * Retrieves a resource by its unique identifier.
@@ -63,7 +63,7 @@ public interface ControllerInterface<DTORequest, DTOResponse> {
      * @param id unique identifier of the resource
      * @return {@link ResponseEntity} containing the requested resource
      */
-    ResponseEntity<DTOResponse> retrieve(UUID id);
+    ResponseEntity<DTOResponse> findById(UUID id);
 
     /**
      * Updates an existing resource.
