@@ -15,10 +15,8 @@ import dev.forgepack.library.internal.utils.Information;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.security.SecureRandom;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -58,27 +56,24 @@ import java.util.UUID;
 @Service
 public class ServiceUser extends ServiceGeneric<User, DTORequestUser, DTOResponseUser> implements UniqueCheckable {
 
+    private final ServicePassword servicePassword;
     private final RepositoryUser repositoryUser;
     private final RepositoryRole repositoryRole;
-    private final PasswordEncoder passwordEncoder;
     private final Mapper<User, DTORequestUser, DTOResponseUser> mapper;
     private static final Logger log = LoggerFactory.getLogger(Information.class);
 
-    public ServiceUser(RepositoryInterface<User> repositoryInterface, Mapper<User, DTORequestUser, DTOResponseUser> mapperInterface, RepositoryUser repositoryUser, RepositoryLog repositoryLog, RepositoryRole repositoryRole, PasswordEncoder passwordEncoder) {
+    public ServiceUser(RepositoryInterface<User> repositoryInterface, Mapper<User, DTORequestUser, DTOResponseUser> mapperInterface, RepositoryUser repositoryUser, RepositoryLog repositoryLog, RepositoryRole repositoryRole, ServicePassword servicePassword) {
         super(User.class, repositoryInterface, mapperInterface, repositoryUser, repositoryLog);
+        this.servicePassword = servicePassword;
         this.repositoryUser = repositoryUser;
         this.repositoryRole = repositoryRole;
-        this.passwordEncoder = passwordEncoder;
         this.mapper = mapperInterface;
     }
 
     @Override
     public DTOResponseUser create(DTORequestUser created){
         User user = mapper.toEntity(created);
-        String password = generateSecurePassword();
-        System.out.println("Password: " + password);
-//        String secret = serviceTOTP.generateSecret();
-        user.setPassword(passwordEncoder.encode(password));
+        user = servicePassword.createPassword(user);
         try {
 //            user.setSecret(e2EE.encrypt(secret));
             Set<Role> roles = new HashSet<>();
@@ -146,32 +141,5 @@ public class ServiceUser extends ServiceGeneric<User, DTORequestUser, DTORespons
         } else {
             throw new IllegalArgumentException("Field must not be null or empty.");
         }
-    }
-
-    public String generateSecurePassword() {
-        String upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        String lower = "abcdefghijklmnopqrstuvwxyz";
-        String digits = "0123456789";
-        String special = "!@#$%^&*()-_=+[]{}|;:,.<>?";
-
-        SecureRandom random = new SecureRandom();
-        StringBuilder password = new StringBuilder();
-
-        password.append(upper.charAt(random.nextInt(upper.length())));
-        password.append(lower.charAt(random.nextInt(lower.length())));
-        password.append(digits.charAt(random.nextInt(digits.length())));
-        password.append(special.charAt(random.nextInt(special.length())));
-        String allChars = upper + lower + digits + special;
-        for (int i = 4; i < 8; i++) {
-            password.append(allChars.charAt(random.nextInt(allChars.length())));
-        }
-        char[] chars = password.toString().toCharArray();
-        for (int i = chars.length - 1; i > 0; i--) {
-            int j = random.nextInt(i + 1);
-            char temp = chars[i];
-            chars[i] = chars[j];
-            chars[j] = temp;
-        }
-        return new String(chars);
     }
 }
