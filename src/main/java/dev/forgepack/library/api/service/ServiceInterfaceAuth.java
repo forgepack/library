@@ -11,7 +11,6 @@ public interface ServiceInterfaceAuth<DTORequest, DTOResponse> {
     DTOResponseToken refresh(DTORequestToken dtoRequestToken);
     DTOResponseToken logout(UUID refreshToken);
     void addAttempt(DTORequestUserAuth dtoRequestUserAuth);
-    void register(String username, String email/*, String captchaToken*/);
     void resetPassword(String username/*, String captchaToken*/);
     void resetTotp(String username/*, String captchaToken*/);
     void captchaTest(String captchaToken);
