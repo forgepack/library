@@ -39,8 +39,8 @@ import java.util.UUID;
  * @see DTORequestRole
  */
 
-@Unique(service = ServiceUser.class, field = "email")
-//@Unique(service = ServiceUser.class, field = "username")
+@Unique(service = ServiceUser.class, field = "username")
+//@Unique(service = ServiceUser.class, field = "email")
 public record DTORequestUser (
 
     UUID id,
