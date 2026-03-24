@@ -31,10 +31,9 @@ import java.util.stream.Collectors;
 @Service
 public class ServiceAuth implements ServiceInterfaceAuth {
 
-//    private final ServiceTOTP serviceTOTP;
-//    private final ServiceEmail serviceEmail;
+    private final ServiceSecret serviceSecret;
 //    private final ServiceRecaptcha serviceRecaptcha;
-//    private final E2EE e2EE;
+//    private final ServiceEmail serviceEmail;
     private final AuthenticationManager authenticationManager;
     private final ConfigurationJWT configurationJwt;
     private final RepositoryToken repositoryToken;
@@ -44,7 +43,8 @@ public class ServiceAuth implements ServiceInterfaceAuth {
     private final ServiceUser serviceUser;
     private static final Logger log = LoggerFactory.getLogger(Information.class);
 
-    public ServiceAuth(AuthenticationManager authenticationManager, ConfigurationJWT configurationJwt, RepositoryToken repositoryToken, RepositoryUser repositoryUser, Mapper<Token, DTORequestToken, DTOResponseToken> mapper, ServiceCustomUserDetails serviceCustomUserDetails, ServiceUser serviceUser) {
+    public ServiceAuth(ServiceSecret serviceSecret, AuthenticationManager authenticationManager, ConfigurationJWT configurationJwt, RepositoryToken repositoryToken, RepositoryUser repositoryUser, Mapper<Token, DTORequestToken, DTOResponseToken> mapper, ServiceCustomUserDetails serviceCustomUserDetails, ServiceUser serviceUser) {
+        this.serviceSecret = serviceSecret;
         this.authenticationManager = authenticationManager;
         this.configurationJwt = configurationJwt;
         this.repositoryToken = repositoryToken;
@@ -57,7 +57,7 @@ public class ServiceAuth implements ServiceInterfaceAuth {
     public DTOResponseToken login(DTORequestUserAuth dtoRequestUserAuth) {
         try {
 //            captchaTest(dtoRequestUserAuth.getCaptchaToken());
-//            serviceTOTP.validateTOTP(dtoRequestUserAuth.username(), dtoRequestUserAuth.totpKey());
+//            serviceSecret.validateTOTP(dtoRequestUserAuth.username(), dtoRequestUserAuth.totpKey());
             serviceCustomUserDetails.loadUserByUsername(dtoRequestUserAuth.username());
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(dtoRequestUserAuth.username(), dtoRequestUserAuth.password()));
             resetAttempts(dtoRequestUserAuth.username());
@@ -101,22 +101,6 @@ public class ServiceAuth implements ServiceInterfaceAuth {
                         new RuntimeException("Token not found.")
                 );
     }
-//    @Override
-//    public DTOResponseUser resetSecret(String username) {
-//        User user = isValidToChange(username);
-//        String secret = serviceTOTP.generateSecret();
-//        try {
-//            Objects.requireNonNull(user).setSecret(e2EE.encrypt(secret));
-//            repositoryUser.save(user);
-//            byte[] qrCodeBytes = QRCode.generateQRCodeBytes(buildTotpUri(user.getUsername(), user.getSecret()), 200);
-//            String emailContent = buildWelcomeEmailContent(user.getUsername(), "Your password is the same as before", secret);
-//            serviceEmail.sendHtmlMessageWithAttachment(user.getEmail(), "Reset TOTP requested", emailContent, qrCodeBytes, "qrcode.png", "image/png");
-//            log.info("{} resetting user totp with ID: {}", information.getCurrentUser().orElse("Unknown User"), user.getId());
-//            return MapStruct.MAPPER.toDTO(user);
-//        } catch (Exception e) {
-//            throw new IllegalStateException("Failed to reset TOTP for user: " + user.getUsername());
-//        }
-//    }
     public void addAttempt(DTORequestUserAuth dtoRequestUserAuth) {
         User entity = repositoryUser.findByUsername(dtoRequestUserAuth.username()).orElseThrow(() -> new RuntimeException("Resource not found"));
         entity.setAttempt(entity.getAttempt() == null ? 0 : entity.getAttempt() + 1);
@@ -133,17 +117,4 @@ public class ServiceAuth implements ServiceInterfaceAuth {
             repositoryUser.save(user);
         });
     }
-//    @Override
-//    public void resetSecret(String username/*, String captchaToken*/) throws Exception {
-////        captchaTest(captchaToken);
-//        User entity = repositoryUser.findByUsername(username).orElseThrow(() -> new RuntimeException("Resource not found"));
-//        serviceEmail.sendSimpleMessage(entity.getEmail(), "Recovery totp", e2EE.decrypt(entity.getSecret()));
-//    }
-//    @Override
-//    public void captchaTest(String captchaToken) {
-//        if (!serviceRecaptcha.validateCaptcha(captchaToken)) {
-//            log.error("Invalid or suspicious CAPTCHA: {}", captchaToken);
-//            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or suspicious CAPTCHA");
-//        }
-//    }
 }

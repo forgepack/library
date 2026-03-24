@@ -7,6 +7,4 @@ public interface ServiceInterfacePassword {
 
     DTOResponseUser changePassword(DTORequestUserAuth dtoRequestUserUser);
     DTOResponseUser resetPassword(String username);
-//    void resetSecret(String username/*, String captchaToken*/);
-//    void captchaTest(String captchaToken);
 }

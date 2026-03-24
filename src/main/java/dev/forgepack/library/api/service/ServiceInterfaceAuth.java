@@ -10,6 +10,4 @@ public interface ServiceInterfaceAuth {
     DTOResponseToken login(DTORequestUserAuth dtoRequestUserAuth);
     DTOResponseToken refresh(DTORequestToken dtoRequestToken);
     DTOResponseToken logout(UUID refreshToken);
-//    void resetSecret(String username/*, String captchaToken*/);
-//    void captchaTest(String captchaToken);
 }
