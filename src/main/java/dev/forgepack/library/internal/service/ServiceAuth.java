@@ -1,6 +1,7 @@
 package dev.forgepack.library.internal.service;
 
 import dev.forgepack.library.api.mapper.Mapper;
+import dev.forgepack.library.api.service.ServiceInterfaceAuth;
 import dev.forgepack.library.internal.configuration.ConfigurationJWT;
 import dev.forgepack.library.internal.model.Token;
 import dev.forgepack.library.internal.model.User;
@@ -15,6 +16,7 @@ import dev.forgepack.library.internal.utils.Information;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -27,7 +29,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-public class ServiceAuth {
+public class ServiceAuth implements ServiceInterfaceAuth {
 
 //    private final ServiceTOTP serviceTOTP;
 //    private final ServiceEmail serviceEmail;
@@ -51,23 +53,29 @@ public class ServiceAuth {
         this.serviceCustomUserDetails = serviceCustomUserDetails;
         this.serviceUser = serviceUser;
     }
-
+    @Override
     public DTOResponseToken login(DTORequestUserAuth dtoRequestUserAuth) {
-//        captchaTest(dtoRequestUserAuth.getCaptchaToken());
-        serviceCustomUserDetails.loadUserByUsername(dtoRequestUserAuth.username());
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(dtoRequestUserAuth.username(), dtoRequestUserAuth.password()));
-//        serviceTOTP.validateTOTP(dtoRequestUserAuth.username(), dtoRequestUserAuth.totpKey());
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String token = configurationJwt.generateToken(authentication.getName());
-        UUID refreshToken = UUID.randomUUID();
-        repositoryToken.save(new Token(refreshToken, true));
-        return new DTOResponseToken(
-                token,
-                refreshToken,
-                authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet())
-        );
+        try {
+//            captchaTest(dtoRequestUserAuth.getCaptchaToken());
+//            serviceTOTP.validateTOTP(dtoRequestUserAuth.username(), dtoRequestUserAuth.totpKey());
+            serviceCustomUserDetails.loadUserByUsername(dtoRequestUserAuth.username());
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(dtoRequestUserAuth.username(), dtoRequestUserAuth.password()));
+            resetAttempts(dtoRequestUserAuth.username());
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String token = configurationJwt.generateToken(authentication.getName());
+            UUID refreshToken = UUID.randomUUID();
+            repositoryToken.save(new Token(refreshToken, true));
+            return new DTOResponseToken(
+                    token,
+                    refreshToken,
+                    authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet())
+            );
+        } catch (BadCredentialsException e) {
+            addAttempt(dtoRequestUserAuth);
+            throw e;
+        }
     }
-
+    @Override
     public DTOResponseToken refresh(DTORequestToken dtoRequestToken) {
         if (repositoryToken.existsByRefreshToken(dtoRequestToken.refreshToken()) &&
                 configurationJwt.validateJWT(dtoRequestToken.accessToken())) {
@@ -82,7 +90,7 @@ public class ServiceAuth {
             return null;
         }
     }
-
+    @Override
     public DTOResponseToken logout(UUID refreshToken) {
         return repositoryToken.findByRefreshToken(refreshToken)
                 .map(token -> {
@@ -93,6 +101,22 @@ public class ServiceAuth {
                         new RuntimeException("Token not found.")
                 );
     }
+//    @Override
+//    public DTOResponseUser resetSecret(String username) {
+//        User user = isValidToChange(username);
+//        String secret = serviceTOTP.generateSecret();
+//        try {
+//            Objects.requireNonNull(user).setSecret(e2EE.encrypt(secret));
+//            repositoryUser.save(user);
+//            byte[] qrCodeBytes = QRCode.generateQRCodeBytes(buildTotpUri(user.getUsername(), user.getSecret()), 200);
+//            String emailContent = buildWelcomeEmailContent(user.getUsername(), "Your password is the same as before", secret);
+//            serviceEmail.sendHtmlMessageWithAttachment(user.getEmail(), "Reset TOTP requested", emailContent, qrCodeBytes, "qrcode.png", "image/png");
+//            log.info("{} resetting user totp with ID: {}", information.getCurrentUser().orElse("Unknown User"), user.getId());
+//            return MapStruct.MAPPER.toDTO(user);
+//        } catch (Exception e) {
+//            throw new IllegalStateException("Failed to reset TOTP for user: " + user.getUsername());
+//        }
+//    }
     public void addAttempt(DTORequestUserAuth dtoRequestUserAuth) {
         User entity = repositoryUser.findByUsername(dtoRequestUserAuth.username()).orElseThrow(() -> new RuntimeException("Resource not found"));
         entity.setAttempt(entity.getAttempt() == null ? 0 : entity.getAttempt() + 1);
@@ -103,20 +127,19 @@ public class ServiceAuth {
         }
         repositoryUser.save(entity);
     }
-    public void validUser(String username) {
-        User entity = repositoryUser.findByUsername(username).orElseThrow(() -> new RuntimeException("Resource not found"));
-        if(!entity.getActive()) throw new RuntimeException("User blocked");
+    public void resetAttempts(String username) {
+        repositoryUser.findByUsername(username).ifPresent(user -> {
+            user.setAttempt(0);
+            repositoryUser.save(user);
+        });
     }
-    public void resetPassword(String username/*, String captchaToken*/) {
-//        captchaTest(captchaToken);
-        User entity = repositoryUser.findByUsername(username).orElseThrow(() -> new RuntimeException("Resource not found"));
-//        serviceEmail.sendSimpleMessage(entity.getEmail(), "Recovery password", entity.getPassword());
-    }
-//    public void resetTotp(String username/*, String captchaToken*/) throws Exception {
+//    @Override
+//    public void resetSecret(String username/*, String captchaToken*/) throws Exception {
 ////        captchaTest(captchaToken);
 //        User entity = repositoryUser.findByUsername(username).orElseThrow(() -> new RuntimeException("Resource not found"));
 //        serviceEmail.sendSimpleMessage(entity.getEmail(), "Recovery totp", e2EE.decrypt(entity.getSecret()));
 //    }
+//    @Override
 //    public void captchaTest(String captchaToken) {
 //        if (!serviceRecaptcha.validateCaptcha(captchaToken)) {
 //            log.error("Invalid or suspicious CAPTCHA: {}", captchaToken);

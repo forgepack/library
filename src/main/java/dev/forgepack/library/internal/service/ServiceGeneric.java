@@ -131,7 +131,7 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
                 .orElse("id");
         if ("id".equalsIgnoreCase(propertyName) && StringUtils.hasText(value)) {
             try {
-                addLog("retrieve", null, propertyName, value);
+                addLog("find all", null, propertyName, value);
                 return repositoryInterface.findById(UUID.fromString(value), pageable)
                         .map(this::addHateoas);
             } catch (IllegalArgumentException e){
@@ -150,7 +150,7 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
             Object convertedValue = ConvertUtils.convert(value, field.getType());
             setter.invoke(object, convertedValue);
             Example<Entity> example = Example.of(object, exampleMatcher);
-            addLog("retrieve", null, propertyName, value);
+            addLog("find all", null, propertyName, value);
             return repositoryInterface.findAll(example, pageable).map(this::addHateoas);
         } catch (Exception exception) {
             log.warn("Error searching {} by {}: {}", entityClass.getSimpleName(), propertyName, exception.getMessage());
@@ -170,10 +170,8 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
      */
     @Transactional
     public DTOResponse findById(UUID id){
-        addLog("retrieve", id, null, null);
-        Entity entity = repositoryInterface.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        String.format("%s not found with ID: %s", entityClass.getSimpleName(), id)));
+        Entity entity = existsEntity("find by ID", id);
+        addLog("find by ID", id, null, null);
         return addHateoas(entity);
     }
 
@@ -193,12 +191,10 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
      */
     @Transactional
     public DTOResponse update(DTORequest updated){
-        addLog("update", updated.id(), null, null);
-        repositoryInterface.findById(updated.id())
-                .orElseThrow(() -> new EntityNotFoundException(
-                        String.format("Cannot update: %s not found with ID: %s", entityClass.getSimpleName(), updated.id())));
+        existsEntity("update", updated.id());
         Entity entity = mapper.toEntity(updated);
         entity.setId(updated.id());
+        addLog("update", updated.id(), null, null);
         return addHateoas(repositoryInterface.save(entity));
     }
 
@@ -214,12 +210,10 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
      */
     @Transactional
     public DTOResponse softDelete(UUID id){
-        addLog("soft delete", id, null, null);
-        Entity entity = repositoryInterface.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        String.format("Cannot soft delete: %s not found with ID: %s", entityClass.getSimpleName(), id)));
+        Entity entity = existsEntity("soft delete", id);
         entity.setDeletedAt(LocalDateTime.now());
         repositoryInterface.save(entity);
+        addLog("soft delete", id, null, null);
         return addHateoas(entity);
     }
 
@@ -235,12 +229,10 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
      */
     @Transactional
     public DTOResponse restore(UUID id){
-        addLog("restore", id, null, null);
-        Entity entity = repositoryInterface.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        String.format("Cannot restore: %s not found with ID: %s", entityClass.getSimpleName(), id)));
+        Entity entity = existsEntity("restore", id);
         entity.setDeletedAt(null);
         repositoryInterface.save(entity);
+        addLog("restore", id, null, null);
         return addHateoas(entity);
     }
 
@@ -256,11 +248,9 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
      */
     @Transactional
     public DTOResponse hardDelete(UUID id){
-        addLog("delete", id, null, null);
-        Entity entity = repositoryInterface.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        String.format("Cannot hard delete: %s not found with ID: %s", entityClass.getSimpleName(), id)));
+        Entity entity = existsEntity("hard delete", id);
         repositoryInterface.delete(entity);
+        addLog("hard delete", id, null, null);
         return addHateoas(entity);
     }
 
@@ -297,5 +287,11 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
         }
 //        User user = repositoryUser.findByUsername(currentUser).orElse(null);
 //        repositoryLog.save(new Log(action, id, entityClass.getSimpleName(), user));
+    }
+
+    public Entity existsEntity(String action, UUID id) {
+        return repositoryInterface.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        String.format("Cannot %s: %s not found with ID %s", action, entityClass.getSimpleName(), id)));
     }
 }

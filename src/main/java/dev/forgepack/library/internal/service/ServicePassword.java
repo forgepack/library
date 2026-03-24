@@ -1,6 +1,7 @@
 package dev.forgepack.library.internal.service;
 
 import dev.forgepack.library.api.mapper.Mapper;
+import dev.forgepack.library.api.service.ServiceInterfacePassword;
 import dev.forgepack.library.internal.model.User;
 import dev.forgepack.library.internal.payload.DTORequestUser;
 import dev.forgepack.library.internal.payload.DTORequestUserAuth;
@@ -17,7 +18,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Service
-public class ServicePassword {
+public class ServicePassword implements ServiceInterfacePassword {
 
     private final PasswordEncoder passwordEncoder;
     private final RepositoryUser repositoryUser;
@@ -30,9 +31,25 @@ public class ServicePassword {
         this.mapper = mapper;
     }
 
+    @Override
+    public DTOResponseUser changePassword(DTORequestUserAuth updated){
+        User user = isValidToChange(updated.id());
+        Objects.requireNonNull(user).setPassword(passwordEncoder.encode(updated.password()));
+        repositoryUser.save(user);
+        log.info("{} changing user password with ID: {}", new Information().getCurrentUser().orElse("Unknown User"), user.getId());
+        return mapper.toResponse(user);
+    }
+    @Override
+    public DTOResponseUser resetPassword(String username) {
+        User user = isValidToChange(username);
+        String password = generateSecurePassword();
+        user.setPassword(passwordEncoder.encode(password));
+        repositoryUser.save(user);
+        log.info("{} changing user password with ID: {}", new Information().getCurrentUser().orElse("Unknown User"), user.getId());
+        return mapper.toResponse(user);
+    }
     public User createPassword(User created){
         String password = generateSecurePassword();
-        System.out.println("Password: " + password);
         created.setPassword(passwordEncoder.encode(password));
         return created;
     }
@@ -61,21 +78,6 @@ public class ServicePassword {
             chars[j] = temp;
         }
         return new String(chars);
-    }
-    public DTOResponseUser changePassword(DTORequestUserAuth updated){
-        User user = isValidToChange(updated.id());
-        Objects.requireNonNull(user).setPassword(passwordEncoder.encode(updated.password()));
-        repositoryUser.save(user);
-        log.info("{} changing user password with ID: {}", new Information().getCurrentUser().orElse("Unknown User"), user.getId());
-        return mapper.toResponse(user);
-    }
-    public DTOResponseUser resetPassword(String username) {
-        User user = isValidToChange(username);
-        String password = generateSecurePassword();
-        user.setPassword(passwordEncoder.encode(password));
-        repositoryUser.save(user);
-        log.info("{} changing user password with ID: {}", new Information().getCurrentUser().orElse("Unknown User"), user.getId());
-        return mapper.toResponse(user);
     }
     public User isValidToChange(UUID id) {
         String currentUser = new Information().getCurrentUser().orElse("Unknown User");
