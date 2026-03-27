@@ -16,7 +16,7 @@ import java.util.UUID;
  * Website:	www.forgepack.dev
  **/
 
-@Unique(service = ServiceRole.class, field = "name")
+@Unique(service = ServiceRole.class, fields = { "name" })
 public record DTORequestRole(
 
         UUID id,

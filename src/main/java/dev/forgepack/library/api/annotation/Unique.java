@@ -64,7 +64,7 @@ public @interface Unique {
     String message() default "{unique}";
     Class<?>[] groups() default { };
     Class<? extends Payload>[] payload() default { };
-    String field() default "name";
+    String[] fields() default {"name"};
     String idField() default "id";
     Class<? extends UniqueCheckable> service();
 }

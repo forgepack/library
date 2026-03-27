@@ -51,7 +51,7 @@ import java.util.UUID;
 @Component
 public class ValidatorUnique implements ConstraintValidator<Unique, Object> {
 
-    private String field;
+    private String[] fields;
     private String idField;
     private Class<? extends UniqueCheckable> serviceClass;
     private UniqueCheckable service;
@@ -63,31 +63,35 @@ public class ValidatorUnique implements ConstraintValidator<Unique, Object> {
 
     @Override
     public void initialize(Unique annotation) {
-        this.field = annotation.field();
+        this.fields = annotation.fields();
         this.idField = annotation.idField();
         this.serviceClass = annotation.service();
-        this.service = (UniqueCheckable) context.getBean(annotation.service());
+        this.service = context.getBean(annotation.service());
     }
     @Override
     public boolean isValid(Object value, ConstraintValidatorContext context) {
         if (value == null) return true;
-        Object fieldValue = getFieldValue(value, field);
-        if (fieldValue == null) return true;
-        String trimmed = fieldValue.toString().trim();
-        if (trimmed.isBlank()) return true;
         Object idValue = getFieldValue(value, idField);
-        boolean isUnique = (idValue == null || idValue.toString().isBlank())
-                ? !resolveService().existsByField(field, trimmed)
-                : !resolveService().existsByFieldAndIdNot(field, trimmed, (UUID) idValue);
-        if (!isUnique) {
-            context.disableDefaultConstraintViolation();
-            context.buildConstraintViolationWithTemplate(
-                            context.getDefaultConstraintMessageTemplate()
-                                    .replace("{field}", field)
-                    ).addPropertyNode(field)
-                    .addConstraintViolation();
+        boolean allUnique = true;
+        for (String field : fields) {
+            Object fieldValue = getFieldValue(value, field);
+            if (fieldValue == null) continue;
+            String trimmed = fieldValue.toString().trim();
+            if (trimmed.isBlank()) continue;
+            boolean isUnique = (idValue == null || idValue.toString().isBlank())
+                    ? !resolveService().existsByField(field, trimmed)
+                    : !resolveService().existsByFieldAndIdNot(field, trimmed, (UUID) idValue);
+            if (!isUnique) {
+                context.disableDefaultConstraintViolation();
+                context.buildConstraintViolationWithTemplate(
+                                context.getDefaultConstraintMessageTemplate()
+                                        .replace("{field}", field)
+                        ).addPropertyNode(field)
+                        .addConstraintViolation();
+                allUnique = false;
+            }
         }
-        return isUnique;
+        return allUnique;
     }
     private UniqueCheckable resolveService() {
         if (service == null) {

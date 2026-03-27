@@ -34,11 +34,11 @@ class UniqueValidatorTest {
     private jakarta.validation.ConstraintValidatorContext ctx;
 
     // DTO auxiliar para testes isolados
-    @Unique(service = ServiceRole.class, field = "name")
+    @Unique(service = ServiceRole.class, fields = { "name" })
     record TestDTO(UUID id, String name) {}
 
     // DTO com idField como String UUID
-    @Unique(service = ServiceRole.class, field = "name", idField = "id")
+    @Unique(service = ServiceRole.class, fields = { "name" }, idField = "id")
     record TestDTOStringId(String id, String name) {}
 
     @BeforeEach

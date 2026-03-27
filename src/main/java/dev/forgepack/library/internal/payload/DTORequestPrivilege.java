@@ -15,7 +15,7 @@ import jakarta.validation.constraints.NotNull;
  * Website:	www.forgepack.dev
  **/
 
-@Unique(service = ServicePrivilege.class, field = "name")
+@Unique(service = ServicePrivilege.class, fields = { "name" })
 public record DTORequestPrivilege(
 
         UUID id,
