@@ -1,7 +1,13 @@
 package dev.forgepack.library.internal.model;
 
-import jakarta.persistence.*;
-
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Column;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.CascadeType;
 import org.hibernate.annotations.*;
 import org.hibernate.envers.Audited;
@@ -14,23 +20,45 @@ import java.util.Objects;
 import java.util.UUID;
 
 /**
- * Entidade base abstrata com funcionalidades de auditoria e soft delete.
- * <p>
- * Esta classe fornece campos comuns para auditoria (criação, atualização, exclusão lógica)
- * e deve ser estendida por todas as entidades que necessitam de rastreamento de alterações.
- * Implementa soft delete.
- * 
- * Funcionalidades:
+ * Base superclass for persistent entities providing auditing and soft delete support.
+ *
+ * <p>This class defines a standardized set of cross-cutting concerns for domain entities,
+ * including identity management, automatic auditing, and logical deletion. It is designed
+ * as a {@link MappedSuperclass}, allowing subclasses to inherit mappings without requiring
+ * a dedicated table.</p>
+ *
+ * <h2>Responsibilities</h2>
  * <ul>
- *     <li>ID único baseado em UUID</li>
- *     <li>Timestamp automático de criação e atualização</li>
- *     <li>Rastreamento de usuário criador e modificador</li>
- *     <li>Soft delete com campo deleted_at</li>
- *     <li>Filtro automático para exclusão lógica</li>
+ *     <li>Unique identification using {@link UUID}</li>
+ *     <li>Automatic temporal auditing (creation and last update timestamps)</li>
+ *     <li>Author tracking (created by / modified by)</li>
+ *     <li>Logical deletion (soft delete)</li>
+ *     <li>Compatibility with Hibernate Envers auditing via {@link Audited}</li>
  * </ul>
- * 
+ *
+ * <h2>Auditing</h2>
+ * <p>Auditing is integrated with Spring Data JPA through
+ * {@link org.springframework.data.jpa.domain.support.AuditingEntityListener}.
+ * An {@code AuditorAware} implementation must be configured in the application
+ * context to automatically populate {@code createdBy} and {@code modifiedBy}.</p>
+ *
+ * <h2>Soft Delete</h2>
+ * <p>Logical deletion is represented by the {@code deletedAt} field. When non-null,
+ * the entity is considered deleted. Applications are responsible for filtering out
+ * such records using mechanisms like {@code @Where}, {@code @Filter}, or repository logic.</p>
+ *
+ * <h2>Equality</h2>
+ * <p>The {@code equals} and {@code hashCode} implementations rely exclusively on the
+ * entity identifier ({@code id}), assuming stable identity after persistence.</p>
+ *
+ * <h2>Considerations</h2>
+ * <ul>
+ *     <li>Avoid accessing {@code LAZY} associations outside of a transactional context</li>
+ *     <li>Using {@code UUID} improves portability and supports distributed systems</li>
+ *     <li>Soft delete does not enforce referential integrity at the database level</li>
+ * </ul>
+ *
  * @author Marcelo Ribeiro Gadelha
- * @version 1.0
  * @since 1.0
  */
 @Audited
@@ -39,69 +67,59 @@ import java.util.UUID;
 public abstract class GenericAuditEntity implements Serializable {
 
     /**
-     * Identificador único da entidade.
-     * <p>
-     * Utiliza UUID para garantir unicidade global e evitar conflitos
-     * em ambientes distribuídos.
+     * Unique identifier of the entity.
+     *
+     * <p>Automatically generated using {@link GenerationType#UUID}, ensuring global
+     * uniqueness and independence from database-specific strategies.</p>
      */
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", unique = true, nullable = false)
     private UUID id;
-    
+
     /**
-     * Data e hora de criação do registro.
-     * <p>
-     * Preenchido automaticamente na persistência através da anotação
-     * {@code @CreationTimestamp}.
+     * Timestamp indicating when the entity was created.
+     *
+     * <p>Automatically set at persistence time and immutable thereafter.</p>
      */
     @CreationTimestamp @Column(updatable = false)
     private LocalDateTime createdAt;
-    
+
     /**
-     * Data e hora da última atualização do registro.
-     * <p>
-     * Atualizado automaticamente a cada modificação através da anotação
-     * {@code @UpdateTimestamp}.
+     * Timestamp indicating the last time the entity was updated.
+     *
+     * <p>Automatically updated on each modification.</p>
      */
     @UpdateTimestamp
     private LocalDateTime updatedAt;
-    
+
     /**
-     * Usuário responsável pela criação do registro.
-     * <p>
-     * Preenchido automaticamente através da anotação {@code @CreatedBy}
-     * e configuração de auditoria do Spring Data.
+     * User responsible for creating the entity.
+     *
+     * <p>Automatically populated via {@link CreatedBy}, depending on the configured
+     * {@code AuditorAware} implementation.</p>
      */
     @CreatedBy
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
     private User createdBy;
-    
+
     /**
-     * Usuário responsável pela última modificação do registro.
-     * <p>
-     * Atualizado automaticamente através da anotação {@code @LastModifiedBy}
-     * e configuração de auditoria do Spring Data.
+     * User responsible for the last modification of the entity.
+     *
+     * <p>Automatically updated via {@link LastModifiedBy}.</p>
      */
     @LastModifiedBy
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
     private User modifiedBy;
-    
+
     /**
-     * Data e hora da exclusão lógica do registro.
-     * <p>
-     * Quando preenchido, indica que o registro foi "excluído" logicamente.
-     * O filtro {@code deletedFilter} oculta automaticamente registros com
-     * este campo preenchido nas consultas.
+     * Timestamp representing logical deletion (soft delete).
+     *
+     * <p>When non-null, the entity is considered deleted. Physical removal
+     * is not performed automatically.</p>
      */
     private LocalDateTime deletedAt;
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
