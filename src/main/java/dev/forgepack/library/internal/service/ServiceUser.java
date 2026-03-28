@@ -74,6 +74,8 @@ public class ServiceUser extends ServiceGeneric<User, DTORequestUser, DTORespons
     public DTOResponseUser create(DTORequestUser created){
         User user = mapper.toEntity(created);
         user = servicePassword.createPassword(user);
+        System.out.println("Username: " + user.getUsername());
+        System.out.println("Password: " + user.getPassword());
         try {
 //            user.setSecret(e2EE.encrypt(secret));
             Set<Role> roles = new HashSet<>();
