@@ -1,7 +1,7 @@
 package dev.forgepack.library.internal.service;
 
 import dev.forgepack.library.internal.model.User;
-import dev.forgepack.library.internal.repository.RepositoryUser;
+import jakarta.persistence.EntityManager;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.security.core.Authentication;
@@ -13,18 +13,22 @@ import java.util.Optional;
 @Service
 public class ServiceAuditorAwareImpl implements AuditorAware<User> {
 
-    private final RepositoryUser repositoryUser;
+    private final EntityManager entityManager;
 
-    public ServiceAuditorAwareImpl(RepositoryUser repositoryUser) {
-        this.repositoryUser = repositoryUser;
+    public ServiceAuditorAwareImpl(EntityManager entityManager) {
+        this.entityManager = entityManager;
     }
     @Override @NonNull
     public Optional<User> getCurrentAuditor() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated() || !(authentication.getPrincipal() instanceof UserDetails)) {
+        if (authentication == null || !authentication.isAuthenticated()
+                || !(authentication.getPrincipal() instanceof UserDetails userDetails)) {
             return Optional.empty();
         }
-        String username = ((UserDetails) authentication.getPrincipal()).getUsername();
-        return repositoryUser.findByUsername(username);
+        return entityManager
+                .createQuery("SELECT u FROM User u WHERE u.username = :username", User.class)
+                .setParameter("username", userDetails.getUsername())
+                .getResultStream()
+                .findFirst();
     }
 }
