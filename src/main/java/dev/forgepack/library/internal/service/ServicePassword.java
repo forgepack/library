@@ -50,6 +50,7 @@ public class ServicePassword implements ServiceInterfacePassword {
     }
     public User createPassword(User created){
         String password = generateSecurePassword();
+        System.out.println("Password: " + password);
         created.setPassword(passwordEncoder.encode(password));
         return created;
     }
