@@ -116,6 +116,9 @@ public class ServiceUser extends ServiceGeneric<User, DTORequestUser, DTORespons
         if ("username".equals(field)) {
             return repositoryUser.existsByUsernameIgnoreCase((String) value);
         }
+        if ("email".equals(field)) {
+            return repositoryUser.existsByUsernameIgnoreCase((String) value);
+        }
         else {
             throw new IllegalArgumentException("Invalid argument");
         }
@@ -139,6 +142,9 @@ public class ServiceUser extends ServiceGeneric<User, DTORequestUser, DTORespons
     @Override
     public boolean existsByFieldAndIdNot(String field, Object value, UUID id) {
         if ("username".equals(field)){
+            return repositoryUser.existsByUsernameIgnoreCaseAndIdNot((String) value, id);
+        }
+        if ("email".equals(field)){
             return repositoryUser.existsByUsernameIgnoreCaseAndIdNot((String) value, id);
         } else {
             throw new IllegalArgumentException("Field must not be null or empty.");
