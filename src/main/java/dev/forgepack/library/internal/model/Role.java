@@ -46,7 +46,7 @@ public class Role extends GenericAuditEntity {
     @NotNull(message = "{not.null}") @NotBlank(message = "{not.blank}")
     private String name;
 
-    @ManyToMany(fetch = FetchType.LAZY , cascade = CascadeType.PERSIST)
+    @ManyToMany(fetch = FetchType.LAZY , cascade = { CascadeType.PERSIST, CascadeType.MERGE } )
     @JoinTable(name = "role_privileges", joinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "privilege_id", referencedColumnName = "id"))
     private Set<Privilege> privilege = new HashSet<>();
