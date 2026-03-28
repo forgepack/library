@@ -191,9 +191,8 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
      */
     @Transactional
     public DTOResponse update(DTORequest updated){
-        existsEntity("update", updated.id());
-        Entity entity = mapper.toEntity(updated);
-        entity.setId(updated.id());
+        Entity entity = existsEntity("update", updated.id());
+        mapper.updateEntity(updated, entity);
         addLog("update", updated.id(), null, null);
         return addHateoas(repositoryInterface.save(entity));
     }
