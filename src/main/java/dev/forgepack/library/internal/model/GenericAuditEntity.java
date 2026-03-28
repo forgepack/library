@@ -119,9 +119,6 @@ public abstract class GenericAuditEntity implements Serializable {
      */
     private LocalDateTime deletedAt;
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
     public void setCreatedBy(User createdBy) {
         this.createdBy = createdBy;
     }
