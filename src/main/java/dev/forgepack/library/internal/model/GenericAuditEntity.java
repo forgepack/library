@@ -99,7 +99,7 @@ public abstract class GenericAuditEntity implements Serializable {
      * {@code AuditorAware} implementation.</p>
      */
     @CreatedBy
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     private User createdBy;
 
     /**
@@ -108,7 +108,7 @@ public abstract class GenericAuditEntity implements Serializable {
      * <p>Automatically updated via {@link LastModifiedBy}.</p>
      */
     @LastModifiedBy
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     private User modifiedBy;
 
     /**
