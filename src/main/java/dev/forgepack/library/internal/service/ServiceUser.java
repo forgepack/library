@@ -2,6 +2,7 @@ package dev.forgepack.library.internal.service;
 
 import dev.forgepack.library.api.mapper.Mapper;
 import dev.forgepack.library.api.repository.RepositoryInterface;
+import dev.forgepack.library.api.service.ServiceInterfaceEmail;
 import dev.forgepack.library.api.validator.UniqueCheckable;
 import dev.forgepack.library.api.service.ServiceInterface;
 import dev.forgepack.library.internal.model.Role;
@@ -59,14 +60,16 @@ public class ServiceUser extends ServiceGeneric<User, DTORequestUser, DTORespons
     private final ServicePassword servicePassword;
     private final RepositoryUser repositoryUser;
     private final RepositoryRole repositoryRole;
+    private final ServiceInterfaceEmail serviceEmail;
     private final Mapper<User, DTORequestUser, DTOResponseUser> mapper;
     private static final Logger log = LoggerFactory.getLogger(Information.class);
 
-    public ServiceUser(RepositoryInterface<User> repositoryInterface, Mapper<User, DTORequestUser, DTOResponseUser> mapperInterface, RepositoryUser repositoryUser, RepositoryLog repositoryLog, RepositoryRole repositoryRole, ServicePassword servicePassword) {
+    public ServiceUser(RepositoryInterface<User> repositoryInterface, ServiceEmailImpl serviceEmail, Mapper<User, DTORequestUser, DTOResponseUser> mapperInterface, RepositoryUser repositoryUser, RepositoryLog repositoryLog, RepositoryRole repositoryRole, ServicePassword servicePassword) {
         super(User.class, repositoryInterface, mapperInterface, repositoryUser, repositoryLog);
         this.servicePassword = servicePassword;
         this.repositoryUser = repositoryUser;
         this.repositoryRole = repositoryRole;
+        this.serviceEmail = serviceEmail;
         this.mapper = mapperInterface;
     }
 
@@ -83,8 +86,8 @@ public class ServiceUser extends ServiceGeneric<User, DTORequestUser, DTORespons
             user.setActive(true);
             user.setAttempt(0);
 //            byte[] qrCodeBytes = QRCode.generateQRCodeBytes(buildTotpUri(user.getUsername(), user.getSecret()), 200);
-//            String emailContent = buildWelcomeEmailContent(user.getUsername(), password, secret);
-//            serviceEmail.sendHtmlMessageWithAttachment(user.getEmail(), "Account Created", emailContent, qrCodeBytes, "qrcode.png", "image/png");
+            String emailContent = serviceEmail.buildWelcomeEmailContent(user.getUsername(), "password", "secret");
+            serviceEmail.sendHtmlMessageWithAttachment(user.getEmail(), "Account Created", emailContent, /*qrCodeBytes, */"qrcode.png", "image/png");
 //        } catch (MailException e) {
 //            log.error("Error sending email for {}: {}", user.getUsername(), e.getMessage());
 //            throw new BadCredentialsException("Failed to send welcome email");
