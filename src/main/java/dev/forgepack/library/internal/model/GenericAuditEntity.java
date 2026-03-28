@@ -44,8 +44,7 @@ import java.util.UUID;
  *
  * <h2>Soft Delete</h2>
  * <p>Logical deletion is represented by the {@code deletedAt} field. When non-null,
- * the entity is considered deleted. Applications are responsible for filtering out
- * such records using mechanisms like {@code @Where}, {@code @Filter}, or repository logic.</p>
+ * the entity is considered deleted.</p>
  *
  * <h2>Equality</h2>
  * <p>The {@code equals} and {@code hashCode} implementations rely exclusively on the
