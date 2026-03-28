@@ -29,8 +29,8 @@ public record DTORequestUserAuth(
     @HasUpperCase
     @HasLowerCase
     @HasLength
-    String password
-//    @NotNull(message = "{not.null}")
-//    Integer totpKey,
+    String password,
+    @NotNull(message = "{not.null}")
+    Integer secret
 //    String captchaToken
 ) implements DTORequestIdentifiable<UUID> {}

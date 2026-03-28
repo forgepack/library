@@ -9,6 +9,6 @@ public interface ServiceInterfaceEmail {
 
     void sendSimpleMessage(String to, String subject, String text);
     void sendHtmlMessageWithAttachment(String to, String subject, String htmlContent,
-                                       /*byte[] attachmentData, */String attachmentName, String mimeType);
+                                       byte[] attachmentData, String attachmentName, String mimeType);
     String buildWelcomeEmailContent(String username, String password, String secret);
 }

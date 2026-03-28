@@ -57,7 +57,7 @@ public class ServiceAuth implements ServiceInterfaceAuth {
     public DTOResponseToken login(DTORequestUserAuth dtoRequestUserAuth) {
         try {
 //            captchaTest(dtoRequestUserAuth.getCaptchaToken());
-//            serviceSecret.validateTOTP(dtoRequestUserAuth.username(), dtoRequestUserAuth.totpKey());
+            serviceSecret.validateTOTP(dtoRequestUserAuth.username(), dtoRequestUserAuth.secret());
             serviceCustomUserDetails.loadUserByUsername(dtoRequestUserAuth.username());
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(dtoRequestUserAuth.username(), dtoRequestUserAuth.password()));
             resetAttempts(dtoRequestUserAuth.username());

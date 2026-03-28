@@ -42,7 +42,7 @@ public class ServiceEmailImpl implements ServiceInterfaceEmail {
         }
     }
 
-    public void sendHtmlMessageWithAttachment(String to, String subject, String htmlContent/*, byte[] attachmentData*/, String attachmentName, String mimeType) {
+    public void sendHtmlMessageWithAttachment(String to, String subject, String htmlContent, byte[] attachmentData, String attachmentName, String mimeType) {
         try {
             MimeMessage message = emailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -50,7 +50,7 @@ public class ServiceEmailImpl implements ServiceInterfaceEmail {
             helper.setTo(to);
             helper.setSubject(subject);
             helper.setText(htmlContent, true);
-//            helper.addAttachment(attachmentName, new ByteArrayResource(attachmentData), mimeType);
+            helper.addAttachment(attachmentName, new ByteArrayResource(attachmentData), mimeType);
             emailSender.send(message);
             log.info("HTML email with attachment sent successfully to: {} with subject: {}", to, subject);
         } catch (MessagingException e) {

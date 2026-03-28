@@ -1,6 +1,7 @@
 package dev.forgepack.library.internal.service;
 
 import dev.forgepack.library.api.mapper.Mapper;
+import dev.forgepack.library.api.service.ServiceInterfaceEmail;
 import dev.forgepack.library.api.service.ServiceInterfaceSecret;
 import dev.forgepack.library.internal.model.User;
 import dev.forgepack.library.internal.payload.DTORequestUser;
@@ -9,6 +10,7 @@ import dev.forgepack.library.internal.payload.DTORequestUserAuth;
 import dev.forgepack.library.internal.repository.RepositoryUser;
 import dev.forgepack.library.internal.utils.E2EE;
 import dev.forgepack.library.internal.utils.Information;
+import dev.forgepack.library.internal.utils.QRCode;
 import org.apache.commons.codec.binary.Base32;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,30 +28,33 @@ import java.security.SecureRandom;
 @Service
 public class ServiceSecret implements ServiceInterfaceSecret {
 
-//    private final ServiceEmail serviceEmail;
+    private final ServiceInterfaceEmail serviceEmail;
+    private final ServiceSecret serviceSecret;
 //    private final ServiceRecaptcha serviceRecaptcha;
     private final E2EE e2EE;
     private final RepositoryUser repositoryUser;
     private final Mapper<User, DTORequestUser, DTOResponseUser> mapper;
-    private final ServicePassword servicePassword;
+    private final ServiceUser serviceUser;
     private static final Logger log = LoggerFactory.getLogger(Information.class);
 
-    public ServiceSecret(E2EE e2EE,RepositoryUser repositoryUser, Mapper<User, DTORequestUser, DTOResponseUser> mapper, ServicePassword servicePassword) {
+    public ServiceSecret(ServiceInterfaceEmail serviceEmail, ServiceSecret serviceSecret, E2EE e2EE, RepositoryUser repositoryUser, Mapper<User, DTORequestUser, DTOResponseUser> mapper, ServicePassword servicePassword, ServiceUser serviceUser) {
+        this.serviceEmail = serviceEmail;
+        this.serviceSecret = serviceSecret;
         this.e2EE = e2EE;
         this.repositoryUser = repositoryUser;
         this.mapper = mapper;
-        this.servicePassword = servicePassword;
+        this.serviceUser = serviceUser;
     }
     @Override
     public DTOResponseUser resetSecret(String username) {
-        User user = servicePassword.isValidToChange(username);
-//        String secret = serviceTOTP.generateSecret();
+        User user = serviceUser.isValidToChange(username);
+        String secret = serviceSecret.generateSecret();
         try {
-//            Objects.requireNonNull(user).setSecret(e2EE.encrypt(secret));
+            user.setSecret(secret);
             repositoryUser.save(user);
-//            byte[] qrCodeBytes = QRCode.generateQRCodeBytes(buildTotpUri(user.getUsername(), user.getSecret()), 200);
-//            String emailContent = buildWelcomeEmailContent(user.getUsername(), "Your password is the same as before", secret);
-//            serviceEmail.sendHtmlMessageWithAttachment(user.getEmail(), "Reset TOTP requested", emailContent, qrCodeBytes, "qrcode.png", "image/png");
+            byte[] qrCodeBytes = QRCode.generateQRCodeBytes(buildTotpUri(user.getUsername(), user.getSecret()), 200);
+            String emailContent = serviceEmail.buildWelcomeEmailContent(user.getUsername(), "Your password is the same as before", secret);
+            serviceEmail.sendHtmlMessageWithAttachment(user.getEmail(), "Reset TOTP requested", emailContent, qrCodeBytes, "qrcode.png", "image/png");
             log.info("{} resetting user totp with ID: {}", new Information().getCurrentUser().orElse("Unknown User"), user.getId());
             return mapper.toResponse(user);
         } catch (Exception e) {
@@ -134,4 +139,14 @@ public class ServiceSecret implements ServiceInterfaceSecret {
         }
         return truncatedHash % 1000000;
     }
+    public String buildTotpUri(String username, String secret) throws Exception {
+        return String.format(
+                "otpauth://totp/%s:%s?secret=%s&issuer=%s",
+                username,
+                username + "@forgepack.com",
+                e2EE.decrypt(secret),
+                "Forgepack"
+        );
+    }
+
 }

@@ -13,8 +13,11 @@ import dev.forgepack.library.internal.repository.RepositoryLog;
 import dev.forgepack.library.internal.repository.RepositoryRole;
 import dev.forgepack.library.internal.repository.RepositoryUser;
 import dev.forgepack.library.internal.utils.Information;
+import dev.forgepack.library.internal.utils.QRCode;
+import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.mail.MailException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
@@ -58,39 +61,45 @@ import java.util.UUID;
 public class ServiceUser extends ServiceGeneric<User, DTORequestUser, DTOResponseUser> implements UniqueCheckable {
 
     private final ServicePassword servicePassword;
+    private final ServiceSecret serviceSecret;
     private final RepositoryUser repositoryUser;
     private final RepositoryRole repositoryRole;
     private final ServiceInterfaceEmail serviceEmail;
     private final Mapper<User, DTORequestUser, DTOResponseUser> mapper;
     private static final Logger log = LoggerFactory.getLogger(Information.class);
 
-    public ServiceUser(RepositoryInterface<User> repositoryInterface, ServiceEmailImpl serviceEmail, Mapper<User, DTORequestUser, DTOResponseUser> mapperInterface, RepositoryUser repositoryUser, RepositoryLog repositoryLog, RepositoryRole repositoryRole, ServicePassword servicePassword) {
+    public ServiceUser(RepositoryInterface<User> repositoryInterface, ServiceEmailImpl serviceEmail, Mapper<User, DTORequestUser, DTOResponseUser> mapperInterface, RepositoryUser repositoryUser, RepositoryLog repositoryLog, RepositoryRole repositoryRole, ServicePassword servicePassword, ServiceSecret serviceSecret) {
         super(User.class, repositoryInterface, mapperInterface, repositoryUser, repositoryLog);
         this.servicePassword = servicePassword;
         this.repositoryUser = repositoryUser;
         this.repositoryRole = repositoryRole;
         this.serviceEmail = serviceEmail;
         this.mapper = mapperInterface;
+        this.serviceSecret = serviceSecret;
     }
 
     @Override
     public DTOResponseUser create(DTORequestUser created){
         User user = mapper.toEntity(created);
-        user = servicePassword.createPassword(user);
         System.out.println("Username: " + user.getUsername());
+        String password = servicePassword.generateSecurePassword();
+        System.out.println("Password: " + password);
+        String secret = serviceSecret.generateSecret();
+        System.out.println("Secret: " + secret);
         try {
-//            user.setSecret(e2EE.encrypt(secret));
+            user.setPassword(password);
+            user.setSecret(secret);
             Set<Role> roles = new HashSet<>();
             roles.add(repositoryRole.findByName("VIEWER"));
             user.setRole(roles);
             user.setActive(true);
             user.setAttempt(0);
-//            byte[] qrCodeBytes = QRCode.generateQRCodeBytes(buildTotpUri(user.getUsername(), user.getSecret()), 200);
-            String emailContent = serviceEmail.buildWelcomeEmailContent(user.getUsername(), "password", "secret");
-            serviceEmail.sendHtmlMessageWithAttachment(user.getEmail(), "Account Created", emailContent, /*qrCodeBytes, */"qrcode.png", "image/png");
-//        } catch (MailException e) {
-//            log.error("Error sending email for {}: {}", user.getUsername(), e.getMessage());
-//            throw new BadCredentialsException("Failed to send welcome email");
+            byte[] qrCodeBytes = QRCode.generateQRCodeBytes(serviceSecret.buildTotpUri(user.getUsername(), user.getSecret()), 200);
+            String emailContent = serviceEmail.buildWelcomeEmailContent(user.getUsername(), password, secret);
+            serviceEmail.sendHtmlMessageWithAttachment(user.getEmail(), "Account Created", emailContent, qrCodeBytes, "qrcode.png", "image/png");
+        } catch (MailException e) {
+            log.error("Error sending email for {}: {}", user.getUsername(), e.getMessage());
+            throw new BadCredentialsException("Failed to send welcome email");
         } catch (Exception e) {
             log.error("Error generating TOTP secret for {}: {}", created, e.getMessage(), e);
             throw new BadCredentialsException("Invalid secret");
@@ -150,6 +159,33 @@ public class ServiceUser extends ServiceGeneric<User, DTORequestUser, DTORespons
             return repositoryUser.existsByUsernameIgnoreCaseAndIdNot((String) value, id);
         } else {
             throw new IllegalArgumentException("Field must not be null or empty.");
+        }
+    }
+    public User isValidToChange(UUID id) {
+        String currentUser = new Information().getCurrentUser().orElse("Unknown User");
+        User user = repositoryUser.findById(id).orElseThrow(() -> new EntityNotFoundException("Resource not found"));
+        User userCurrent = repositoryUser.findByUsername(currentUser).orElseThrow(() -> new EntityNotFoundException("Current user not found"));
+        if (userCurrent.getUsername() != null && user.getUsername() != null &&
+                userCurrent.getUsername().equals(user.getUsername()) ||
+                userCurrent.getRole().stream().anyMatch(role -> role.getName().equals("ADMIN"))) {
+            return user;
+        } else {
+            log.warn("{} attempted unauthorized access to user with ID: {}", currentUser, id);
+            throw new EntityNotFoundException("Resource not found");
+        }
+    }
+    public User isValidToChange(String username) {
+        try {
+            repositoryUser.findByUsername(username.trim()).orElseThrow(() -> new EntityNotFoundException("Resource not found"));
+        } catch (Exception e) {
+            throw new EntityNotFoundException("Resource not found");
+        }
+        User user = repositoryUser.findByUsername(username).orElseThrow(() -> new EntityNotFoundException("Resource not found"));
+        if (user.getUsername() != null) {
+            return user;
+        } else {
+            log.warn("{} attempted unauthorized access to user with username: {}", new Information().getCurrentUser().orElse("Unknown User"), username);
+            throw new EntityNotFoundException("Resource not found");
         }
     }
 }
