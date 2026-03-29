@@ -29,7 +29,6 @@ import java.security.SecureRandom;
 public class ServiceSecret implements ServiceInterfaceSecret {
 
     private final ServiceInterfaceEmail serviceEmail;
-    private final ServiceSecret serviceSecret;
 //    private final ServiceRecaptcha serviceRecaptcha;
     private final E2EE e2EE;
     private final RepositoryUser repositoryUser;
@@ -37,9 +36,8 @@ public class ServiceSecret implements ServiceInterfaceSecret {
     private final ServiceUser serviceUser;
     private static final Logger log = LoggerFactory.getLogger(Information.class);
 
-    public ServiceSecret(ServiceInterfaceEmail serviceEmail, ServiceSecret serviceSecret, E2EE e2EE, RepositoryUser repositoryUser, Mapper<User, DTORequestUser, DTOResponseUser> mapper, ServicePassword servicePassword, ServiceUser serviceUser) {
+    public ServiceSecret(ServiceInterfaceEmail serviceEmail, ServiceSecret serviceSecret, E2EE e2EE, RepositoryUser repositoryUser, Mapper<User, DTORequestUser, DTOResponseUser> mapper, ServiceUser serviceUser) {
         this.serviceEmail = serviceEmail;
-        this.serviceSecret = serviceSecret;
         this.e2EE = e2EE;
         this.repositoryUser = repositoryUser;
         this.mapper = mapper;
@@ -48,7 +46,7 @@ public class ServiceSecret implements ServiceInterfaceSecret {
     @Override
     public DTOResponseUser resetSecret(String username) {
         User user = serviceUser.isValidToChange(username);
-        String secret = serviceSecret.generateSecret();
+        String secret = generateSecret();
         try {
             user.setSecret(secret);
             repositoryUser.save(user);
