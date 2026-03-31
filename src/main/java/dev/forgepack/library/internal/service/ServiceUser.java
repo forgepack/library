@@ -8,6 +8,7 @@ import dev.forgepack.library.api.service.ServiceInterface;
 import dev.forgepack.library.internal.model.Role;
 import dev.forgepack.library.internal.model.User;
 import dev.forgepack.library.internal.payload.DTORequestUser;
+import dev.forgepack.library.internal.payload.DTORequestUserAuth;
 import dev.forgepack.library.internal.payload.DTOResponseUser;
 import dev.forgepack.library.internal.repository.RepositoryLog;
 import dev.forgepack.library.internal.repository.RepositoryRole;
@@ -19,9 +20,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mail.MailException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -60,43 +64,51 @@ import java.util.UUID;
 @Service
 public class ServiceUser extends ServiceGeneric<User, DTORequestUser, DTOResponseUser> implements UniqueCheckable {
 
-    private final ServicePassword servicePassword;
-    private final ServiceSecret serviceSecret;
+    private final ServiceAuth serviceAuth;
     private final RepositoryUser repositoryUser;
     private final RepositoryRole repositoryRole;
+    private final PasswordEncoder passwordEncoder;
     private final ServiceInterfaceEmail serviceEmail;
     private final Mapper<User, DTORequestUser, DTOResponseUser> mapper;
     private static final Logger log = LoggerFactory.getLogger(Information.class);
 
-    public ServiceUser(RepositoryInterface<User> repositoryInterface, ServiceEmailImpl serviceEmail, Mapper<User, DTORequestUser, DTOResponseUser> mapperInterface, RepositoryUser repositoryUser, RepositoryLog repositoryLog, RepositoryRole repositoryRole, ServicePassword servicePassword, ServiceSecret serviceSecret) {
+    public ServiceUser(RepositoryInterface<User> repositoryInterface, ServiceAuth serviceAuth, ServiceEmailImpl serviceEmail, Mapper<User, DTORequestUser, DTOResponseUser> mapperInterface, RepositoryUser repositoryUser, RepositoryLog repositoryLog, RepositoryRole repositoryRole, PasswordEncoder passwordEncoder) {
         super(User.class, repositoryInterface, mapperInterface, repositoryUser, repositoryLog);
-        this.servicePassword = servicePassword;
+        this.serviceAuth = serviceAuth;
         this.repositoryUser = repositoryUser;
         this.repositoryRole = repositoryRole;
         this.serviceEmail = serviceEmail;
         this.mapper = mapperInterface;
-        this.serviceSecret = serviceSecret;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public DTOResponseUser create(DTORequestUser created){
         User user = mapper.toEntity(created);
         System.out.println("Username: " + user.getUsername());
-        String password = servicePassword.generateSecurePassword();
+        String password = generateSecurePassword();
         System.out.println("Password: " + password);
-        String secret = serviceSecret.generateSecret();
+        String secret = serviceAuth.generateSecret();
         System.out.println("Secret: " + secret);
         try {
+            System.out.println("0");
             user.setPassword(password);
             user.setSecret(secret);
+            System.out.println("1");
             Set<Role> roles = new HashSet<>();
             roles.add(repositoryRole.findByName("VIEWER"));
+            System.out.println("2");
             user.setRole(roles);
             user.setActive(true);
+            System.out.println("3");
             user.setAttempt(0);
-            byte[] qrCodeBytes = QRCode.generateQRCodeBytes(serviceSecret.buildTotpUri(user.getUsername(), user.getSecret()), 200);
+            String ss = serviceAuth.buildSecretUri(user.getUsername(), user.getSecret());
+            System.out.println("3.5");
+            byte[] qrCodeBytes = QRCode.generateQRCodeBytes(ss, 200);
+            System.out.println("4");
             String emailContent = serviceEmail.buildWelcomeEmailContent(user.getUsername(), password, secret);
             serviceEmail.sendHtmlMessageWithAttachment(user.getEmail(), "Account Created", emailContent, qrCodeBytes, "qrcode.png", "image/png");
+            System.out.println("5");
         } catch (MailException e) {
             log.error("Error sending email for {}: {}", user.getUsername(), e.getMessage());
             throw new BadCredentialsException("Failed to send welcome email");
@@ -160,6 +172,62 @@ public class ServiceUser extends ServiceGeneric<User, DTORequestUser, DTORespons
         } else {
             throw new IllegalArgumentException("Field must not be null or empty.");
         }
+    }
+    public DTOResponseUser changePassword(DTORequestUserAuth updated){
+        User user = isValidToChange(updated.id());
+        Objects.requireNonNull(user).setPassword(passwordEncoder.encode(updated.password()));
+        repositoryUser.save(user);
+        log.info("{} changing user password with ID: {}", new Information().getCurrentUser().orElse("Unknown User"), user.getId());
+        return mapper.toResponse(user);
+    }
+    public DTOResponseUser resetSecret(String username) {
+        User user = isValidToChange(username);
+        String secret = serviceAuth.generateSecret();
+        try {
+            user.setSecret(secret);
+            repositoryUser.save(user);
+            byte[] qrCodeBytes = QRCode.generateQRCodeBytes(serviceAuth.buildSecretUri(user.getUsername(), user.getSecret()), 200);
+            String emailContent = serviceEmail.buildWelcomeEmailContent(user.getUsername(), "Your password is the same as before", secret);
+            serviceEmail.sendHtmlMessageWithAttachment(user.getEmail(), "Reset TOTP requested", emailContent, qrCodeBytes, "qrcode.png", "image/png");
+            log.info("{} resetting user secret with ID: {}", new Information().getCurrentUser().orElse("Unknown User"), user.getId());
+            return mapper.toResponse(user);
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to reset TOTP for user: " + user.getUsername());
+        }
+    }
+    public DTOResponseUser resetPassword(String username) {
+        User user = isValidToChange(username);
+        String password = generateSecurePassword();
+        user.setPassword(passwordEncoder.encode(password));
+        repositoryUser.save(user);
+        log.info("{} changing user password with ID: {}", new Information().getCurrentUser().orElse("Unknown User"), user.getId());
+        return mapper.toResponse(user);
+    }
+    public String generateSecurePassword() {
+        String upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String lower = "abcdefghijklmnopqrstuvwxyz";
+        String digits = "0123456789";
+        String special = "!@#$%^&*()-_=+[]{}|;:,.<>?";
+
+        SecureRandom random = new SecureRandom();
+        StringBuilder password = new StringBuilder();
+
+        password.append(upper.charAt(random.nextInt(upper.length())));
+        password.append(lower.charAt(random.nextInt(lower.length())));
+        password.append(digits.charAt(random.nextInt(digits.length())));
+        password.append(special.charAt(random.nextInt(special.length())));
+        String allChars = upper + lower + digits + special;
+        for (int i = 4; i < 8; i++) {
+            password.append(allChars.charAt(random.nextInt(allChars.length())));
+        }
+        char[] chars = password.toString().toCharArray();
+        for (int i = chars.length - 1; i > 0; i--) {
+            int j = random.nextInt(i + 1);
+            char temp = chars[i];
+            chars[i] = chars[j];
+            chars[j] = temp;
+        }
+        return new String(chars);
     }
     public User isValidToChange(UUID id) {
         String currentUser = new Information().getCurrentUser().orElse("Unknown User");
