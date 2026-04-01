@@ -13,6 +13,7 @@ import dev.forgepack.library.internal.payload.DTOResponseUser;
 import dev.forgepack.library.internal.repository.RepositoryLog;
 import dev.forgepack.library.internal.repository.RepositoryRole;
 import dev.forgepack.library.internal.repository.RepositoryUser;
+import dev.forgepack.library.internal.utils.E2EE;
 import dev.forgepack.library.internal.utils.Information;
 import dev.forgepack.library.internal.utils.QRCode;
 import jakarta.persistence.EntityNotFoundException;
@@ -64,6 +65,7 @@ import java.util.UUID;
 @Service
 public class ServiceUser extends ServiceGeneric<User, DTORequestUser, DTOResponseUser> implements UniqueCheckable {
 
+    private final E2EE e2EE;
     private final ServiceAuth serviceAuth;
     private final RepositoryUser repositoryUser;
     private final RepositoryRole repositoryRole;
@@ -72,8 +74,9 @@ public class ServiceUser extends ServiceGeneric<User, DTORequestUser, DTORespons
     private final Mapper<User, DTORequestUser, DTOResponseUser> mapper;
     private static final Logger log = LoggerFactory.getLogger(Information.class);
 
-    public ServiceUser(RepositoryInterface<User> repositoryInterface, ServiceAuth serviceAuth, ServiceEmailImpl serviceEmail, Mapper<User, DTORequestUser, DTOResponseUser> mapperInterface, RepositoryUser repositoryUser, RepositoryLog repositoryLog, RepositoryRole repositoryRole, PasswordEncoder passwordEncoder) {
+    public ServiceUser(RepositoryInterface<User> repositoryInterface, E2EE e2EE, ServiceAuth serviceAuth, ServiceEmailImpl serviceEmail, Mapper<User, DTORequestUser, DTOResponseUser> mapperInterface, RepositoryUser repositoryUser, RepositoryLog repositoryLog, RepositoryRole repositoryRole, PasswordEncoder passwordEncoder) {
         super(User.class, repositoryInterface, mapperInterface, repositoryUser, repositoryLog);
+        this.e2EE = e2EE;
         this.serviceAuth = serviceAuth;
         this.repositoryUser = repositoryUser;
         this.repositoryRole = repositoryRole;
@@ -91,24 +94,16 @@ public class ServiceUser extends ServiceGeneric<User, DTORequestUser, DTORespons
         String secret = serviceAuth.generateSecret();
         System.out.println("Secret: " + secret);
         try {
-            System.out.println("0");
             user.setPassword(password);
             user.setSecret(secret);
-            System.out.println("1");
             Set<Role> roles = new HashSet<>();
             roles.add(repositoryRole.findByName("VIEWER"));
-            System.out.println("2");
             user.setRole(roles);
             user.setActive(true);
-            System.out.println("3");
             user.setAttempt(0);
-            String ss = serviceAuth.buildSecretUri(user.getUsername(), user.getSecret());
-            System.out.println("3.5");
-            byte[] qrCodeBytes = QRCode.generateQRCodeBytes(ss, 200);
-            System.out.println("4");
+            byte[] qrCodeBytes = QRCode.generateQRCodeBytes(serviceAuth.buildSecretUri(user.getUsername(), user.getSecret()), 200);
             String emailContent = serviceEmail.buildWelcomeEmailContent(user.getUsername(), password, secret);
             serviceEmail.sendHtmlMessageWithAttachment(user.getEmail(), "Account Created", emailContent, qrCodeBytes, "qrcode.png", "image/png");
-            System.out.println("5");
         } catch (MailException e) {
             log.error("Error sending email for {}: {}", user.getUsername(), e.getMessage());
             throw new BadCredentialsException("Failed to send welcome email");
@@ -184,7 +179,7 @@ public class ServiceUser extends ServiceGeneric<User, DTORequestUser, DTORespons
         User user = isValidToChange(username);
         String secret = serviceAuth.generateSecret();
         try {
-            user.setSecret(secret);
+            user.setSecret(e2EE.encrypt(secret));
             repositoryUser.save(user);
             byte[] qrCodeBytes = QRCode.generateQRCodeBytes(serviceAuth.buildSecretUri(user.getUsername(), user.getSecret()), 200);
             String emailContent = serviceEmail.buildWelcomeEmailContent(user.getUsername(), "Your password is the same as before", secret);

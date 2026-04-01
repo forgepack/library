@@ -188,7 +188,7 @@ public class ServiceAuth implements ServiceInterfaceAuth {
                 "otpauth://totp/%s:%s?secret=%s&issuer=%s",
                 username,
                 username + "@forgepack.dev",
-                secret,
+                e2EE.decrypt(secret),
                 "Forgepack"
         );
     }
