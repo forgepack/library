@@ -5,8 +5,6 @@ import dev.forgepack.library.api.payload.DTORequestIdentifiable;
 import dev.forgepack.library.api.repository.RepositoryInterface;
 import dev.forgepack.library.api.service.ServiceInterface;
 import dev.forgepack.library.internal.model.GenericAuditEntity;
-import dev.forgepack.library.internal.model.Log;
-import dev.forgepack.library.internal.model.User;
 import dev.forgepack.library.internal.repository.RepositoryLog;
 import dev.forgepack.library.internal.repository.RepositoryUser;
 import dev.forgepack.library.internal.utils.Information;
@@ -73,15 +71,11 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
     private final RepositoryInterface<Entity> repositoryInterface;
     private final Mapper<Entity, DTORequest, DTOResponse> mapper;
     private static final Logger log = LoggerFactory.getLogger(Information.class);
-    private final RepositoryUser repositoryUser;
-    private final RepositoryLog repositoryLog;
 
-    public ServiceGeneric(Class<Entity> entityClass, RepositoryInterface<Entity> repositoryInterface, Mapper<Entity, DTORequest, DTOResponse> mapper, RepositoryUser repositoryUser, RepositoryLog repositoryLog) {
+    public ServiceGeneric(Class<Entity> entityClass, RepositoryInterface<Entity> repositoryInterface, Mapper<Entity, DTORequest, DTOResponse> mapper) {
         this.entityClass = entityClass;
         this.repositoryInterface = repositoryInterface;
         this.mapper = mapper;
-        this.repositoryUser = repositoryUser;
-        this.repositoryLog = repositoryLog;
     }
 
     /**
@@ -284,8 +278,6 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
         } else {
             log.info("{} {} entity with ID: {}", currentUser, action, id);
         }
-//        User user = repositoryUser.findByUsername(currentUser).orElse(null);
-//        repositoryLog.save(new Log(action, id, entityClass.getSimpleName(), user));
     }
 
     public Entity existsEntity(String action, UUID id) {

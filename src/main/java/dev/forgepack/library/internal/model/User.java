@@ -1,7 +1,5 @@
 package dev.forgepack.library.internal.model;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Index;
@@ -17,41 +15,77 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Entidade que representa um usuário do sistema.
- * <p>
- * Esta entidade armazena informações básicas do usuário incluindo credenciais,
- * status de atividade, controle de tentativas de login e associações com roles.
- * 
- * Características:
+ * Domain entity representing an authenticable system user.
+ *
+ * <p>This entity is responsible for persisting core identity, authentication,
+ * and authorization data, including credentials, activation state, login attempt
+ * tracking, and associations with access roles ({@link Role}).</p>
+ *
+ * <h3>Persistence Constraints</h3>
  * <ul>
- *     <li>Username único e obrigatório</li>
- *     <li>Email opcional</li>
- *     <li>Controle de tentativas de login com falhadas</li>
- *     <li>Flag de ativação/desativação</li>
- *     <li>Secret para autenticação 2FA (opcional)</li>
- *     <li>Associação many-to-many com roles</li>
- *     <li>Auditoria completa herdada de GenericAuditEntity</li>
+ *     <li><b>username</b>: unique and indexed</li>
+ *     <li><b>email</b>: unique and indexed</li>
  * </ul>
- * 
+ *
+ * <p>Uniqueness constraints are enforced at the database level via
+ * {@link jakarta.persistence.UniqueConstraint}, ensuring data integrity
+ * and preventing race conditions in concurrent environments.</p>
+ *
+ * <h3>Security Aspects</h3>
+ * <ul>
+ *     <li><b>password</b>: authentication credential (expected to be securely stored, e.g., hashed)</li>
+ *     <li><b>attempt</b>: counter for failed authentication attempts</li>
+ *     <li><b>active</b>: indicates whether the account is enabled</li>
+ *     <li><b>secret</b>: optional secret key for multi-factor authentication (2FA)</li>
+ * </ul>
+ *
+ * <h3>Relationships</h3>
+ * <ul>
+ *     <li><b>Many-to-Many</b> association with {@link Role}, representing authorization profiles</li>
+ *     <li>Cascade operations limited to {@link jakarta.persistence.CascadeType#PERSIST}</li>
+ *     <li><i>Eager</i> fetching strategy, suitable for authentication/authorization contexts</li>
+ * </ul>
+ *
+ * <h3>Auditing</h3>
+ * <p>Full auditing is enabled via {@link org.hibernate.envers.Audited},
+ * inheriting creation and modification metadata from {@link GenericAuditEntity}.</p>
+ *
+ * <h3>Architectural Notes</h3>
+ * <ul>
+ *     <li>Input validation (e.g., {@code @NotBlank}, {@code @Email}) should be handled at the DTO layer</li>
+ *     <li>Business rules (e.g., uniqueness checks) should be enforced in the service layer</li>
+ *     <li>This entity is focused solely on persistence and structural integrity concerns</li>
+ * </ul>
+ *
  * @author Marcelo Ribeiro Gadelha
  * @version 1.0
  * @since 1.0
- * 
+ *
  * @see GenericAuditEntity
  * @see Role
  */
-
 @Entity
 @Audited
-@Table(name = "users", indexes = @Index(columnList = "username"), uniqueConstraints = @UniqueConstraint(columnNames = {"username"}))
+@Table(name = "users",
+    indexes = {
+        @Index(columnList = "username"),
+        @Index(columnList = "email")
+    },
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"username"}),
+        @UniqueConstraint(columnNames = {"email"})
+    }
+)
 public class User extends GenericAuditEntity {
 
-    @NotNull(message = "{not.null}") @NotBlank(message = "{not.blank}")
+    @Column(nullable = false, unique = true)
     private String username;
+    @Column(nullable = false, unique = true)
     private String email;
     private String password;
     @Column(columnDefinition = "integer default 0")
     private Integer attempt;
+    @Column(columnDefinition = "boolean default true")
     private Boolean active;
     private String secret;
 

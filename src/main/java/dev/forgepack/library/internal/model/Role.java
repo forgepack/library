@@ -1,7 +1,5 @@
 package dev.forgepack.library.internal.model;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Index;
@@ -11,39 +9,67 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Column;
 import org.hibernate.envers.Audited;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Entidade que representa um papel/função no sistema de autorização.
- * <p>
- * Esta entidade define os diferentes papéis que os usuários podem assumir,
- * agrupando privilégios relacionados para facilitar o gerenciamento de permissões.
- * 
- * Características:
+ * Domain entity representing a role in the authorization model.
+ *
+ * <p>This entity defines logical groupings of permissions that can be assigned
+ * to users, enabling a role-based access control (RBAC) approach. Roles aggregate
+ * multiple {@link Privilege} instances to simplify permission management and
+ * enforce consistent authorization policies.</p>
+ *
+ * <h3>Persistence Constraints</h3>
  * <ul>
- *     <li>Nome único e obrigatório</li>
- *     <li>Associação many-to-many com privilégios</li>
- *     <li>Auditoria completa herdada de GenericAuditEntity</li>
- *     <li>Indexação por nome para performance</li>
+ *     <li><b>name</b>: unique and indexed identifier of the role</li>
  * </ul>
- * 
+ *
+ * <p>Uniqueness is enforced at the database level via
+ * {@link jakarta.persistence.UniqueConstraint}, ensuring integrity and preventing
+ * duplication in concurrent environments.</p>
+ *
+ * <h3>Relationships</h3>
+ * <ul>
+ *     <li><b>Many-to-Many</b> association with {@link Privilege}, representing granted permissions</li>
+ *     <li>Join table: <b>role_privileges</b></li>
+ *     <li>Lazy fetching strategy to optimize performance in non-authorization contexts</li>
+ *     <li>Cascade operations limited to {@link jakarta.persistence.CascadeType#PERSIST} and {@link jakarta.persistence.CascadeType#MERGE}</li>
+ * </ul>
+ *
+ * <h3>Usage Context</h3>
+ * <ul>
+ *     <li>Typically associated with {@link User} entities to define access rights</li>
+ *     <li>Used by authorization frameworks (e.g., Spring Security) to evaluate access control rules</li>
+ * </ul>
+ *
+ * <h3>Auditing</h3>
+ * <p>Auditing is enabled via {@link org.hibernate.envers.Audited},
+ * inheriting lifecycle metadata from {@link GenericAuditEntity}.</p>
+ *
+ * <h3>Architectural Notes</h3>
+ * <ul>
+ *     <li>Validation annotations (e.g., {@code @NotBlank}) are preferably handled at the DTO layer</li>
+ *     <li>This entity focuses on persistence and structural representation of roles</li>
+ *     <li>Business rules (e.g., role hierarchy, immutability of system roles) should be enforced at the service layer</li>
+ * </ul>
+ *
  * @author Marcelo Ribeiro Gadelha
  * @version 1.0
  * @since 1.0
- * 
+ *
  * @see GenericAuditEntity
  * @see Privilege
  * @see User
  */
-
 @Entity
 @Audited
 @Table(indexes = @Index(columnList = "name"), uniqueConstraints = @UniqueConstraint(columnNames = {"name"}))
 public class Role extends GenericAuditEntity {
 
-    @NotNull(message = "{not.null}") @NotBlank(message = "{not.blank}")
+    @Column(nullable = false, unique = true)
     private String name;
 
     @ManyToMany(fetch = FetchType.LAZY , cascade = { CascadeType.PERSIST, CascadeType.MERGE } )
