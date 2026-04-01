@@ -94,8 +94,8 @@ public class ServiceUser extends ServiceGeneric<User, DTORequestUser, DTORespons
         String secret = serviceAuth.generateSecret();
         System.out.println("Secret: " + secret);
         try {
-            user.setPassword(password);
-            user.setSecret(secret);
+            user.setPassword(passwordEncoder.encode(password));
+            user.setSecret(e2EE.encrypt(secret));
             Set<Role> roles = new HashSet<>();
             roles.add(repositoryRole.findByName("VIEWER"));
             user.setRole(roles);
