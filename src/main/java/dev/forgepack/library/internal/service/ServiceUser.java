@@ -10,7 +10,6 @@ import dev.forgepack.library.internal.model.User;
 import dev.forgepack.library.internal.payload.DTORequestUser;
 import dev.forgepack.library.internal.payload.DTORequestUserAuth;
 import dev.forgepack.library.internal.payload.DTOResponseUser;
-import dev.forgepack.library.internal.repository.RepositoryLog;
 import dev.forgepack.library.internal.repository.RepositoryRole;
 import dev.forgepack.library.internal.repository.RepositoryUser;
 import dev.forgepack.library.internal.utils.E2EE;
@@ -23,7 +22,6 @@ import org.springframework.mail.MailException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.security.SecureRandom;
 import java.util.HashSet;
 import java.util.Objects;
@@ -74,8 +72,8 @@ public class ServiceUser extends ServiceGeneric<User, DTORequestUser, DTORespons
     private final Mapper<User, DTORequestUser, DTOResponseUser> mapper;
     private static final Logger log = LoggerFactory.getLogger(Information.class);
 
-    public ServiceUser(RepositoryInterface<User> repositoryInterface, E2EE e2EE, ServiceAuth serviceAuth, ServiceEmailImpl serviceEmail, Mapper<User, DTORequestUser, DTOResponseUser> mapperInterface, RepositoryUser repositoryUser, RepositoryLog repositoryLog, RepositoryRole repositoryRole, PasswordEncoder passwordEncoder) {
-        super(User.class, repositoryInterface, mapperInterface, repositoryUser, repositoryLog);
+    public ServiceUser(RepositoryInterface<User> repositoryInterface, E2EE e2EE, ServiceAuth serviceAuth, ServiceEmailImpl serviceEmail, Mapper<User, DTORequestUser, DTOResponseUser> mapperInterface, RepositoryUser repositoryUser, RepositoryRole repositoryRole, PasswordEncoder passwordEncoder) {
+        super(User.class, repositoryInterface, mapperInterface);
         this.e2EE = e2EE;
         this.serviceAuth = serviceAuth;
         this.repositoryUser = repositoryUser;
