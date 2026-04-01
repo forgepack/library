@@ -5,8 +5,6 @@ import dev.forgepack.library.api.payload.DTORequestIdentifiable;
 import dev.forgepack.library.api.repository.RepositoryInterface;
 import dev.forgepack.library.api.service.ServiceInterface;
 import dev.forgepack.library.internal.model.GenericAuditEntity;
-import dev.forgepack.library.internal.repository.RepositoryLog;
-import dev.forgepack.library.internal.repository.RepositoryUser;
 import dev.forgepack.library.internal.utils.Information;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
