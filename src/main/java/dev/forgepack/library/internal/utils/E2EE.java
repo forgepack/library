@@ -114,17 +114,13 @@ public class E2EE {
             byte[] encrypted = new byte[combined.length - IV_LENGTH];
             System.arraycopy(combined, 0, iv, 0, IV_LENGTH);
             System.arraycopy(combined, IV_LENGTH, encrypted, 0, encrypted.length);
-            System.out.println("6");
             // Initialize cipher for decryption
             Cipher cipher = Cipher.getInstance(ALGORITHM);
             SecretKeySpec keySpec = new SecretKeySpec(getSecretKeyBytes(), KEY_ALGORITHM);
-            System.out.println("7");
             IvParameterSpec ivSpec = new IvParameterSpec(iv);
             cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
-            System.out.println("8");
             // Decrypt the data
             byte[] decrypted = cipher.doFinal(encrypted);
-            System.out.println("9");
             return new String(decrypted, StandardCharsets.UTF_8);
         } catch (Exception e) {
 //            log.error("Decryption failed: {}", e.getMessage());
