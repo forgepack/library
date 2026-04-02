@@ -1,5 +1,6 @@
 package dev.forgepack.library.internal.payload;
 
+import dev.forgepack.library.api.payload.DTOIdentifiable;
 import dev.forgepack.library.internal.model.Privilege;
 import dev.forgepack.library.internal.model.Role;
 import org.springframework.hateoas.Link;
@@ -53,25 +54,13 @@ import java.util.UUID;
  * @see org.springframework.hateoas.RepresentationModel
  */
 
-public class DTOResponseRole extends RepresentationModel<DTOResponseRole> {
+public class DTOResponseRole extends RepresentationModel<DTOResponseRole> implements DTOIdentifiable<UUID> {
 
-    private UUID id;
-    private String name;
+    private final UUID id;
+    private final String name;
     private Set<DTOResponsePrivilege> privilege = new HashSet<>();
 
     public DTOResponseRole(UUID id, String name, Set<DTOResponsePrivilege> privilege) {
-        this.id = id;
-        this.name = name;
-        this.privilege = privilege;
-    }
-    public DTOResponseRole(Link initialLink, UUID id, String name, Set<DTOResponsePrivilege> privilege) {
-        super(initialLink);
-        this.id = id;
-        this.name = name;
-        this.privilege = privilege;
-    }
-    public DTOResponseRole(Iterable<Link> initialLinks, UUID id, String name, Set<DTOResponsePrivilege> privilege) {
-        super(initialLinks);
         this.id = id;
         this.name = name;
         this.privilege = privilege;
@@ -85,5 +74,10 @@ public class DTOResponseRole extends RepresentationModel<DTOResponseRole> {
     }
     public Set<DTOResponsePrivilege> getDTOResponsePrivilege() {
         return privilege;
+    }
+
+    @Override
+    public UUID id() {
+        return id;
     }
 }

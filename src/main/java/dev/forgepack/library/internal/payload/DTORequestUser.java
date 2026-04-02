@@ -1,7 +1,7 @@
 package dev.forgepack.library.internal.payload;
 
 import dev.forgepack.library.api.annotation.Unique;
-import dev.forgepack.library.api.payload.DTORequestIdentifiable;
+import dev.forgepack.library.api.payload.DTOIdentifiable;
 import dev.forgepack.library.internal.model.User;
 import dev.forgepack.library.internal.service.ServiceUser;
 import jakarta.validation.constraints.NotNull;
@@ -51,7 +51,7 @@ import java.util.UUID;
  * @version 1.0
  * @since 1.0
  *
- * @see DTORequestIdentifiable
+ * @see DTOIdentifiable
  * @see DTOResponseRole
  * @see User
  */
@@ -65,4 +65,4 @@ public record DTORequestUser (
     String email,
 
     Set<DTOResponseRole> role
-) implements DTORequestIdentifiable<UUID> {}
+) implements DTOIdentifiable<UUID> {}

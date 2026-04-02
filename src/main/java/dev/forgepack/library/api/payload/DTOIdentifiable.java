@@ -31,12 +31,12 @@ import java.util.UUID;
  *
  * @see UUID
  */
-public interface DTORequestIdentifiable<T> {
+public interface DTOIdentifiable<T> {
 
     /**
      * Returns the unique identifier of the target entity.
      *
-     * @return entity identifier, or {@code null} if the request represents
+     * @return entity identifier, or {@code null} if the request or response represents
      *         a creation operation
      */
     T id();

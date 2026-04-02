@@ -1,9 +1,9 @@
 package dev.forgepack.library.internal.service;
 
 import dev.forgepack.library.api.mapper.Mapper;
-import dev.forgepack.library.api.payload.DTORequestIdentifiable;
-import dev.forgepack.library.api.repository.RepositoryInterface;
-import dev.forgepack.library.api.service.ServiceInterface;
+import dev.forgepack.library.api.payload.DTOIdentifiable;
+import dev.forgepack.library.api.repository.RepositoryGeneric;
+import dev.forgepack.library.api.service.ServiceGeneric;
 import dev.forgepack.library.internal.model.GenericAuditEntity;
 import dev.forgepack.library.internal.utils.Information;
 import jakarta.persistence.EntityNotFoundException;
@@ -32,7 +32,7 @@ import static org.springframework.data.domain.ExampleMatcher.matching;
  * and paginated search.</p>
  *
  * <p>The class delegates persistence responsibilities to a
- * {@link RepositoryInterface} implementation and uses a {@link Mapper}
+ * {@link RepositoryGeneric} implementation and uses a {@link Mapper}
  * to convert between entity and DTO representations.</p>
  *
  * <p>Additionally, this service integrates with Spring HATEOAS to enrich
@@ -52,27 +52,27 @@ import static org.springframework.data.domain.ExampleMatcher.matching;
  * allowing case-insensitive and partial string matching.</p>
  *
  * @param <Entity> domain entity type extending {@link GenericAuditEntity}
- * @param <DTORequest> request DTO extending {@link DTORequestIdentifiable}, used for create and update operations
+ * @param <DTORequest> request DTO extending {@link DTOIdentifiable}, used for create and update operations
  * @param <DTOResponse> response DTO extending {@link RepresentationModel} , returned by service operations
  *
  * @author Marcelo Ribeiro Gadelha
  * @since 1.0
- * @see ServiceInterface
- * @see RepositoryInterface
+ * @see ServiceGeneric
+ * @see RepositoryGeneric
  * @see Mapper
  * @see GenericAuditEntity
  * @see RepresentationModel
  */
-public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTORequest extends DTORequestIdentifiable<UUID>, DTOResponse extends RepresentationModel<DTOResponse>> implements ServiceInterface<Entity, DTORequest, DTOResponse> {
+public abstract class ServiceGenericImpl<Entity extends GenericAuditEntity, DTORequest extends DTOIdentifiable<UUID>, DTOResponse extends RepresentationModel<DTOResponse>> implements ServiceGeneric<Entity, DTORequest, DTOResponse> {
 
-    private final Class<Entity> entityClass;
-    private final RepositoryInterface<Entity> repositoryInterface;
+    private final Class<Entity> entity;
+    private final RepositoryGeneric<Entity> repositoryGeneric;
     private final Mapper<Entity, DTORequest, DTOResponse> mapper;
     private static final Logger log = LoggerFactory.getLogger(Information.class);
 
-    public ServiceGeneric(Class<Entity> entityClass, RepositoryInterface<Entity> repositoryInterface, Mapper<Entity, DTORequest, DTOResponse> mapper) {
-        this.entityClass = entityClass;
-        this.repositoryInterface = repositoryInterface;
+    public ServiceGenericImpl(Class<Entity> entity, RepositoryGeneric<Entity> repositoryGeneric, Mapper<Entity, DTORequest, DTOResponse> mapper) {
+        this.entity = entity;
+        this.repositoryGeneric = repositoryGeneric;
         this.mapper = mapper;
     }
 
@@ -81,7 +81,7 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
      *
      * <p>The {@link DTORequest} is converted into a domain entity using the configured
      * {@link Mapper}. The entity is then persisted through the
-     * {@link RepositoryInterface}. After persistence, the entity is converted
+     * {@link RepositoryGeneric}. After persistence, the entity is converted
      * back into a {@link DTOResponse} enriched with HATEOAS links.</p>
      *
      * @param created {@link DTORequest} containing the data required to create the entity
@@ -89,7 +89,7 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
      */
     @Transactional
     public DTOResponse create(DTORequest created){
-        Entity entity = repositoryInterface.save(mapper.toEntity(created));
+        Entity entity = repositoryGeneric.save(mapper.toEntity(created));
         addLog("create", entity.getId(), null, null);
         return addHateoas(entity);
     }
@@ -112,11 +112,11 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
      *
      * @param pageable pagination and sorting configuration
      * @param value value used as search filter
-     * @param entityClass class of the entity being queried
+     * @param entity class of the entity being queried
      * @return a paginated list of response DTOs with HATEOAS links
      */
     @Transactional
-    public Page<DTOResponse> findAll(Pageable pageable, String value, Class<Entity> entityClass) {
+    public Page<DTOResponse> findAll(Pageable pageable, String value, Class<Entity> entity) {
         String propertyName = pageable.getSort().stream()
                 .findFirst()
                 .map(Sort.Order::getProperty)
@@ -124,29 +124,29 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
         if ("id".equalsIgnoreCase(propertyName) && StringUtils.hasText(value)) {
             try {
                 addLog("find all", null, propertyName, value);
-                return repositoryInterface.findById(UUID.fromString(value), pageable)
+                return repositoryGeneric.findById(UUID.fromString(value), pageable)
                         .map(this::addHateoas);
             } catch (IllegalArgumentException e){
                 log.debug("Value '{}' is not a valid UUID, falling back to property search", value);
             }
         }
         try {
-            Entity object = entityClass.getDeclaredConstructor().newInstance();
+            Entity object = entity.getDeclaredConstructor().newInstance();
             ExampleMatcher exampleMatcher = matching()
                     .withIgnoreNullValues()
                     .withIgnoreCase()
                     .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
-            Field field = ReflectionUtils.findField(entityClass, propertyName);
+            Field field = ReflectionUtils.findField(entity, propertyName);
             String setterName = "set" + StringUtils.capitalize(propertyName);
             Method setter = object.getClass().getDeclaredMethod(setterName, field.getType());
             Object convertedValue = ConvertUtils.convert(value, field.getType());
             setter.invoke(object, convertedValue);
             Example<Entity> example = Example.of(object, exampleMatcher);
             addLog("find all", null, propertyName, value);
-            return repositoryInterface.findAll(example, pageable).map(this::addHateoas);
+            return repositoryGeneric.findAll(example, pageable).map(this::addHateoas);
         } catch (Exception exception) {
-            log.warn("Error searching {} by {}: {}", entityClass.getSimpleName(), propertyName, exception.getMessage());
-            return repositoryInterface.findAll(pageable).map(this::addHateoas);
+            log.warn("Error searching {} by {}: {}", entity.getSimpleName(), propertyName, exception.getMessage());
+            return repositoryGeneric.findAll(pageable).map(this::addHateoas);
         }
     }
 
@@ -182,11 +182,11 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
      * @throws EntityNotFoundException if the entity does not exist
      */
     @Transactional
-    public DTOResponse update(DTORequest updated){
-        Entity entity = existsEntity("update", updated.id());
+    public DTOResponse update(UUID id, DTORequest updated){
+        Entity entity = existsEntity("update", id);
         mapper.updateEntity(updated, entity);
         addLog("update", updated.id(), null, null);
-        return addHateoas(repositoryInterface.save(entity));
+        return addHateoas(repositoryGeneric.save(entity));
     }
 
     /**
@@ -203,7 +203,7 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
     public DTOResponse softDelete(UUID id){
         Entity entity = existsEntity("soft delete", id);
         entity.setDeletedAt(LocalDateTime.now());
-        repositoryInterface.save(entity);
+        repositoryGeneric.save(entity);
         addLog("soft delete", id, null, null);
         return addHateoas(entity);
     }
@@ -222,7 +222,7 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
     public DTOResponse restore(UUID id){
         Entity entity = existsEntity("restore", id);
         entity.setDeletedAt(null);
-        repositoryInterface.save(entity);
+        repositoryGeneric.save(entity);
         addLog("restore", id, null, null);
         return addHateoas(entity);
     }
@@ -240,7 +240,7 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
     @Transactional
     public DTOResponse hardDelete(UUID id){
         Entity entity = existsEntity("hard delete", id);
-        repositoryInterface.delete(entity);
+        repositoryGeneric.delete(entity);
         addLog("hard delete", id, null, null);
         return addHateoas(entity);
     }
@@ -261,8 +261,8 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
      * @return {@link DTOResponse} containing the entity data and HATEOAS self link
      */
     public DTOResponse addHateoas(Entity object) {
-        String entityName = Character.toLowerCase(entityClass.getSimpleName().charAt(0))
-                + entityClass.getSimpleName().substring(1);
+        String entityName = Character.toLowerCase(entity.getSimpleName().charAt(0))
+                + entity.getSimpleName().substring(1);
         String selfUri = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .pathSegment(entityName, String.valueOf(object.getId()))
                 .toUriString();
@@ -272,15 +272,15 @@ public abstract class ServiceGeneric<Entity extends GenericAuditEntity, DTOReque
     public void addLog(String action, UUID id, Object propertyName, Object value) {
         String currentUser = new Information().getCurrentUser().orElse("Unknown User");
         if(propertyName != null){
-            log.debug("Retrieving {} with property: {}, value: {}", entityClass.getSimpleName(), propertyName, value);
+            log.debug("Retrieving {} with property: {}, value: {}", entity.getSimpleName(), propertyName, value);
         } else {
             log.info("{} {} entity with ID: {}", currentUser, action, id);
         }
     }
 
     public Entity existsEntity(String action, UUID id) {
-        return repositoryInterface.findById(id)
+        return repositoryGeneric.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        String.format("Cannot %s: %s not found with ID %s", action, entityClass.getSimpleName(), id)));
+                        String.format("Cannot %s: %s not found with ID %s", action, entity.getSimpleName(), id)));
     }
 }

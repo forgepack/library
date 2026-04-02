@@ -1,7 +1,7 @@
 package dev.forgepack.library.api.validator;
 
 import dev.forgepack.library.internal.validator.ValidatorUnique;
-
+import dev.forgepack.library.api.annotation.Unique;
 import java.util.UUID;
 
 /**
@@ -26,10 +26,9 @@ import java.util.UUID;
  * @author Marcelo Ribeiro Gadelha
  * @since 1.0
  *
- * @see dev.forgepack.library.api.annotation.Unique
+ * @see Unique
  * @see ValidatorUnique
  */
-
 public interface UniqueCheckable {
 
     /**

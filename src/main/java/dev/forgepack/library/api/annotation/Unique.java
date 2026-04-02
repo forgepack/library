@@ -54,7 +54,6 @@ import java.lang.annotation.RetentionPolicy;
  * @see UniqueCheckable
  * @see Constraint
  */
-
 @Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = { ValidatorUnique.class })

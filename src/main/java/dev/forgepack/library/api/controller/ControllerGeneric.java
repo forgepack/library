@@ -5,6 +5,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+
 import java.util.UUID;
 
 /**
@@ -35,7 +37,7 @@ import java.util.UUID;
  * @author Marcelo Ribeiro Gadelha
  * @since 1.0
  */
-public interface ControllerInterface<DTORequest, DTOResponse> {
+public interface ControllerGeneric<DTORequest, DTOResponse> {
 
     /**
      * Creates a new resource.
@@ -43,7 +45,7 @@ public interface ControllerInterface<DTORequest, DTOResponse> {
      * @param created request payload containing resource data
      * @return {@link ResponseEntity} containing the created resource
      */
-    ResponseEntity<DTOResponse> create(@Valid @RequestBody DTORequest created);
+    ResponseEntity<DTOResponse> create(@RequestBody @Valid DTORequest created);
 
     /**
      * Retrieves a paginated list of resources, optionally filtered by a value.
@@ -55,7 +57,7 @@ public interface ControllerInterface<DTORequest, DTOResponse> {
      * @param pageable pagination and sorting information
      * @return {@link ResponseEntity} containing a page of resources
      */
-    ResponseEntity<Page<DTOResponse>> findAll(String value, Pageable pageable);
+    ResponseEntity<Page<DTOResponse>> findAll(@RequestParam(name = "value", defaultValue = "", required = false) String value, Pageable pageable);
 
     /**
      * Retrieves a resource by its unique identifier.
@@ -72,13 +74,14 @@ public interface ControllerInterface<DTORequest, DTOResponse> {
      * @param updated request payload containing updated data
      * @return {@link ResponseEntity} containing the updated resource
      */
-    ResponseEntity<DTOResponse> update(UUID id, @Valid DTORequest updated);
+    ResponseEntity<DTOResponse> update(UUID id, @RequestBody @Valid DTORequest updated);
 
     /**
      * Deletes a resource by its unique identifier.
      *
      * @param id identifier of the resource to delete
-     * @return {@link ResponseEntity} containing the deleted resource
+     * @return {@link ResponseEntity} with no content, indicating the resource
+     * was soft deleted (HTTP 204)
      */
-    ResponseEntity<DTOResponse> delete(UUID id);
+    ResponseEntity<Void> delete(UUID id);
 }

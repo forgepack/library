@@ -1,10 +1,10 @@
 package dev.forgepack.library.internal.service;
 
 import dev.forgepack.library.api.mapper.Mapper;
-import dev.forgepack.library.api.repository.RepositoryInterface;
-import dev.forgepack.library.api.service.ServiceInterfaceEmail;
+import dev.forgepack.library.api.repository.RepositoryGeneric;
+import dev.forgepack.library.api.service.ServiceEmail;
 import dev.forgepack.library.api.validator.UniqueCheckable;
-import dev.forgepack.library.api.service.ServiceInterface;
+import dev.forgepack.library.api.service.ServiceGeneric;
 import dev.forgepack.library.internal.model.Role;
 import dev.forgepack.library.internal.model.User;
 import dev.forgepack.library.internal.payload.DTORequestUser;
@@ -31,7 +31,7 @@ import java.util.UUID;
 /**
  * Service responsible for managing {@link User} entities.
  *
- * <p>Extends {@link ServiceGeneric} by inheriting the full CRUD operations
+ * <p>Extends {@link ServiceGenericImpl} by inheriting the full CRUD operations
  * for the entity {@link User}, and implements {@link UniqueCheckable}
  * to provide uniqueness checks used during data validation.</p>
  *
@@ -52,8 +52,8 @@ import java.util.UUID;
  * @version 1.0
  * @since 1.0
  *
+ * @see ServiceGenericImpl
  * @see ServiceGeneric
- * @see ServiceInterface
  * @see UniqueCheckable
  * @see RepositoryUser
  * @see User
@@ -61,21 +61,21 @@ import java.util.UUID;
  * @see DTOResponseUser
  */
 @Service
-public class ServiceUser extends ServiceGeneric<User, DTORequestUser, DTOResponseUser> implements UniqueCheckable {
+public class ServiceUser extends ServiceGenericImpl<User, DTORequestUser, DTOResponseUser> implements UniqueCheckable {
 
     private final E2EE e2EE;
-    private final ServiceAuth serviceAuth;
+    private final ServiceAuthenticationImpl serviceAuthenticationImpl;
     private final RepositoryUser repositoryUser;
     private final RepositoryRole repositoryRole;
     private final PasswordEncoder passwordEncoder;
-    private final ServiceInterfaceEmail serviceEmail;
+    private final ServiceEmail serviceEmail;
     private final Mapper<User, DTORequestUser, DTOResponseUser> mapper;
     private static final Logger log = LoggerFactory.getLogger(Information.class);
 
-    public ServiceUser(RepositoryInterface<User> repositoryInterface, E2EE e2EE, ServiceAuth serviceAuth, ServiceEmailImpl serviceEmail, Mapper<User, DTORequestUser, DTOResponseUser> mapperInterface, RepositoryUser repositoryUser, RepositoryRole repositoryRole, PasswordEncoder passwordEncoder) {
-        super(User.class, repositoryInterface, mapperInterface);
+    public ServiceUser(RepositoryGeneric<User> repositoryGeneric, E2EE e2EE, ServiceAuthenticationImpl serviceAuthenticationImpl, ServiceEmailImpl serviceEmail, Mapper<User, DTORequestUser, DTOResponseUser> mapperInterface, RepositoryUser repositoryUser, RepositoryRole repositoryRole, PasswordEncoder passwordEncoder) {
+        super(User.class, repositoryGeneric, mapperInterface);
         this.e2EE = e2EE;
-        this.serviceAuth = serviceAuth;
+        this.serviceAuthenticationImpl = serviceAuthenticationImpl;
         this.repositoryUser = repositoryUser;
         this.repositoryRole = repositoryRole;
         this.serviceEmail = serviceEmail;
@@ -89,7 +89,7 @@ public class ServiceUser extends ServiceGeneric<User, DTORequestUser, DTORespons
         System.out.println("Username: " + user.getUsername());
         String password = generateSecurePassword();
         System.out.println("Password: " + password);
-        String secret = serviceAuth.generateSecret();
+        String secret = serviceAuthenticationImpl.generateSecret();
         System.out.println("Secret: " + secret);
         try {
             user.setPassword(passwordEncoder.encode(password));
@@ -99,7 +99,7 @@ public class ServiceUser extends ServiceGeneric<User, DTORequestUser, DTORespons
             user.setRole(roles);
             user.setActive(true);
             user.setAttempt(0);
-            byte[] qrCodeBytes = QRCode.generateQRCodeBytes(serviceAuth.buildSecretUri(user.getUsername(), user.getSecret()), 200);
+            byte[] qrCodeBytes = QRCode.generateQRCodeBytes(serviceAuthenticationImpl.buildSecretUri(user.getUsername(), user.getSecret()), 200);
             String emailContent = serviceEmail.buildWelcomeEmailContent(user.getUsername(), password, secret);
             serviceEmail.sendHtmlMessageWithAttachment(user.getEmail(), "Account Created", emailContent, qrCodeBytes, "qrcode.png", "image/png");
         } catch (MailException e) {
@@ -175,11 +175,11 @@ public class ServiceUser extends ServiceGeneric<User, DTORequestUser, DTORespons
     }
     public DTOResponseUser resetSecret(String username) {
         User user = isValidToChange(username);
-        String secret = serviceAuth.generateSecret();
+        String secret = serviceAuthenticationImpl.generateSecret();
         try {
             user.setSecret(e2EE.encrypt(secret));
             repositoryUser.save(user);
-            byte[] qrCodeBytes = QRCode.generateQRCodeBytes(serviceAuth.buildSecretUri(user.getUsername(), user.getSecret()), 200);
+            byte[] qrCodeBytes = QRCode.generateQRCodeBytes(serviceAuthenticationImpl.buildSecretUri(user.getUsername(), user.getSecret()), 200);
             String emailContent = serviceEmail.buildWelcomeEmailContent(user.getUsername(), "Your password is the same as before", secret);
             serviceEmail.sendHtmlMessageWithAttachment(user.getEmail(), "Reset TOTP requested", emailContent, qrCodeBytes, "qrcode.png", "image/png");
             log.info("{} resetting user secret with ID: {}", new Information().getCurrentUser().orElse("Unknown User"), user.getId());

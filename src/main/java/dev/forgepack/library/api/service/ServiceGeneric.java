@@ -1,7 +1,7 @@
 package dev.forgepack.library.api.service;
 
 import dev.forgepack.library.api.mapper.Mapper;
-import dev.forgepack.library.api.repository.RepositoryInterface;
+import dev.forgepack.library.api.repository.RepositoryGeneric;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -36,17 +36,16 @@ import java.util.UUID;
  * @since 1.0
  *
  * @see Mapper
- * @see RepositoryInterface
+ * @see RepositoryGeneric
  */
-
-public interface ServiceInterface<Entity, DTORequest, DTOResponse> {
+public interface ServiceGeneric<Entity, DTORequest, DTOResponse> {
 
     /**
      * Creates and persists a new entity based on the provided {@link DTORequest}.
      *
      * <p>The {@link DTORequest} is converted into a domain entity using the configured
      * {@link Mapper}. The entity is then persisted through the
-     * {@link RepositoryInterface}. After persistence, the entity is converted
+     * {@link RepositoryGeneric}. After persistence, the entity is converted
      * back into a {@link DTOResponse} enriched with HATEOAS links.</p>
      *
      * @param created {@link DTORequest} containing the data required to create the entity
@@ -88,9 +87,9 @@ public interface ServiceInterface<Entity, DTORequest, DTOResponse> {
      * @throws EntityNotFoundException if the entity does not exist
      */
     DTOResponse findById(UUID id);
-    
+
     /**
-     * Updates an existing entity using the provided request DTO.
+     * Updates an existing resource identified by the given ID.
      *
      * <p>The method first verifies if an entity with the specified identifier
      * exists. If the entity does not exist, an {@link EntityNotFoundException}
@@ -99,11 +98,12 @@ public interface ServiceInterface<Entity, DTORequest, DTOResponse> {
      * <p>The DTO is converted to an entity using the configured {@link Mapper},
      * persisted, and then returned as a {@link DTOResponse} enriched with HATEOAS links.</p>
      *
+     * @param id      unique identifier of the resource to update
      * @param updated {@link DTORequest} containing updated entity data
      * @return {@link DTOResponse} representing the updated entity
      * @throws EntityNotFoundException if the entity does not exist
      */
-    DTOResponse update(DTORequest updated);
+    DTOResponse update(UUID id, DTORequest updated);
     
     /**
      * Soft deletes an entity identified by the specified identifier.

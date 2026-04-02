@@ -2,8 +2,8 @@ package dev.forgepack.library.internal.service;
 
 import dev.forgepack.library.api.mapper.Mapper;
 import dev.forgepack.library.api.validator.UniqueCheckable;
-import dev.forgepack.library.api.repository.RepositoryInterface;
-import dev.forgepack.library.api.service.ServiceInterface;
+import dev.forgepack.library.api.repository.RepositoryGeneric;
+import dev.forgepack.library.api.service.ServiceGeneric;
 import dev.forgepack.library.internal.model.Role;
 import dev.forgepack.library.internal.payload.DTORequestRole;
 import dev.forgepack.library.internal.payload.DTOResponseRole;
@@ -14,7 +14,7 @@ import java.util.UUID;
 /**
  * Service responsible for managing {@link Role} entities.
  *
- * <p>Extends {@link ServiceGeneric} by inheriting the full CRUD operations
+ * <p>Extends {@link ServiceGenericImpl} by inheriting the full CRUD operations
  * for the entity {@link Role}, and implements {@link UniqueCheckable}
  * to provide uniqueness checks used during data validation.</p>
  *
@@ -35,8 +35,8 @@ import java.util.UUID;
  * @version 1.0
  * @since 1.0
  *
+ * @see ServiceGenericImpl
  * @see ServiceGeneric
- * @see ServiceInterface
  * @see UniqueCheckable
  * @see RepositoryRole
  * @see Role
@@ -44,12 +44,12 @@ import java.util.UUID;
  * @see DTOResponseRole
  */
 @Service
-public class ServiceRole extends ServiceGeneric<Role, DTORequestRole, DTOResponseRole> implements UniqueCheckable {
+public class ServiceRole extends ServiceGenericImpl<Role, DTORequestRole, DTOResponseRole> implements UniqueCheckable {
 
     private final RepositoryRole repositoryRole;
 
-    public ServiceRole(RepositoryInterface<Role> repositoryInterface, Mapper<Role, DTORequestRole, DTOResponseRole> mapperInterface, RepositoryRole repositoryRole) {
-        super(Role.class, repositoryInterface, mapperInterface);
+    public ServiceRole(RepositoryGeneric<Role> repositoryGeneric, Mapper<Role, DTORequestRole, DTOResponseRole> mapperInterface, RepositoryRole repositoryRole) {
+        super(Role.class, repositoryGeneric, mapperInterface);
         this.repositoryRole = repositoryRole;
     }
     /**

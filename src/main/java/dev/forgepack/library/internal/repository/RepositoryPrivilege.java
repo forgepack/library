@@ -1,17 +1,10 @@
 package dev.forgepack.library.internal.repository;
 
-import dev.forgepack.library.api.repository.RepositoryWithName;
+import dev.forgepack.library.api.repository.RepositoryGenericWithName;
 import dev.forgepack.library.internal.model.Privilege;
 import java.util.UUID;
 
-/**
- * Implements Privilege Repository
- *
- * @author	Marcelo Ribeiro Gadelha
- * Website:	www.forgepack.dev
- **/
-
-public interface RepositoryPrivilege extends RepositoryWithName<Privilege> {
+public interface RepositoryPrivilege extends RepositoryGenericWithName<Privilege> {
 
     Privilege findByName(String name);
     boolean existsByNameIgnoreCaseAndIdNot(String value, UUID id);

@@ -2,7 +2,7 @@ package dev.forgepack.library.internal.payload;
 
 import java.util.UUID;
 import dev.forgepack.library.api.annotation.Unique;
-import dev.forgepack.library.api.payload.DTORequestIdentifiable;
+import dev.forgepack.library.api.payload.DTOIdentifiable;
 import dev.forgepack.library.internal.service.ServicePrivilege;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -19,5 +19,5 @@ public record DTORequestPrivilege(
         UUID id,
         @NotNull(message = "{not.null}") @NotBlank(message = "{not.blank}")
         String name
-) implements DTORequestIdentifiable<UUID> {
+) implements DTOIdentifiable<UUID> {
 }

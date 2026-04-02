@@ -1,6 +1,6 @@
 package dev.forgepack.library.internal.service;
 
-import dev.forgepack.library.api.service.ServiceInterfaceEmail;
+import dev.forgepack.library.api.service.ServiceEmail;
 import dev.forgepack.library.internal.utils.Information;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
  **/
 
 @Service
-public class ServiceEmailImpl implements ServiceInterfaceEmail {
+public class ServiceEmailImpl implements ServiceEmail {
 
     private final JavaMailSender emailSender;
     private static final Logger log = LoggerFactory.getLogger(Information.class);

@@ -1,6 +1,6 @@
 package dev.forgepack.library.internal.payload;
 
-import dev.forgepack.library.api.payload.DTORequestIdentifiable;
+import dev.forgepack.library.api.payload.DTOIdentifiable;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 
@@ -53,7 +53,7 @@ import java.util.UUID;
  * @version 1.0
  * @since 1.0
  *
- * @see DTORequestIdentifiable
+ * @see DTOIdentifiable
  */
 public record DTORequestToken (
 
@@ -62,7 +62,7 @@ public record DTORequestToken (
     String accessToken,
     @NotNull
     UUID refreshToken
-) implements DTORequestIdentifiable<UUID> {
+) implements DTOIdentifiable<UUID> {
 
     public DTORequestToken(UUID id, String accessToken, UUID refreshToken) {
         this(id, "Bearer ", accessToken, refreshToken);

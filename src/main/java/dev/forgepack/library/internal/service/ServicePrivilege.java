@@ -1,9 +1,9 @@
 package dev.forgepack.library.internal.service;
 
 import dev.forgepack.library.api.mapper.Mapper;
-import dev.forgepack.library.api.repository.RepositoryInterface;
+import dev.forgepack.library.api.repository.RepositoryGeneric;
 import dev.forgepack.library.api.validator.UniqueCheckable;
-import dev.forgepack.library.api.service.ServiceInterface;
+import dev.forgepack.library.api.service.ServiceGeneric;
 import dev.forgepack.library.internal.model.Privilege;
 import dev.forgepack.library.internal.payload.DTORequestPrivilege;
 import dev.forgepack.library.internal.payload.DTOResponsePrivilege;
@@ -14,7 +14,7 @@ import java.util.UUID;
 /**
  * Service responsible for managing {@link Privilege} entities.
  *
- * <p>Extends {@link ServiceGeneric} by inheriting the full CRUD operations
+ * <p>Extends {@link ServiceGenericImpl} by inheriting the full CRUD operations
  * for the entity {@link Privilege}, and implements {@link UniqueCheckable}
  * to provide uniqueness checks used during data validation.</p>
  *
@@ -35,8 +35,8 @@ import java.util.UUID;
  * @version 1.0
  * @since 1.0
  *
+ * @see ServiceGenericImpl
  * @see ServiceGeneric
- * @see ServiceInterface
  * @see UniqueCheckable
  * @see RepositoryPrivilege
  * @see Privilege
@@ -44,12 +44,12 @@ import java.util.UUID;
  * @see DTOResponsePrivilege
  */
 @Service
-public class ServicePrivilege extends ServiceGeneric<Privilege, DTORequestPrivilege, DTOResponsePrivilege> implements UniqueCheckable {
+public class ServicePrivilege extends ServiceGenericImpl<Privilege, DTORequestPrivilege, DTOResponsePrivilege> implements UniqueCheckable {
 
     private final RepositoryPrivilege repositoryPrivilege;
 
-    public ServicePrivilege(RepositoryInterface<Privilege> repositoryInterface, Mapper<Privilege, DTORequestPrivilege, DTOResponsePrivilege> mapperInterface, RepositoryPrivilege repositoryPrivilege) {
-        super(Privilege.class, repositoryInterface, mapperInterface);
+    public ServicePrivilege(RepositoryGeneric<Privilege> repositoryGeneric, Mapper<Privilege, DTORequestPrivilege, DTOResponsePrivilege> mapperInterface, RepositoryPrivilege repositoryPrivilege) {
+        super(Privilege.class, repositoryGeneric, mapperInterface);
         this.repositoryPrivilege = repositoryPrivilege;
     }
     /**

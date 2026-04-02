@@ -62,25 +62,13 @@ public class DTOResponseToken extends RepresentationModel<DTOResponseToken> {
 
     private final String tokenType = "Bearer ";
     private String accessToken;
-    private UUID refreshToken;
+    private final UUID refreshToken;
     private Set<String> role;
 
     public DTOResponseToken(UUID refreshToken) {
         this.refreshToken = refreshToken;
     }
     public DTOResponseToken(String accessToken, UUID refreshToken, Set<String> role) {
-        this.accessToken = accessToken;
-        this.refreshToken = refreshToken;
-        this.role = role;
-    }
-    public DTOResponseToken(Link initialLink, String accessToken, UUID refreshToken, Set<String> role) {
-        super(initialLink);
-        this.accessToken = accessToken;
-        this.refreshToken = refreshToken;
-        this.role = role;
-    }
-    public DTOResponseToken(Iterable<Link> initialLinks, String accessToken, UUID refreshToken, Set<String> role) {
-        super(initialLinks);
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
         this.role = role;

@@ -1,7 +1,7 @@
 package dev.forgepack.library.internal.payload;
 
 import dev.forgepack.library.api.annotation.Unique;
-import dev.forgepack.library.api.payload.DTORequestIdentifiable;
+import dev.forgepack.library.api.payload.DTOIdentifiable;
 import dev.forgepack.library.internal.model.Role;
 import dev.forgepack.library.internal.service.ServiceRole;
 import jakarta.validation.constraints.NotBlank;
@@ -47,7 +47,7 @@ import java.util.UUID;
  * @version 1.0
  * @since 1.0
  *
- * @see DTORequestIdentifiable
+ * @see DTOIdentifiable
  * @see DTOResponsePrivilege
  * @see Role
  */
@@ -58,5 +58,5 @@ public record DTORequestRole(
         @NotNull(message = "{not.null}") @NotBlank(message = "{not.blank}")
         String name,
         Set<DTOResponsePrivilege> privilege
-) implements DTORequestIdentifiable<UUID> {
+) implements DTOIdentifiable<UUID> {
 }

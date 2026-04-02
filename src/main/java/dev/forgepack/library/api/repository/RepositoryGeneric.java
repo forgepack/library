@@ -4,7 +4,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.NoRepositoryBean;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -37,7 +36,7 @@ import java.util.UUID;
  * @see NoRepositoryBean
  */
 @NoRepositoryBean
-public interface RepositoryInterface<T> extends JpaRepository<T, UUID> {
+public interface RepositoryGeneric<T> extends JpaRepository<T, UUID> {
 
     /**
      * Retrieves a paginated result containing entities that match the given ID.

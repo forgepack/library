@@ -4,7 +4,7 @@ import dev.forgepack.library.internal.payload.DTORequestToken;
 import dev.forgepack.library.internal.payload.DTOResponseToken;
 import dev.forgepack.library.internal.payload.DTOResponseUser;
 import dev.forgepack.library.internal.payload.DTORequestUserAuth;
-import dev.forgepack.library.internal.service.ServiceAuth;
+import dev.forgepack.library.internal.service.ServiceAuthenticationImpl;
 import dev.forgepack.library.internal.service.ServiceUser;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -13,27 +13,27 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/auth")
-public class ControllerAuth {
+public class ControllerAuthentication {
 
-    private final ServiceAuth serviceAuth;
+    private final ServiceAuthenticationImpl serviceAuthenticationImpl;
     private final ServiceUser serviceUser;
 
-    public ControllerAuth(ServiceAuth serviceAuth, ServiceUser serviceUser) {
-        this.serviceAuth = serviceAuth;
+    public ControllerAuthentication(ServiceAuthenticationImpl serviceAuthenticationImpl, ServiceUser serviceUser) {
+        this.serviceAuthenticationImpl = serviceAuthenticationImpl;
         this.serviceUser = serviceUser;
     }
 
     @PostMapping("/login")
     public ResponseEntity<DTOResponseToken> login(@RequestBody @Valid DTORequestUserAuth value){
-        return ResponseEntity.ok().body(serviceAuth.login(value));
+        return ResponseEntity.ok().body(serviceAuthenticationImpl.login(value));
     }
     @PostMapping("/refresh")
     public ResponseEntity<DTOResponseToken> refresh(@RequestBody @Valid DTORequestToken value){
-        return ResponseEntity.accepted().body(serviceAuth.refresh(value));
+        return ResponseEntity.accepted().body(serviceAuthenticationImpl.refresh(value));
     }
     @DeleteMapping("/logout/{refreshToken}")
     public ResponseEntity<DTOResponseToken> logout(@PathVariable("refreshToken") UUID refreshToken) {
-        return ResponseEntity.accepted().body(serviceAuth.logout(refreshToken));
+        return ResponseEntity.accepted().body(serviceAuthenticationImpl.logout(refreshToken));
     }
     @PutMapping("/changePassword")
 //    @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR', 'USER')")

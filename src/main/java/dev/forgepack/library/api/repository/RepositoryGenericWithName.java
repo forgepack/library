@@ -2,15 +2,13 @@ package dev.forgepack.library.api.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.NoRepositoryBean;
-import java.util.Set;
 import java.util.UUID;
 
 /**
  * Specialized repository contract for entities that expose a {@code name} attribute.
  *
- * <p>This interface extends {@link RepositoryInterface} by adding query methods
+ * <p>This interface extends {@link RepositoryGeneric} by adding query methods
  * based on a conventional {@code name} field, enabling common operations such as
  * search, filtering, and uniqueness validation.</p>
  *
@@ -33,11 +31,11 @@ import java.util.UUID;
  * @author Marcelo Ribeiro Gadelha
  * @since 1.0
  *
- * @see RepositoryInterface
+ * @see RepositoryGeneric
  * @see org.springframework.data.jpa.repository.JpaRepository
  */
 @NoRepositoryBean
-public interface RepositoryWithName<T> extends RepositoryInterface<T> {
+public interface RepositoryGenericWithName<T> extends RepositoryGeneric<T> {
 
     /**
      * Retrieves all entities with the exact given name.

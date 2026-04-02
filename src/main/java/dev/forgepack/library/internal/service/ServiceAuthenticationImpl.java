@@ -1,7 +1,7 @@
 package dev.forgepack.library.internal.service;
 
 import dev.forgepack.library.api.mapper.Mapper;
-import dev.forgepack.library.api.service.ServiceInterfaceAuth;
+import dev.forgepack.library.api.service.ServiceAuthentication;
 import dev.forgepack.library.internal.configuration.ConfigurationJWT;
 import dev.forgepack.library.internal.model.Token;
 import dev.forgepack.library.internal.model.User;
@@ -36,7 +36,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-public class ServiceAuth implements ServiceInterfaceAuth {
+public class ServiceAuthenticationImpl implements ServiceAuthentication {
 
 //    private final ServiceRecaptcha serviceRecaptcha;
     private final E2EE e2EE;
@@ -48,7 +48,7 @@ public class ServiceAuth implements ServiceInterfaceAuth {
     private final ServiceCustomUserDetails serviceCustomUserDetails;
     private static final Logger log = LoggerFactory.getLogger(Information.class);
 
-    public ServiceAuth(E2EE e2EE, AuthenticationManager authenticationManager, ConfigurationJWT configurationJwt, RepositoryToken repositoryToken, RepositoryUser repositoryUser, Mapper<Token, DTORequestToken, DTOResponseToken> mapper, ServiceCustomUserDetails serviceCustomUserDetails) {
+    public ServiceAuthenticationImpl(E2EE e2EE, AuthenticationManager authenticationManager, ConfigurationJWT configurationJwt, RepositoryToken repositoryToken, RepositoryUser repositoryUser, Mapper<Token, DTORequestToken, DTOResponseToken> mapper, ServiceCustomUserDetails serviceCustomUserDetails) {
         this.e2EE = e2EE;
         this.authenticationManager = authenticationManager;
         this.configurationJwt = configurationJwt;

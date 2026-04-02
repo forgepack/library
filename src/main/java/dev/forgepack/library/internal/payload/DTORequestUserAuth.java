@@ -5,7 +5,7 @@ import dev.forgepack.library.api.annotation.HasLetter;
 import dev.forgepack.library.api.annotation.HasUpperCase;
 import dev.forgepack.library.api.annotation.HasLowerCase;
 import dev.forgepack.library.api.annotation.HasLength;
-import dev.forgepack.library.api.payload.DTORequestIdentifiable;
+import dev.forgepack.library.api.payload.DTOIdentifiable;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.NotBlank;
 import java.util.UUID;
@@ -62,7 +62,7 @@ import java.util.UUID;
  * @version 1.0
  * @since 1.0
  *
- * @see DTORequestIdentifiable
+ * @see DTOIdentifiable
  */
 public record DTORequestUserAuth(
 
@@ -79,4 +79,4 @@ public record DTORequestUserAuth(
     @NotNull(message = "{not.null}")
     Integer secret
 //    String captchaToken
-) implements DTORequestIdentifiable<UUID> {}
+) implements DTOIdentifiable<UUID> {}

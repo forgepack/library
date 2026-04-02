@@ -1,5 +1,6 @@
 package dev.forgepack.library.internal.payload;
 
+import dev.forgepack.library.api.payload.DTOIdentifiable;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.RepresentationModel;
 
@@ -59,34 +60,16 @@ import java.util.UUID;
  *
  * @see org.springframework.hateoas.RepresentationModel
  */
-public class DTOResponseUser extends RepresentationModel<DTOResponseUser> {
+public class DTOResponseUser extends RepresentationModel<DTOResponseUser> implements DTOIdentifiable<UUID> {
 
-    private UUID id;
-    private String username;
-    private String email;
-    private Integer attempt;
-    private Boolean active;
-    private Set<DTOResponseRole> role;
+    private final UUID id;
+    private final String username;
+    private final String email;
+    private final Integer attempt;
+    private final Boolean active;
+    private final Set<DTOResponseRole> role;
 
     public DTOResponseUser(UUID id, String username, String email, Integer attempt, Boolean active, Set<DTOResponseRole> role) {
-        this.id = id;
-        this.username = username;
-        this.email = email;
-        this.attempt = attempt;
-        this.active = active;
-        this.role = role;
-    }
-    public DTOResponseUser(Link initialLink, UUID id, String username, String email, Integer attempt, Boolean active, Set<DTOResponseRole> role) {
-        super(initialLink);
-        this.id = id;
-        this.username = username;
-        this.email = email;
-        this.attempt = attempt;
-        this.active = active;
-        this.role = role;
-    }
-    public DTOResponseUser(Iterable<Link> initialLinks, UUID id, String username, String email, Integer attempt, Boolean active, Set<DTOResponseRole> role) {
-        super(initialLinks);
         this.id = id;
         this.username = username;
         this.email = email;
@@ -112,5 +95,10 @@ public class DTOResponseUser extends RepresentationModel<DTOResponseUser> {
     }
     public Set<DTOResponseRole> getRole() {
         return role;
+    }
+
+    @Override
+    public UUID id() {
+        return id;
     }
 }
