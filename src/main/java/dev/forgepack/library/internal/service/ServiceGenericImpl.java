@@ -7,7 +7,7 @@ import dev.forgepack.library.api.service.ServiceGeneric;
 import dev.forgepack.library.internal.model.GenericAuditEntity;
 import dev.forgepack.library.internal.utils.Information;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.*;
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.Link;
@@ -279,7 +279,7 @@ public abstract class ServiceGenericImpl<Entity extends GenericAuditEntity, DTOR
     }
 
     public Entity existsEntity(String action, UUID id) {
-        return repositoryGeneric.findById(id)
+        return repositoryGeneric.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new EntityNotFoundException(
                         String.format("Cannot %s: %s not found with ID %s", action, entity.getSimpleName(), id)));
     }
