@@ -95,7 +95,7 @@ public class ServiceUser extends ServiceGenericImpl<User, DTORequestUser, DTORes
             user.setPassword(passwordEncoder.encode(password));
             user.setSecret(e2EE.encrypt(secret));
             Set<Role> roles = new HashSet<>();
-            roles.add(repositoryRole.findByName("VIEWER"));
+            roles.add(repositoryRole.findByName("VIEWER").orElseThrow(() -> new RuntimeException("Default role VIEWER not found")));
             user.setRole(roles);
             user.setActive(true);
             user.setAttempt(0);

@@ -10,7 +10,7 @@
     </parent>
 	<groupId>dev.forgepack</groupId>
 	<artifactId>library</artifactId>
-	<version>1.0.47</version>
+	<version>1.0.48</version>
     <packaging>jar</packaging>
 	<name>Maven Library</name>
 	<description>Project for Spring Boot library</description>
@@ -59,12 +59,13 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-hateoas</artifactId>
+            <version>4.1.0-M4</version>
         </dependency>
         <!-- Remove vulnerable dependency of hateoas -->
         <dependency>
             <groupId>tools.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>3.1.0</version>
+            <version>3.1.1</version>
         </dependency>
         <!-- Test: open source testing framework -->
         <dependency>
@@ -104,6 +105,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
+            <version>4.1.0-M4</version>
         </dependency>
         <dependency>
             <groupId>io.jsonwebtoken</groupId>

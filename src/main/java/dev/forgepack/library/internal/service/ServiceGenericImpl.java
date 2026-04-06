@@ -183,14 +183,9 @@ public abstract class ServiceGenericImpl<Entity extends GenericAuditEntity, DTOR
      */
     @Transactional
     public DTOResponse update(UUID id, DTORequest updated){
-        log.info("A DTO: " + updated.toString());
-        log.info("A Entity: " + entity.toString());
         Entity entity = existsEntity("update", id);
-        log.info("B DTO: " + updated.toString());
-        log.info("B Entity: " + entity.toString());
         mapper.updateEntity(updated, entity);
-//        entity.setId(updated.id());
-        addLog("update", updated.id(), null, null);
+        addLog("update", id, null, null);
         return addHateoas(repositoryGeneric.save(entity));
     }
 

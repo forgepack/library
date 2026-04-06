@@ -3,6 +3,7 @@ package dev.forgepack.library.api.repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.NoRepositoryBean;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -43,7 +44,7 @@ public interface RepositoryGenericWithName<T> extends RepositoryGeneric<T> {
      * @param name name to search for
      * @return set of entities matching the provided name
      */
-    T findByName(String name);
+    Optional<T> findByName(String name);
 
     /**
      * Checks if any entity exists with the given name.

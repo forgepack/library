@@ -35,14 +35,8 @@ public final class MapperPrivilege implements Mapper<Privilege, DTORequestPrivil
 
     @Override
     public void updateEntity(DTORequestPrivilege dto, Privilege entity) {
-        log.info(dto == null ? "DTO: sim" : "DTO: não" );
-        log.info(dto == null ? "Entity: sim" : "Entity: não" );
         if (dto == null || entity == null) return;
-        log.info("0 DTO: " + dto.toString());
-        log.info("0 Entity: " + entity.toString());
         entity.setName(dto.name());
-        log.info("1 DTO: " + dto.toString());
-        log.info("1 Entity: " + entity.toString());
     }
 
     public Set<DTOResponsePrivilege> toResponseSet(Set<Privilege> entities) {
