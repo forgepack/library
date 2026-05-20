@@ -76,7 +76,7 @@ import java.util.Set;
         @UniqueConstraint(columnNames = {"email"})
     }
 )
-public class User extends GenericAuditEntity {
+public class User extends GenericBaseEntity {
 
     @Column(nullable = false, unique = true)
     private String username;

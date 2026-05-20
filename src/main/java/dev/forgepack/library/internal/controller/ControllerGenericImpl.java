@@ -3,7 +3,7 @@ package dev.forgepack.library.internal.controller;
 import dev.forgepack.library.api.controller.ControllerGeneric;
 import dev.forgepack.library.api.payload.DTOIdentifiable;
 import dev.forgepack.library.api.service.ServiceGeneric;
-import dev.forgepack.library.internal.model.GenericAuditEntity;
+import dev.forgepack.library.internal.model.GenericBaseEntity;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,7 +17,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.UUID;
 
-public abstract class ControllerGenericImpl<Entity extends GenericAuditEntity, DTORequest extends DTOIdentifiable<UUID>, DTOResponse extends DTOIdentifiable<UUID>> implements ControllerGeneric<DTORequest, DTOResponse> {
+public abstract class ControllerGenericImpl<Entity extends GenericBaseEntity, DTORequest extends DTOIdentifiable<UUID>, DTOResponse extends DTOIdentifiable<UUID>> implements ControllerGeneric<DTORequest, DTOResponse> {
 
     private final Class<Entity> entityClass;
     private final ServiceGeneric<Entity, DTORequest, DTOResponse> serviceGeneric;

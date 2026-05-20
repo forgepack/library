@@ -1,14 +1,17 @@
 package dev.forgepack.library.internal.model;
 
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.EntityListeners;
-import jakarta.persistence.CascadeType;
+import org.hibernate.annotations.*;
 import org.hibernate.envers.Audited;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -55,30 +58,68 @@ import java.util.UUID;
 @Audited
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public abstract class GenericAuditEntity extends GenericBaseEntity {
+public abstract class GenericBaseEntity implements Serializable {
 
     /**
-     * User responsible for creating the entity.
+     * Unique identifier of the entity.
      *
-     * <p>Automatically populated via {@link CreatedBy}, depending on the configured
-     * {@code AuditorAware} implementation.</p>
+     * <p>Automatically generated using {@link GenerationType#UUID}, ensuring global
+     * uniqueness and independence from database-specific strategies.</p>
      */
-    @CreatedBy
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-    private User createdBy;
-    /**
-     * User responsible for the last modification of the entity.
-     *
-     * <p>Automatically updated via {@link LastModifiedBy}.</p>
-     */
-    @LastModifiedBy
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-    private User modifiedBy;
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", unique = true, nullable = false)
+    private UUID id;
 
-    public User getCreatedBy() {
-        return createdBy;
+    /**
+     * Timestamp indicating when the entity was created.
+     *
+     * <p>Automatically set at persistence time and immutable thereafter.</p>
+     */
+    @CreationTimestamp @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    /**
+     * Timestamp indicating the last time the entity was updated.
+     *
+     * <p>Automatically updated on each modification.</p>
+     */
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
+
+    /**
+     * Timestamp representing logical deletion (soft delete).
+     *
+     * <p>When non-null, the entity is considered deleted. Physical removal
+     * is not performed automatically.</p>
+     */
+    private LocalDateTime deletedAt;
+
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
     }
-    public User getModifiedBy() {
-        return modifiedBy;
+
+    public UUID getId() {
+        return id;
+    }
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+    public LocalDateTime getDeletedAt() {
+        return deletedAt;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof GenericBaseEntity that)) return false;
+        return Objects.equals(id, that.id);
+    }
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
