@@ -35,7 +35,7 @@ import java.util.UUID;
  *
  * <h3>Validation flow</h3>
  * <ol>
- *     <li>Retrieve the field value configured in {@link Unique#field()}</li>
+ *     <li>Retrieve the field value configured in {@link Unique#fields()}</li>
  *     <li>If present, retrieve the identifier configured in {@link Unique#idField()}</li>
  *     <li>Resolve the configured {@link UniqueCheckable} service</li>
  *     <li>Execute the appropriate uniqueness verification</li>

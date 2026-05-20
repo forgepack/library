@@ -60,7 +60,6 @@ public class ServiceRole extends ServiceGenericImpl<Role, DTORequestRole, DTORes
      * @return  {@code true} if another record exists with the same value in the specified field;
      *          {@code false} otherwise.
      * @throws IllegalArgumentException if the specified field is not supported.
-     * @author Marcelo Ribeiro Gadelha
      *
      * <p><b>Example:</b></p>
      * <pre>{@code
@@ -85,7 +84,6 @@ public class ServiceRole extends ServiceGenericImpl<Role, DTORequestRole, DTORes
      * @return  {@code true} if another record exists with the same value in the specified field;
      *          {@code false} otherwise.
      * @throws IllegalArgumentException if the specified field is not supported.
-     * @author Marcelo Ribeiro Gadelha
      *
      * <p><b>Example:</b></p>
      * <pre>{@code
