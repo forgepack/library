@@ -4,6 +4,7 @@ import dev.forgepack.library.internal.model.Privilege;
 import dev.forgepack.library.internal.model.Role;
 import dev.forgepack.library.internal.model.User;
 import dev.forgepack.library.internal.repository.RepositoryUser;
+import jakarta.transaction.Transactional;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,6 +24,7 @@ public class ServiceCustomUserDetails implements UserDetailsService {
     public ServiceCustomUserDetails(RepositoryUser repositoryUser) {
         this.repositoryUser = repositoryUser;
     }
+    @Transactional
     @Override
     public UserDetails loadUserByUsername(String username) {
         User user = repositoryUser.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("Resource not found"));
