@@ -181,6 +181,7 @@ public abstract class ServiceGenericImpl<Entity extends GenericBaseEntity, DTORe
      * @return {@link DTOResponse} representing the updated entity
      * @throws EntityNotFoundException if the entity does not exist
      */
+    @Transactional
     public DTOResponse update(UUID id, DTORequest updated){
         Entity entity = existsEntity("update", id);
         mapper.updateEntity(updated, entity);
@@ -277,6 +278,7 @@ public abstract class ServiceGenericImpl<Entity extends GenericBaseEntity, DTORe
         }
     }
 
+    @Transactional(readOnly = true)
     public Entity existsEntity(String action, UUID id) {
         return repositoryGeneric.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new EntityNotFoundException(
