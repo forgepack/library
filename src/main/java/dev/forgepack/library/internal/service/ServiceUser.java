@@ -16,6 +16,7 @@ import dev.forgepack.library.internal.utils.E2EE;
 import dev.forgepack.library.internal.utils.Information;
 import dev.forgepack.library.internal.utils.QRCode;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mail.MailException;
@@ -127,6 +128,7 @@ public class ServiceUser extends ServiceGenericImpl<User, DTORequestUser, DTORes
      * }</pre>
      */
     @Override
+    @Transactional
     public boolean existsByField(String field, Object value) {
         if ("username".equals(field)) {
             return repositoryUser.existsByUsernameIgnoreCase((String) value);
@@ -154,6 +156,7 @@ public class ServiceUser extends ServiceGenericImpl<User, DTORequestUser, DTORes
      * }</pre>
      */
     @Override
+    @Transactional
     public boolean existsByFieldAndIdNot(String field, Object value, UUID id) {
         if ("username".equals(field)){
             return repositoryUser.existsByUsernameIgnoreCaseAndIdNot((String) value, id);

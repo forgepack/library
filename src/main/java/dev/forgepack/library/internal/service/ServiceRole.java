@@ -8,6 +8,7 @@ import dev.forgepack.library.internal.model.Role;
 import dev.forgepack.library.internal.payload.DTORequestRole;
 import dev.forgepack.library.internal.payload.DTOResponseRole;
 import dev.forgepack.library.internal.repository.RepositoryRole;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import java.util.UUID;
 
@@ -67,6 +68,7 @@ public class ServiceRole extends ServiceGenericImpl<Role, DTORequestRole, DTORes
      * }</pre>
      */
     @Override
+    @Transactional
     public boolean existsByField(String field, Object value) {
         if ("name".equals(field)) {
             return repositoryRole.existsByNameIgnoreCase((String) value);
@@ -91,6 +93,7 @@ public class ServiceRole extends ServiceGenericImpl<Role, DTORequestRole, DTORes
      * }</pre>
      */
     @Override
+    @Transactional
     public boolean existsByFieldAndIdNot(String field, Object value, UUID id) {
         if ("name".equals(field)){
             return repositoryRole.existsByNameIgnoreCaseAndIdNot((String) value, id);

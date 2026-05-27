@@ -8,6 +8,7 @@ import dev.forgepack.library.internal.model.Privilege;
 import dev.forgepack.library.internal.payload.DTORequestPrivilege;
 import dev.forgepack.library.internal.payload.DTOResponsePrivilege;
 import dev.forgepack.library.internal.repository.RepositoryPrivilege;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import java.util.UUID;
 
@@ -67,6 +68,7 @@ public class ServicePrivilege extends ServiceGenericImpl<Privilege, DTORequestPr
      * }</pre>
      */
     @Override
+    @Transactional
     public boolean existsByField(String field, Object value) {
         if ("name".equals(field)) {
             return repositoryPrivilege.existsByNameIgnoreCase((String) value);
@@ -91,6 +93,7 @@ public class ServicePrivilege extends ServiceGenericImpl<Privilege, DTORequestPr
      * }</pre>
      */
     @Override
+    @Transactional
     public boolean existsByFieldAndIdNot(String field, Object value, UUID id) {
         if ("name".equals(field)){
             return repositoryPrivilege.existsByNameIgnoreCaseAndIdNot((String) value, id);
