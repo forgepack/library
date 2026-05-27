@@ -10,7 +10,6 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Column;
-import org.hibernate.envers.Audited;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -65,7 +64,6 @@ import java.util.Set;
  * @see User
  */
 @Entity
-@Audited
 @Table(indexes = @Index(columnList = "name"), uniqueConstraints = @UniqueConstraint(columnNames = {"name"}))
 public class Role extends GenericAuditEntity {
 

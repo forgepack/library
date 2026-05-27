@@ -5,7 +5,6 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Index;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.persistence.Column;
-import org.hibernate.envers.Audited;
 
 /**
  * Domain entity representing a fine-grained permission within the authorization model.
@@ -49,7 +48,6 @@ import org.hibernate.envers.Audited;
  * @see Role
  */
 @Entity
-@Audited
 @Table(indexes = @Index(columnList = "name"), uniqueConstraints = @UniqueConstraint(columnNames = {"name"}))
 public class Privilege extends GenericAuditEntity {
 

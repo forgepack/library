@@ -10,7 +10,6 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Column;
-import org.hibernate.envers.Audited;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -65,7 +64,6 @@ import java.util.Set;
  * @see Role
  */
 @Entity
-@Audited
 @Table(name = "users",
     indexes = {
         @Index(columnList = "username"),
@@ -89,7 +87,7 @@ public class User extends GenericAuditEntity {
     private Boolean active;
     private String secret;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
     private Set<Role> role = new HashSet<>();

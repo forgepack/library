@@ -2,7 +2,6 @@ package dev.forgepack.library.internal.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import org.hibernate.envers.Audited;
 import java.util.UUID;
 
 /**
@@ -48,7 +47,6 @@ import java.util.UUID;
  * @see GenericAuditEntity
  */
 @Entity
-@Audited
 @Table
 public class Token extends GenericAuditEntity {
 
