@@ -28,6 +28,7 @@ public class ServiceAuditorAwareImpl implements AuditorAware<User> {
         return entityManager
                 .createQuery("SELECT u FROM User u WHERE u.username = :username", User.class)
                 .setParameter("username", userDetails.getUsername())
+                .setHint("org.hibernate.flushMode", "MANUAL")
                 .getResultStream()
                 .findFirst();
     }
