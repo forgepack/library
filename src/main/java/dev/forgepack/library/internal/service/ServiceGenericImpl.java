@@ -4,7 +4,7 @@ import dev.forgepack.library.api.mapper.Mapper;
 import dev.forgepack.library.api.payload.DTOIdentifiable;
 import dev.forgepack.library.api.repository.RepositoryGeneric;
 import dev.forgepack.library.api.service.ServiceGeneric;
-import dev.forgepack.library.internal.model.GenericBaseEntity;
+import dev.forgepack.library.internal.model.GenericAuditEntity;
 import dev.forgepack.library.internal.utils.Information;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,7 +51,7 @@ import static org.springframework.data.domain.ExampleMatcher.matching;
  * search queries using Spring Data {@link Example} and {@link ExampleMatcher},
  * allowing case-insensitive and partial string matching.</p>
  *
- * @param <Entity> domain entity type extending {@link GenericBaseEntity}
+ * @param <Entity> domain entity type extending {@link GenericAuditEntity}
  * @param <DTORequest> request DTO extending {@link DTOIdentifiable}, used for create and update operations
  * @param <DTOResponse> response DTO extending {@link RepresentationModel} , returned by service operations
  *
@@ -60,10 +60,10 @@ import static org.springframework.data.domain.ExampleMatcher.matching;
  * @see ServiceGeneric
  * @see RepositoryGeneric
  * @see Mapper
- * @see GenericBaseEntity
+ * @see GenericAuditEntity
  * @see RepresentationModel
  */
-public abstract class ServiceGenericImpl<Entity extends GenericBaseEntity, DTORequest extends DTOIdentifiable<UUID>, DTOResponse extends RepresentationModel<DTOResponse>> implements ServiceGeneric<Entity, DTORequest, DTOResponse> {
+public abstract class ServiceGenericImpl<Entity extends GenericAuditEntity, DTORequest extends DTOIdentifiable<UUID>, DTOResponse extends RepresentationModel<DTOResponse>> implements ServiceGeneric<Entity, DTORequest, DTOResponse> {
 
     private final Class<Entity> entity;
     private final RepositoryGeneric<Entity> repositoryGeneric;
