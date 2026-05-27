@@ -1,8 +1,6 @@
 package dev.forgepack.library.internal.repository;
 
 import dev.forgepack.library.internal.model.User;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import dev.forgepack.library.api.repository.RepositoryGeneric;
 import org.springframework.data.jpa.repository.Query;
 import java.util.Optional;
