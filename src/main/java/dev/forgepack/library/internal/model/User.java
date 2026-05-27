@@ -10,6 +10,10 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Column;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -74,7 +78,7 @@ import java.util.Set;
         @UniqueConstraint(columnNames = {"email"})
     }
 )
-public class User extends GenericAuditEntity {
+public class User extends GenericAuditEntity implements UserDetails {
 
     @Column(nullable = false, unique = true)
     private String username;
@@ -152,4 +156,27 @@ public class User extends GenericAuditEntity {
     public Set<Role> getRole() {
         return role;
     }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        Set<GrantedAuthority> authorities = new HashSet<>();
+        for (Role r : role) {
+            authorities.add(new SimpleGrantedAuthority(r.getName()));
+            r.getPrivilege().forEach(p ->
+                    authorities.add(new SimpleGrantedAuthority(p.getName())));
+        }
+        return authorities;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() { return true; }
+
+    @Override
+    public boolean isAccountNonLocked() { return attempt == null || attempt < 5; }
+
+    @Override
+    public boolean isEnabled() { return Boolean.TRUE.equals(active); }
+
+    @Override
+    public boolean isCredentialsNonExpired() { return true; }
 }

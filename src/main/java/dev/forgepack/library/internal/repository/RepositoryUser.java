@@ -4,12 +4,14 @@ import dev.forgepack.library.internal.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import dev.forgepack.library.api.repository.RepositoryGeneric;
+import org.springframework.data.jpa.repository.Query;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface RepositoryUser extends RepositoryGeneric<User> {
 
     User findByUsernameIgnoreCase(String name);
+    @Query("SELECT DISTINCT u FROM User u LEFT JOIN FETCH u.role r LEFT JOIN FETCH r.privilege WHERE u.username = :name")
     Optional<User> findByUsername(String name);
     boolean existsByUsername(String name);
     boolean existsByUsernameIgnoreCase(String name);
