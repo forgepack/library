@@ -169,14 +169,8 @@ public class User extends GenericAuditEntity implements UserDetails {
     }
 
     @Override
-    public boolean isAccountNonExpired() { return true; }
-
-    @Override
     public boolean isAccountNonLocked() { return attempt == null || attempt < 5; }
 
     @Override
     public boolean isEnabled() { return Boolean.TRUE.equals(active); }
-
-    @Override
-    public boolean isCredentialsNonExpired() { return true; }
 }
