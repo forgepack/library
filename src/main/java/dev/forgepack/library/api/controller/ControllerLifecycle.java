@@ -8,7 +8,7 @@ import java.util.UUID;
  * such as hard deletion and restoration of resources.
  *
  * <p>This interface is intended to be used as an optional extension to
- * {@link ControllerLifecycle}, providing additional endpoints for managing
+ * {@link ControllerGeneric}, providing additional endpoints for managing
  * resource states beyond standard CRUD operations.</p>
  *
  * <p>These operations are typically applicable in systems that implement
@@ -42,7 +42,7 @@ public interface ControllerLifecycle<DTOResponse> {
      * irreversible data removal.</p>
      *
      * @param id identifier of the resource to be permanently deleted
-     * @return {@link ResponseEntity<Void>} with no content, indicating the resource
+     * @return {@link ResponseEntity} with no content, indicating the resource
      * was permanently deleted (HTTP 204)
      */
     ResponseEntity<Void> hardDelete(UUID id);

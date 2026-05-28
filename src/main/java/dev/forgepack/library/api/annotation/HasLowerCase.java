@@ -15,11 +15,11 @@ import java.lang.annotation.Documented;
  * at least one lowercase letter.
  *
  * <p>This constraint validates that the annotated field includes at least
- * one lowercase letter ({@code a-zA-Z}). The validation logic delegates the
- * verification to {@link Validator#hasLetter(String)}.</p>
+ * one lowercase letter ({@code a-z}). The validation logic delegates the
+ * verification to {@link Validator#hasLowerCase(String)}.</p>
  *
  * <p>This constraint can be applied to string fields that require the
- * presence of numeric characters, such as passwords, identifiers,
+ * presence of lowercase letters, such as passwords, identifiers,
  * or formatted codes.</p>
  *
  * <h3>Validation rules</h3>
@@ -30,14 +30,14 @@ import java.lang.annotation.Documented;
  *
  * <h3>Example</h3>
  * <pre>{@code
- * @HasLetter
+ * @HasLowerCase
  * private String password;
  * }</pre>
  *
  * @author Marcelo Ribeiro Gadelha
  * @since 1.0
  *
- * @see Validator#hasLetter(String)
+ * @see Validator#hasLowerCase(String)
  * @see Constraint
  */
 @Target(ElementType.FIELD)

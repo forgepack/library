@@ -11,15 +11,15 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Documented;
 
 /**
- * Bean Validation constraint that verifies whether a string contains
- * at least one numeric digit.
+ * Bean Validation constraint that verifies whether a string meets
+ * the minimum length requirement.
  *
  * <p>This constraint validates that the annotated field includes the minimum required length.
  * The validation logic delegates the
  * verification to {@link Validator#hasLength(int, String)}.</p>
  *
- * <p>This constraint can be applied to string fields that require the
- * presence of numeric characters, such as passwords, identifiers,
+ * <p>This constraint can be applied to string fields that require a
+ * minimum number of characters, such as passwords, identifiers,
  * or formatted codes.</p>
  *
  * <h3>Validation rules</h3>

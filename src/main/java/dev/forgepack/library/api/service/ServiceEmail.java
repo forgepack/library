@@ -2,12 +2,12 @@ package dev.forgepack.library.api.service;
 
 /**
  * Contract for email delivery services.
- * <p>
- * Provides operations for sending plain text and HTML emails, including support
- * for attachments and dynamic content generation.
- * <p>
- * Implementations are expected to handle underlying transport concerns
- * (e.g., SMTP, third-party providers), encoding, and error handling.
+ *
+ * <p>Provides operations for sending plain text and HTML emails, including support
+ * for attachments and dynamic content generation.</p>
+ *
+ * <p>Implementations are expected to handle underlying transport concerns
+ * (e.g., SMTP, third-party providers), encoding, and error handling.</p>
  *
  * @author Marcelo Ribeiro Gadelha
  * @since 1.0
@@ -41,9 +41,9 @@ public interface ServiceEmail {
 
     /**
      * Builds the HTML content for a welcome email.
-     * <p>
-     * Typically used during user onboarding to provide initial credentials
-     * and additional security information.
+     *
+     * <p>Typically used during user onboarding to provide initial credentials
+     * and additional security information.</p>
      *
      * @param username the user's login identifier
      * @param password the user's initial or temporary password

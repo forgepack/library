@@ -24,7 +24,7 @@ import java.lang.annotation.RetentionPolicy;
  *
  * <h3>Configuration parameters</h3>
  * <ul>
- *     <li>{@code field} – name of the field whose value must be unique</li>
+ *     <li>{@code fields} – name of the field whose value must be unique</li>
  *     <li>{@code idField} – identifier field used to exclude the current entity during updates</li>
  *     <li>{@code service} – service responsible for performing the uniqueness check</li>
  *     <li>{@code message} – validation error message</li>
@@ -47,7 +47,6 @@ import java.lang.annotation.RetentionPolicy;
  * }</pre>
  * 
  * @author Marcelo Ribeiro Gadelha
- * @version 1.0
  * @since 1.0
  * 
  * @see ValidatorUnique

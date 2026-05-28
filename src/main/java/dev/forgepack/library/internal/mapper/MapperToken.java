@@ -35,6 +35,7 @@ public final class MapperToken implements Mapper<Token, DTORequestToken, DTOResp
         entity.setRefreshToken(dto.refreshToken());
     }
 
+    @Override
     public Set<DTOResponseToken> toResponseSet(Set<Token> entities) {
         if (entities == null) return Set.of();
         return entities.stream()

@@ -19,7 +19,7 @@ import java.lang.annotation.Documented;
  * verification to {@link Validator#hasLetter(String)}.</p>
  *
  * <p>This constraint can be applied to string fields that require the
- * presence of numeric characters, such as passwords, identifiers,
+ * presence of alphabetic characters, such as passwords, identifiers,
  * or formatted codes.</p>
  *
  * <h3>Validation rules</h3>

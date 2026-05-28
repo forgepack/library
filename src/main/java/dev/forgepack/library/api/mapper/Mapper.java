@@ -1,5 +1,7 @@
 package dev.forgepack.library.api.mapper;
 
+import java.util.Set;
+
 /**
  * Contract for mapping between domain entities and Data Transfer Objects (DTOs).
  *
@@ -63,4 +65,12 @@ public interface Mapper<Entity, Request, Response> {
      * @param entity existing entity instance to be modified
      */
     public void updateEntity(Request dto, Entity entity);
+
+    /**
+     * Converts a set of entities into a set of response DTOs.
+     *
+     * @param entities set of entities to convert
+     * @return set of response DTOs, or an empty set if {@code entities} is {@code null}
+     */
+    public Set<Response> toResponseSet(Set<Entity> entities);
 }

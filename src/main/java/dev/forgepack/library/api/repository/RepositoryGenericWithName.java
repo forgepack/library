@@ -39,10 +39,10 @@ import java.util.UUID;
 public interface RepositoryGenericWithName<T> extends RepositoryGeneric<T> {
 
     /**
-     * Retrieves all entities with the exact given name.
+     * Retrieves the entity with the exact given name, if present.
      *
      * @param name name to search for
-     * @return set of entities matching the provided name
+     * @return an {@link Optional} containing the matching entity, or empty if none found
      */
     Optional<T> findByName(String name);
 

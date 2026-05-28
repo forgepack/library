@@ -50,6 +50,12 @@ public final class MapperUser implements Mapper<User, DTORequestUser, DTORespons
         }
     }
 
+    /**
+     * Converts a set of {@link User} entities into a set of response DTOs.
+     *
+     * @param entities set of entities to convert
+     * @return set of response DTOs, or an empty set if {@code entities} is {@code null}
+     */
     public Set<DTOResponseUser> toResponseSet(Set<User> entities) {
         if (entities == null) return Set.of();
         return entities.stream()

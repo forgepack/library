@@ -45,6 +45,7 @@ public final class MapperRole implements Mapper<Role, DTORequestRole, DTORespons
         }
     }
 
+    @Override
     public Set<DTOResponseRole> toResponseSet(Set<Role> entities) {
         if (entities == null) return Set.of();
         return entities.stream()
@@ -52,6 +53,12 @@ public final class MapperRole implements Mapper<Role, DTORequestRole, DTORespons
                 .collect(Collectors.toSet());
     }
 
+    /**
+     * Converts a set of {@link DTOResponseRole} DTOs into a set of {@link Role} entities.
+     *
+     * @param dtos set of response DTOs to convert
+     * @return set of entities, or an empty set if {@code dtos} is {@code null}
+     */
     public Set<Role> toEntitySet(Set<DTOResponseRole> dtos) {
         if (dtos == null) return Set.of();
         return dtos.stream()

@@ -39,6 +39,7 @@ public final class MapperPrivilege implements Mapper<Privilege, DTORequestPrivil
         entity.setName(dto.name());
     }
 
+    @Override
     public Set<DTOResponsePrivilege> toResponseSet(Set<Privilege> entities) {
         if (entities == null) return Set.of();
         return entities.stream()
@@ -46,6 +47,12 @@ public final class MapperPrivilege implements Mapper<Privilege, DTORequestPrivil
                 .collect(Collectors.toSet());
     }
 
+    /**
+     * Converts a set of {@link DTOResponsePrivilege} DTOs into a set of {@link Privilege} entities.
+     *
+     * @param dtos set of response DTOs to convert
+     * @return set of entities, or an empty set if {@code dtos} is {@code null}
+     */
     public Set<Privilege> toEntitySet(Set<DTOResponsePrivilege> dtos) {
         if (dtos == null) return Set.of();
         return dtos.stream()

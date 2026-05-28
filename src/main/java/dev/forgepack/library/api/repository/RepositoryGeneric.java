@@ -51,6 +51,17 @@ public interface RepositoryGeneric<T> extends JpaRepository<T, UUID> {
      * @return page containing matching entities
      */
     Page<T> findById(UUID uuid, Pageable pageable);
+
+    /**
+     * Retrieves a non-deleted entity by its unique identifier.
+     *
+     * <p>This method is typically used to fetch active (non-soft-deleted) entities,
+     * excluding those with a non-null {@code deletedAt} timestamp.</p>
+     *
+     * @param id identifier of the entity to retrieve
+     * @return an {@link Optional} containing the matching entity, or empty if
+     *         not found or already soft-deleted
+     */
     Optional<T> findByIdAndDeletedAtIsNull(UUID id);
 
     /**
