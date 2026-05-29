@@ -18,7 +18,7 @@ import jakarta.validation.ConstraintValidatorContext;
  * @see HasUpperCase
  * @see ConstraintValidator
  */
-public interface HasUpperCaseValidator extends ConstraintValidator<HasUpperCase, String> {
+public interface ValidatorHasUpperCase extends ConstraintValidator<HasUpperCase, String> {
 
     /**
      * Validates whether the provided string contains at least one uppercase letter.

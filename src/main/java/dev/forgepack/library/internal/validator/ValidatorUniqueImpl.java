@@ -1,32 +1,24 @@
 package dev.forgepack.library.internal.validator;
 
 import dev.forgepack.library.api.annotation.Unique;
-import dev.forgepack.library.api.validator.UniqueCheckable;
-import dev.forgepack.library.api.validator.UniqueValidator;
+import dev.forgepack.library.api.service.ServiceUniqueCheckable;
+import dev.forgepack.library.api.validator.ValidatorUnique;
 import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import java.lang.reflect.Field;
 import java.util.UUID;
 
-/**
- * Default implementation of {@link UniqueValidator}.
- *
- * <p>This bean is managed by Spring and requires an {@link ApplicationContext}
- * to resolve the configured {@link UniqueCheckable} service at runtime.</p>
- *
- * @see UniqueValidator
- */
 @Component
-public class ValidatorUnique implements UniqueValidator {
+public class ValidatorUniqueImpl implements ValidatorUnique {
 
     private String[] fields;
     private String idField;
-    private Class<? extends UniqueCheckable> serviceClass;
-    private UniqueCheckable service;
+    private Class<? extends ServiceUniqueCheckable> serviceClass;
+    private ServiceUniqueCheckable service;
     private final ApplicationContext context;
 
-    public ValidatorUnique(ApplicationContext context) {
+    public ValidatorUniqueImpl(ApplicationContext context) {
         this.context = context;
     }
 
@@ -62,7 +54,7 @@ public class ValidatorUnique implements UniqueValidator {
         }
         return allUnique;
     }
-    private UniqueCheckable resolveService() {
+    private ServiceUniqueCheckable resolveService() {
         if (service == null) {
             service = context.getBean(serviceClass);
         }

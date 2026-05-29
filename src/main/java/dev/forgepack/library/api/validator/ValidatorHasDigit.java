@@ -18,7 +18,7 @@ import jakarta.validation.ConstraintValidatorContext;
  * @see HasDigit
  * @see ConstraintValidator
  */
-public interface HasDigitValidator extends ConstraintValidator<HasDigit, String> {
+public interface ValidatorHasDigit extends ConstraintValidator<HasDigit, String> {
 
     /**
      * Validates whether the provided string contains at least one digit.

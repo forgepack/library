@@ -1,6 +1,7 @@
 package dev.forgepack.library.api.validator;
 
 import dev.forgepack.library.api.annotation.Unique;
+import dev.forgepack.library.api.service.ServiceUniqueCheckable;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
@@ -9,7 +10,7 @@ import jakarta.validation.ConstraintValidatorContext;
  *
  * <p>Implementations are responsible for verifying that the values of configured
  * fields are unique in the persistence layer. The validation logic must delegate
- * uniqueness checks to a service that implements {@link UniqueCheckable}.</p>
+ * uniqueness checks to a service that implements {@link ServiceUniqueCheckable}.</p>
  *
  * <p>Both entity creation and update scenarios must be supported:</p>
  * <ul>
@@ -25,7 +26,7 @@ import jakarta.validation.ConstraintValidatorContext;
  * <ol>
  *     <li>Retrieve the field value configured in {@link Unique#fields()}</li>
  *     <li>If present, retrieve the identifier configured in {@link Unique#idField()}</li>
- *     <li>Resolve the configured {@link UniqueCheckable} service</li>
+ *     <li>Resolve the configured {@link ServiceUniqueCheckable} service</li>
  *     <li>Execute the appropriate uniqueness verification</li>
  * </ol>
  *
@@ -33,10 +34,10 @@ import jakarta.validation.ConstraintValidatorContext;
  * @since 1.0
  *
  * @see Unique
- * @see UniqueCheckable
+ * @see ServiceUniqueCheckable
  * @see ConstraintValidator
  */
-public interface UniqueValidator extends ConstraintValidator<Unique, Object> {
+public interface ValidatorUnique extends ConstraintValidator<Unique, Object> {
 
     /**
      * Initializes the validator with the metadata provided in the {@link Unique} annotation.

@@ -16,7 +16,7 @@ import jakarta.validation.ConstraintValidatorContext;
  * @see HasLength
  * @see ConstraintValidator
  */
-public interface HasLengthValidator extends ConstraintValidator<HasLength, String> {
+public interface ValidatorHasLength extends ConstraintValidator<HasLength, String> {
 
     /**
      * Validates whether the provided string meets the minimum required length.

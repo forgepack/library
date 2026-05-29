@@ -12,11 +12,6 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-/**
- * @author Marcelo Ribeiro Gadelha
- * Website: www.gadelha.eti.br
- **/
-
 @Service
 public class ServiceEmailImpl implements ServiceEmail {
 

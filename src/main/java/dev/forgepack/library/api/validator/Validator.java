@@ -1,4 +1,4 @@
-package dev.forgepack.library.internal.validator;
+package dev.forgepack.library.api.validator;
 
 /**
  * Utility class providing common validation helper methods.
@@ -25,11 +25,7 @@ package dev.forgepack.library.internal.validator;
  * @author Marcelo Ribeiro Gadelha
  * @since 1.0
  */
-public final class Validator {
-
-    private Validator() {
-        throw new UnsupportedOperationException("Utility class");
-    }
+public interface Validator {
 
     /**
      * Checks whether the provided value is {@code null}.
@@ -37,9 +33,7 @@ public final class Validator {
      * @param value object to be checked
      * @return {@code true} if the value is {@code null}; {@code false} otherwise
      */
-    public static boolean isNull(Object value) {
-        return value == null;
-    }
+    boolean isNull(Object value);
 
     /**
      * Checks whether the given string contains at least one numeric digit.
@@ -47,9 +41,7 @@ public final class Validator {
      * @param value string to be evaluated
      * @return {@code true} if the string contains a digit; {@code false} otherwise
      */
-    public static boolean hasDigit(String value) {
-        return !isNull(value) && value.chars().anyMatch(Character::isDigit);
-    }
+    boolean hasDigit(String value);
 
     /**
      * Checks whether the given string contains at least one letter.
@@ -57,9 +49,7 @@ public final class Validator {
      * @param value string to be evaluated
      * @return {@code true} if the string contains a letter; {@code false} otherwise
      */
-    public static boolean hasLetter(String value) {
-        return !isNull(value) && value.chars().anyMatch(Character::isLetter);
-    }
+    boolean hasLetter(String value);
 
     /**
      * Checks whether the given string contains at least one lowercase character.
@@ -67,9 +57,7 @@ public final class Validator {
      * @param value string to be evaluated
      * @return {@code true} if the string contains a lowercase character; {@code false} otherwise
      */
-    public static boolean hasLowerCase(String value) {
-        return !isNull(value) && value.chars().anyMatch(Character::isLowerCase);
-    }
+    boolean hasLowerCase(String value);
 
     /**
      * Checks whether the given string contains at least one uppercase character.
@@ -77,9 +65,7 @@ public final class Validator {
      * @param value string to be evaluated
      * @return {@code true} if the string contains an uppercase character; {@code false} otherwise
      */
-    public static boolean hasUpperCase(String value) {
-        return !isNull(value) && value.chars().anyMatch(Character::isUpperCase);
-    }
+    boolean hasUpperCase(String value);
 
     /**
      * Checks whether the given string has at least the specified minimum length.
@@ -89,7 +75,5 @@ public final class Validator {
      * @return {@code true} if the string length is greater than or equal to
      *         the specified length; {@code false} otherwise
      */
-    public static boolean hasLength(int length, String value) {
-        return !isNull(value) && value.length() >= length;
-    }
+    boolean hasLength(int length, String value);
 }
