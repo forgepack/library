@@ -7,7 +7,7 @@ import jakarta.validation.ConstraintValidatorContext;
 import static dev.forgepack.library.internal.validator.Validator.hasUpperCase;
 
 /**
- * This inner class implements the interface {@link ConstraintValidator}
+ * This class implements the interface {@link ConstraintValidator}
  * <p>
  * Validator implementation that checks whether a string
  * contains at least one uppercase letter.
@@ -20,7 +20,7 @@ public class ValidatorHasUpperCase implements ConstraintValidator<HasUpperCase, 
      *
      * @param value string to be validated
      * @param context validation context
-     * @return {@code true} if the string contains a numeric digit;
+     * @return {@code true} if the string contains at least one uppercase letter;
      *         {@code false} otherwise
      */
     @Override

@@ -61,6 +61,11 @@ public class ValidatorUnique implements ConstraintValidator<Unique, Object> {
         this.context = context;
     }
 
+    /**
+     * Initializes the validator with the metadata provided in the {@link Unique} annotation.
+     *
+     * @param annotation the annotation instance containing the constraint configuration
+     */
     @Override
     public void initialize(Unique annotation) {
         this.fields = annotation.fields();
@@ -68,6 +73,17 @@ public class ValidatorUnique implements ConstraintValidator<Unique, Object> {
         this.serviceClass = annotation.service();
         this.service = context.getBean(annotation.service());
     }
+    /**
+     * Validates whether all configured fields of the given object satisfy the uniqueness constraint.
+     *
+     * <p>Null objects are considered valid. For each configured field, blank or null values are
+     * skipped. On a uniqueness violation, a constraint violation is added to the specific field
+     * node instead of using the default message template.</p>
+     *
+     * @param value   the object being validated
+     * @param context the constraint validator context
+     * @return {@code true} if all configured fields are unique; {@code false} otherwise
+     */
     @Override
     public boolean isValid(Object value, ConstraintValidatorContext context) {
         if (value == null) return true;

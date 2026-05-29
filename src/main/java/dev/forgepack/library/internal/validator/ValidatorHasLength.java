@@ -20,7 +20,7 @@ public class ValidatorHasLength implements ConstraintValidator<HasLength, String
      *
      * @param value string to be validated
      * @param context validation context
-     * @return {@code true} if the string contains a numeric digit;
+     * @return {@code true} if the string meets the minimum required length;
      *         {@code false} otherwise
      */
     @Override

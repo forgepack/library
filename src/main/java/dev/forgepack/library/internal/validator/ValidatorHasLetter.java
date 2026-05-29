@@ -20,7 +20,7 @@ public class ValidatorHasLetter implements ConstraintValidator<HasLetter, String
      *
      * @param value string to be validated
      * @param context validation context
-     * @return {@code true} if the string contains a numeric digit;
+     * @return {@code true} if the string contains at least one letter;
      *         {@code false} otherwise
      */
     @Override

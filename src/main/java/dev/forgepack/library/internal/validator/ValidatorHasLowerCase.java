@@ -20,7 +20,7 @@ public class ValidatorHasLowerCase implements ConstraintValidator<HasLowerCase, 
      *
      * @param value string to be validated
      * @param context validation context
-     * @return {@code true} if the string contains a numeric digit;
+     * @return {@code true} if the string contains at least one lowercase letter;
      *         {@code false} otherwise
      */
     @Override
