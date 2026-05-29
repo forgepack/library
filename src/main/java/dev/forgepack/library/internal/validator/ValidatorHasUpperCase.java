@@ -1,28 +1,15 @@
 package dev.forgepack.library.internal.validator;
 
-import dev.forgepack.library.api.annotation.HasUpperCase;
-import jakarta.validation.ConstraintValidator;
+import dev.forgepack.library.api.validator.HasUpperCaseValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
 import static dev.forgepack.library.internal.validator.Validator.hasUpperCase;
 
 /**
- * This class implements the interface {@link ConstraintValidator}
- * <p>
- * Validator implementation that checks whether a string
- * contains at least one uppercase letter.
- * </p>
+ * Default implementation of {@link HasUpperCaseValidator}.
  */
-public class ValidatorHasUpperCase implements ConstraintValidator<HasUpperCase, String> {
+public class ValidatorHasUpperCase implements HasUpperCaseValidator {
 
-    /**
-     * Validates whether the provided string contains at least one uppercase letter.
-     *
-     * @param value string to be validated
-     * @param context validation context
-     * @return {@code true} if the string contains at least one uppercase letter;
-     *         {@code false} otherwise
-     */
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
         return hasUpperCase(value);

@@ -2,7 +2,7 @@ package dev.forgepack.library.internal.validator;
 
 import dev.forgepack.library.api.annotation.Unique;
 import dev.forgepack.library.api.validator.UniqueCheckable;
-import jakarta.validation.ConstraintValidator;
+import dev.forgepack.library.api.validator.UniqueValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -10,46 +10,15 @@ import java.lang.reflect.Field;
 import java.util.UUID;
 
 /**
- * Bean Validation validator responsible for enforcing the {@link Unique} constraint.
+ * Default implementation of {@link UniqueValidator}.
  *
- * <p>This validator checks whether the value of a specified field is unique in the
- * persistence layer. The validation logic delegates the uniqueness verification
- * to a service that implements {@link UniqueCheckable}.</p>
+ * <p>This bean is managed by Spring and requires an {@link ApplicationContext}
+ * to resolve the configured {@link UniqueCheckable} service at runtime.</p>
  *
- * <p>The validator supports both entity creation and update scenarios:</p>
- * <ul>
- *     <li><b>Create operation</b>: verifies that no record exists with the same field value</li>
- *     <li><b>Update operation</b>: verifies that no other record exists with the same field
- *     value excluding the current entity identifier</li>
- * </ul>
- *
- * <p>The service responsible for performing the uniqueness check is obtained
- * from the Spring {@link ApplicationContext} based on the configuration provided
- * in the {@link Unique} annotation.</p>
- *
- * <p>Field values are accessed via reflection, allowing the validator to read
- * private fields without requiring public getters.</p>
- *
- * <p>Null or blank values are considered valid and will not trigger a uniqueness
- * verification.</p>
- *
- * <h3>Validation flow</h3>
- * <ol>
- *     <li>Retrieve the field value configured in {@link Unique#fields()}</li>
- *     <li>If present, retrieve the identifier configured in {@link Unique#idField()}</li>
- *     <li>Resolve the configured {@link UniqueCheckable} service</li>
- *     <li>Execute the appropriate uniqueness verification</li>
- * </ol>
- *
- * @author Marcelo Ribeiro Gadelha
- * @since 1.0
- *
- * @see Unique
- * @see UniqueCheckable
- * @see ConstraintValidator
+ * @see UniqueValidator
  */
 @Component
-public class ValidatorUnique implements ConstraintValidator<Unique, Object> {
+public class ValidatorUnique implements UniqueValidator {
 
     private String[] fields;
     private String idField;
@@ -61,11 +30,6 @@ public class ValidatorUnique implements ConstraintValidator<Unique, Object> {
         this.context = context;
     }
 
-    /**
-     * Initializes the validator with the metadata provided in the {@link Unique} annotation.
-     *
-     * @param annotation the annotation instance containing the constraint configuration
-     */
     @Override
     public void initialize(Unique annotation) {
         this.fields = annotation.fields();
@@ -73,17 +37,6 @@ public class ValidatorUnique implements ConstraintValidator<Unique, Object> {
         this.serviceClass = annotation.service();
         this.service = context.getBean(annotation.service());
     }
-    /**
-     * Validates whether all configured fields of the given object satisfy the uniqueness constraint.
-     *
-     * <p>Null objects are considered valid. For each configured field, blank or null values are
-     * skipped. On a uniqueness violation, a constraint violation is added to the specific field
-     * node instead of using the default message template.</p>
-     *
-     * @param value   the object being validated
-     * @param context the constraint validator context
-     * @return {@code true} if all configured fields are unique; {@code false} otherwise
-     */
     @Override
     public boolean isValid(Object value, ConstraintValidatorContext context) {
         if (value == null) return true;

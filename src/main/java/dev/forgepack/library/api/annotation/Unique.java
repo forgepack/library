@@ -1,6 +1,7 @@
 package dev.forgepack.library.api.annotation;
 
 import dev.forgepack.library.api.validator.UniqueCheckable;
+import dev.forgepack.library.api.validator.UniqueValidator;
 import dev.forgepack.library.internal.validator.ValidatorUnique;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
@@ -49,7 +50,7 @@ import java.lang.annotation.RetentionPolicy;
  * @author Marcelo Ribeiro Gadelha
  * @since 1.0
  * 
- * @see ValidatorUnique
+ * @see UniqueValidator
  * @see UniqueCheckable
  * @see Constraint
  */
