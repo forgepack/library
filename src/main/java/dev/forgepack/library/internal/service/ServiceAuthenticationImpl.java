@@ -79,13 +79,6 @@ public class ServiceAuthenticationImpl implements ServiceAuthentication {
             throw e;
         }
     }
-//    @Override
-//    public void captchaTest(String captchaToken) {
-//        if (!serviceRecaptcha.validateCaptcha(captchaToken)) {
-//            log.error("Invalid or suspicious CAPTCHA: {}", captchaToken);
-//            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or suspicious CAPTCHA");
-//        }
-//    }
     @Override
     public DTOResponseToken refresh(DTORequestToken dtoRequestToken) {
         if (repositoryToken.existsByRefreshToken(dtoRequestToken.refreshToken()) &&
@@ -112,6 +105,13 @@ public class ServiceAuthenticationImpl implements ServiceAuthentication {
                         new RuntimeException("Token not found.")
                 );
     }
+//    @Override
+//    public void captchaTest(String captchaToken) {
+//        if (!serviceRecaptcha.validateCaptcha(captchaToken)) {
+//            log.error("Invalid or suspicious CAPTCHA: {}", captchaToken);
+//            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or suspicious CAPTCHA");
+//        }
+//    }
     public void addAttempt(DTORequestUserAuth dtoRequestUserAuth) {
         User entity = repositoryUser.findByUsername(dtoRequestUserAuth.username()).orElseThrow(() -> new RuntimeException("Resource not found"));
         entity.setAttempt(entity.getAttempt() == null ? 0 : entity.getAttempt() + 1);

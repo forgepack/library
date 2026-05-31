@@ -16,6 +16,24 @@ import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.Date;
 
+/**
+ * Component responsible for JWT generation, parsing, and validation.
+ *
+ * <p>Tokens are signed with {@code HmacSHA512} using the secret configured via
+ * {@code application.jwtSecret}. If no secret is configured, a random in-memory
+ * key is generated and a warning is logged (all tokens are invalidated on restart).</p>
+ *
+ * <p>Configurable properties:</p>
+ * <ul>
+ *     <li>{@code application.jwtIssuer} – token issuer claim</li>
+ *     <li>{@code application.jwtAudience} – token audience claim</li>
+ *     <li>{@code application.jwtExpiration} – token lifetime in milliseconds</li>
+ *     <li>{@code application.jwtSecret} – HMAC signing secret (min. 64 bytes recommended)</li>
+ * </ul>
+ *
+ * @author Marcelo Ribeiro Gadelha
+ * @since 1.0
+ */
 @Component
 public class ConfigurationJWT {
 
@@ -29,6 +47,14 @@ public class ConfigurationJWT {
     private String secretKey;
     private static final Logger log = LoggerFactory.getLogger(Information.class);
 
+    /**
+     * Builds the {@link SecretKey} used to sign and verify JWT tokens.
+     *
+     * <p>Falls back to a random in-memory key when {@code application.jwtSecret}
+     * is not configured, logging a warning to alert about the insecure state.</p>
+     *
+     * @return the {@link SecretKey} for HMAC-SHA512 signing
+     */
     private SecretKey getSigningKey() {
         if (secretKey == null || secretKey.isBlank()) {
             log.warn("JWT secret key not configured. Using random in-memory key");
@@ -39,6 +65,12 @@ public class ConfigurationJWT {
         return new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8), "HmacSHA512");
     }
 
+    /**
+     * Generates a signed JWT for the given subject (username).
+     *
+     * @param authentication the subject to embed in the token (typically the username)
+     * @return the compact serialized JWT string
+     */
     public String generateToken(String authentication) {
         return Jwts.builder()
                 .audience().add(audience).and()
@@ -51,6 +83,12 @@ public class ConfigurationJWT {
                 .signWith(getSigningKey())
                 .compact();
     }
+    /**
+     * Extracts the subject (username) from a signed JWT.
+     *
+     * @param token the compact serialized JWT string
+     * @return the username stored in the token's subject claim
+     */
     public String getUsernameFromJWT(String token) {
         return Jwts.parser()
                 .verifyWith(getSigningKey()).build()
@@ -58,6 +96,16 @@ public class ConfigurationJWT {
                 .getPayload()
                 .getSubject();
     }
+    /**
+     * Validates a JWT by verifying its signature and claims.
+     *
+     * <p>Returns {@code false} and logs the cause for any of the following conditions:
+     * invalid signature, malformed token, expired token, unsupported token, or
+     * empty claims string.</p>
+     *
+     * @param token the compact serialized JWT string
+     * @return {@code true} if the token is valid; {@code false} otherwise
+     */
     public boolean validateJWT(String token) {
         try {
             Jwts.parser()

@@ -19,6 +19,24 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Optional;
 
+/**
+ * JWT authentication filter that intercepts every HTTP request to validate
+ * and establish the security context from a Bearer token.
+ *
+ * <p>Extends {@link OncePerRequestFilter} to guarantee single execution per request.
+ * If a valid JWT is present in the {@code Authorization} header, the associated
+ * user is loaded and set in the {@link SecurityContextHolder}.</p>
+ *
+ * <p>Regardless of the authentication outcome, the filter appends an
+ * {@code X-API-Version} response header and always continues the filter chain.</p>
+ *
+ * @author Marcelo Ribeiro Gadelha
+ * @since 1.0
+ *
+ * @see ConfigurationJWT
+ * @see ServiceCustomUserDetails
+ * @see OncePerRequestFilter
+ */
 public class FilterJWT extends OncePerRequestFilter {
 
     @Value("${application.version}")
@@ -32,6 +50,23 @@ public class FilterJWT extends OncePerRequestFilter {
         this.serviceCustomUserDetails = serviceCustomUserDetails;
     }
 
+    /**
+     * Processes each HTTP request to extract and validate a JWT from the
+     * {@code Authorization: Bearer <token>} header.
+     *
+     * <p>When a valid token is found, the corresponding user is loaded via
+     * {@link ServiceCustomUserDetails} and stored in the
+     * {@link SecurityContextHolder}. Authentication errors are logged and
+     * silently swallowed so the filter chain always continues.</p>
+     *
+     * <p>An {@code X-API-Version} header is appended to every response.</p>
+     *
+     * @param request     the incoming HTTP request
+     * @param response    the HTTP response
+     * @param filterChain the remaining filter chain
+     * @throws ServletException if a servlet error occurs while processing the request
+     * @throws IOException      if an I/O error occurs during filter execution
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {

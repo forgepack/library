@@ -25,43 +25,22 @@ import org.slf4j.LoggerFactory;
 import static org.springframework.data.domain.ExampleMatcher.matching;
 
 /**
- * Generic base service providing common CRUD operations for domain entities.
+ * Default implementation of {@link ServiceGeneric}.
  *
- * <p>This abstract service implements the core business operations used by
- * application services, including creation, retrieval, update, deletion,
- * and paginated search.</p>
- *
- * <p>The class delegates persistence responsibilities to a
- * {@link RepositoryGeneric} implementation and uses a {@link Mapper}
- * to convert between entity and DTO representations.</p>
- *
- * <p>Additionally, this service integrates with Spring HATEOAS to enrich
- * response DTOs with hypermedia links following the HATEOAS constraint.</p>
- *
- * <h3>Main responsibilities</h3>
- * <ul>
- *     <li>Provide reusable CRUD operations for entities</li>
- *     <li>Support paginated and filtered queries</li>
- *     <li>Convert entities to DTO representations</li>
- *     <li>Add HATEOAS self links to response models</li>
- * </ul>
- *
- * <h3>Search behavior</h3>
- * <p>The {@code retrieve(Pageable, String, Class)} method dynamically builds
- * search queries using Spring Data {@link Example} and {@link ExampleMatcher},
- * allowing case-insensitive and partial string matching.</p>
+ * <p>Delegates persistence to a {@link RepositoryGeneric} and conversion to a
+ * {@link Mapper}. Enriches response DTOs with HATEOAS self links via
+ * {@link #addHateoas(GenericAuditEntity)}.</p>
  *
  * @param <Entity> domain entity type extending {@link GenericAuditEntity}
  * @param <DTORequest> request DTO extending {@link DTOIdentifiable}, used for create and update operations
- * @param <DTOResponse> response DTO extending {@link RepresentationModel} , returned by service operations
+ * @param <DTOResponse> response DTO extending {@link RepresentationModel}, returned by service operations
  *
  * @author Marcelo Ribeiro Gadelha
  * @since 1.0
+ *
  * @see ServiceGeneric
  * @see RepositoryGeneric
  * @see Mapper
- * @see GenericAuditEntity
- * @see RepresentationModel
  */
 public abstract class ServiceGenericImpl<Entity extends GenericAuditEntity, DTORequest extends DTOIdentifiable<UUID>, DTOResponse extends RepresentationModel<DTOResponse>> implements ServiceGeneric<Entity, DTORequest, DTOResponse> {
 
@@ -76,17 +55,7 @@ public abstract class ServiceGenericImpl<Entity extends GenericAuditEntity, DTOR
         this.mapper = mapper;
     }
 
-    /**
-     * Creates and persists a new entity based on the provided {@link DTORequest}.
-     *
-     * <p>The {@link DTORequest} is converted into a domain entity using the configured
-     * {@link Mapper}. The entity is then persisted through the
-     * {@link RepositoryGeneric}. After persistence, the entity is converted
-     * back into a {@link DTOResponse} enriched with HATEOAS links.</p>
-     *
-     * @param created {@link DTORequest} containing the data required to create the entity
-     * @return {@link DTOResponse} representing the persisted entity with HATEOAS links
-     */
+    @Override
     @Transactional
     public DTOResponse create(DTORequest created){
         Entity entity = repositoryGeneric.save(mapper.toEntity(created));
@@ -94,27 +63,7 @@ public abstract class ServiceGenericImpl<Entity extends GenericAuditEntity, DTOR
         return addHateoas(entity);
     }
 
-    /**
-     * Retrieves entities using pagination and dynamic filtering.
-     *
-     * <p>The filtering behavior is determined by the property specified in the
-     * {@link Pageable} sort configuration. If the sorted property is {@code id}
-     * and the provided value is a valid {@link UUID}, the search will be performed
-     * directly by identifier.</p>
-     *
-     * <p>Otherwise, the method dynamically builds a query using Spring Data
-     * {@link Example} and {@link ExampleMatcher}, performing case-insensitive
-     * and partial string matching.</p>
-     *
-     * <p>If the property cannot be resolved or an error occurs during query
-     * construction, the method falls back to returning all entities using the
-     * provided pagination.</p>
-     *
-     * @param pageable pagination and sorting configuration
-     * @param value value used as search filter
-     * @param entity class of the entity being queried
-     * @return a paginated list of response DTOs with HATEOAS links
-     */
+    @Override
     @Transactional
     public Page<DTOResponse> findAll(Pageable pageable, String value, Class<Entity> entity) {
         String propertyName = pageable.getSort().stream()
@@ -150,16 +99,7 @@ public abstract class ServiceGenericImpl<Entity extends GenericAuditEntity, DTOR
         }
     }
 
-    /**
-     * Retrieves a single entity by its unique identifier.
-     *
-     * <p>If no entity exists with the specified identifier, an
-     * {@link EntityNotFoundException} is thrown.</p>
-     *
-     * @param id {@link UUID} unique identifier of the entity
-     * @return {@link DTOResponse} representing the found entity with HATEOAS links
-     * @throws EntityNotFoundException if the entity does not exist
-     */
+    @Override
     @Transactional
     public DTOResponse findById(UUID id){
         Entity entity = existsEntity("find by ID", id);
@@ -167,20 +107,7 @@ public abstract class ServiceGenericImpl<Entity extends GenericAuditEntity, DTOR
         return addHateoas(entity);
     }
 
-    /**
-     * Updates an existing entity using the provided request DTO.
-     *
-     * <p>The method first verifies if an entity with the specified identifier
-     * exists. If the entity does not exist, an {@link EntityNotFoundException}
-     * is thrown.</p>
-     *
-     * <p>The DTO is converted to an entity using the configured {@link Mapper},
-     * persisted, and then returned as a {@link DTOResponse} enriched with HATEOAS links.</p>
-     *
-     * @param updated {@link DTORequest} containing updated entity data
-     * @return {@link DTOResponse} representing the updated entity
-     * @throws EntityNotFoundException if the entity does not exist
-     */
+    @Override
     @Transactional
     public DTOResponse update(UUID id, DTORequest updated){
         Entity entity = existsEntity("update", id);
@@ -189,16 +116,7 @@ public abstract class ServiceGenericImpl<Entity extends GenericAuditEntity, DTOR
         return addHateoas(repositoryGeneric.save(entity));
     }
 
-    /**
-     * Deletes an entity identified by the specified identifier.
-     *
-     * <p>If the entity does not exist, an {@link EntityNotFoundException}
-     * is thrown.</p>
-     *
-     * @param id {@link UUID} unique identifier of the entity to be soft deleted
-     * @return {@link DTOResponse} representing the soft deleted entity with HATEOAS links
-     * @throws EntityNotFoundException if the entity does not exist
-     */
+    @Override
     @Transactional
     public DTOResponse softDelete(UUID id){
         Entity entity = existsEntity("soft delete", id);
@@ -208,16 +126,7 @@ public abstract class ServiceGenericImpl<Entity extends GenericAuditEntity, DTOR
         return addHateoas(entity);
     }
 
-    /**
-     * Restores an entity identified by the specified identifier.
-     *
-     * <p>If the entity does not exist, an {@link EntityNotFoundException}
-     * is thrown.</p>
-     *
-     * @param id {@link UUID} unique identifier of the entity to be restored
-     * @return {@link DTOResponse} representing the soft restored entity with HATEOAS links
-     * @throws EntityNotFoundException if the entity does not exist
-     */
+    @Override
     @Transactional
     public DTOResponse restore(UUID id){
         Entity entity = existsEntity("restore", id);
@@ -227,16 +136,7 @@ public abstract class ServiceGenericImpl<Entity extends GenericAuditEntity, DTOR
         return addHateoas(entity);
     }
 
-    /**
-     * Deletes an entity identified by the specified identifier.
-     *
-     * <p>If the entity does not exist, an {@link EntityNotFoundException}
-     * is thrown.</p>
-     *
-     * @param id {@link UUID} unique identifier of the entity to be hard deleted
-     * @return {@link DTOResponse} representing the hard deleted entity with HATEOAS links
-     * @throws EntityNotFoundException if the entity does not exist
-     */
+    @Override
     @Transactional
     public DTOResponse hardDelete(UUID id){
         Entity entity = existsEntity("hard delete", id);
@@ -269,6 +169,18 @@ public abstract class ServiceGenericImpl<Entity extends GenericAuditEntity, DTOR
         return mapper.toResponse(object).add(Link.of(selfUri, IanaLinkRelations.SELF));
     }
 
+    /**
+     * Records a log entry for the given service action.
+     *
+     * <p>When {@code propertyName} is provided, a {@code DEBUG} entry is written
+     * indicating a search by property. Otherwise, an {@code INFO} entry is written
+     * identifying the current user, the action performed, and the target entity ID.</p>
+     *
+     * @param action       description of the operation (e.g., {@code "create"}, {@code "find by ID"})
+     * @param id           identifier of the target entity, or {@code null} for search operations
+     * @param propertyName name of the search property, or {@code null} for non-search operations
+     * @param value        value used in the search, or {@code null} for non-search operations
+     */
     public void addLog(String action, UUID id, Object propertyName, Object value) {
         String currentUser = new Information().getCurrentUser().orElse("Unknown User");
         if(propertyName != null){
@@ -278,6 +190,17 @@ public abstract class ServiceGenericImpl<Entity extends GenericAuditEntity, DTOR
         }
     }
 
+    /**
+     * Looks up a non-deleted entity by its identifier, throwing if absent.
+     *
+     * <p>Only entities whose {@code deletedAt} field is {@code null} are considered.
+     * Used internally before any mutating operation to guarantee the entity exists.</p>
+     *
+     * @param action description of the calling operation, used in the exception message
+     * @param id     identifier of the entity to look up
+     * @return the found {@link Entity}
+     * @throws EntityNotFoundException if no active entity exists with the given {@code id}
+     */
     @Transactional(readOnly = true)
     public Entity existsEntity(String action, UUID id) {
         return repositoryGeneric.findByIdAndDeletedAtIsNull(id)
