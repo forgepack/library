@@ -275,7 +275,7 @@ SOFTWARE.
 ```
 ---
 
-<div align="center">
+<div style="text-align: center;">
 
 **⭐ Did you like the project? Leave a star! ⭐**
 
