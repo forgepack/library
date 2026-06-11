@@ -1,5 +1,4 @@
-# _ForgePack Library_
-
+# _ForgePack - Library API_
 [![GitHub stars](https://img.shields.io/github/stars/forgepack/library?style=social)](https://github.com/forgepack/library)
 [![GitHub forks](https://img.shields.io/github/forks/forgepack/library?style=social)](https://github.com/forgepack/library/fork)
 [![GitHub watchers](https://img.shields.io/github/watchers/forgepack/library?style=social)](https://github.com/forgepack/library)
@@ -9,8 +8,7 @@
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
 ![Code Quality](https://img.shields.io/badge/code%20quality-A-brightgreen)
 
-## Necessary Tech stack
-
+## Necessary Tech Stack
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17.5-blue?logo=postgresql)
 ![PostGIS](https://img.shields.io/badge/PostGIS-3.5-blue?logo=postgis)
 
@@ -22,12 +20,12 @@
 
 ## Description
 
-How publish an artifact on Maven Central.
+_Library API_ is a robust and modern platform for consolidating interdisciplinary applications.
 
-## Summary
-- [1.Publishing to Maven Central](#1-publishing-to-maven-central)
-- [2.Prove Namespace ownership](#2-prove-namespace-ownership)
-- [3.Create a GPG Key](#3-create-a-gpg-key)
+## SUMMARY
+- [1.QUALITY & TESTING](#1-quality-&-testing)
+- [2.API DOCUMENTATION](#2-api-documentation)
+- [3.ARTIFACT COORDINATES](#3-artifact-coordinates)
 - [4.Publish th GPG Key](#4-publish-the-gpg-key)
 - [5.Configure Maven Credentials](#5-configure-maven-credentials)
 - [6.Publish the Artifact](#6-publish-the-artifact)
@@ -36,160 +34,105 @@ How publish an artifact on Maven Central.
 - [Developers](#developers)
 - [License](#license)
 
-Artifact published on Maven Central.
-```bash
-dev.forgepack:library:1.0.0
+## 1. QUALITY & TESTING
+
+### 1.1. Current Coverage Metrics
+
+GENERAL COVERAGE: 5%
+TOTAL NUMBER OF TESTS: 126
+
+| Package                                              | Coverage |        |
+|:-----------------------------------------------------|:--------:|:------:|
+| 📁 dev.forgepack.library.persistence.model           |   100%   |   ✅   |
+| 📁 dev.forgepack.library.configuration.interceptor   |   40%    |   🟡   |
+| 📁 dev.forgepack.library.utils                       |   34%    |   🟡   |
+| 📁 dev.forgepack.library.persistence.payload.request |   18%    |   🟠   |
+| 📁 dev.forgepack.library.configuration               |   18%    |   🟠   |
+| 📁 dev.forgepack.library.controller                  |    6%    |   🔴   |
+| 📁 dev.forgepack.library.service                     |    2%    |   🔴   |
+| 📁 demais pacotes                                    |    0%    |   🔴   |
+
+### 1.2. Types of Tests Implemented
+1. __Unit Tests__: Service layer, Utils, DTOs
+2. __Integration Tests__: Testcontainers + PostgreSQL
+3. __Controller Tests__: MockMVC with validation REST
+4. __Validation Tests__: Bean Validation and custom annotations
+5. __Security Tests__: JWT, authentication, authorization
+
+## 2. API Documentation
+
+### 2.1. Main Endpoints
+
+All resources follow the RESTful standard with complete CRUD operations
+> __Base URL__ [http://localhost:8080/demo](http://localhost:8080/demo`)
+
+| Endpoint                                                  | Method                        | Description                                                         | Exemple              |
+|-----------------------------------------------------------|:------------------------------|:--------------------------------------------------------------------|:---------------------|
+| [CREATE](http://localhost:8080/demo/user)                 | `POST /{resource}`            | path to item creation                                               | `POST /user`         |
+| [RETRIEVE](http://localhost:8080/demo/user/id)            | `GET /{resource}/{id}`        | path to search for item by id                                       | `GET /user/123`      |
+| [RETRIEVE ALL](http://localhost:8080/demo/user/attribute) | `GET /{resource}/{attribute}` | path to search for item by attribute or all items without attribute | `GET /user/username` |
+| [UPDATE](http://localhost:8080/demo/user/id)              | `PUT /{resource}/{id}`        | path to item update                                                 | `PUT /user/123`      |
+| [DELETE](http://localhost:8080/demo/user/id)              | `DELETE /{resource}/{id}`     | path to item delete                                                 | `DELETE /user/123`   |
+
+## 2.2. Swagger Documentation
+Access the interactive documentation when the application is running.
+> __Swagger__ [http://localhost:8080/demo/v1/swagger-ui/index.html](http://localhost:8080/demo/v1/swagger-ui/index.html)
+
+### 🔗 __Links Úteis__
+> __Home__: [http://localhost:8080/demo](http://localhost:8080/demo)
+
+> __Health Check__: [http://localhost:8080/demo/actuator/health](http://localhost:8080/demo/actuator/health)
+
+> __Metrics__: [http://localhost:8080/demo/actuator/metrics](http://localhost:8080/demo/actuator/metrics)
+
+> __Info__: [http://localhost:8080/demo/actuator/info](http://localhost:8080/demo/actuator/info)
+
+## 2.2. Available Resources
+| Resource      | Endpoint          | Description        | Exemple                    |
+|:--------------|:------------------|:-------------------|:---------------------------|
+| __Users__     | `/demo/user`      | Gestão de usuários | `GET /demo/user`           |
+| __Roles__     | `/demo/role`      | Controle de perfis | `POST /demo/role`          |
+| __Privilege__ | `/demo/privilege` | Privilégios        | `PUT /demo/privilege/1`    |
+| __Research__  | `/demo/research`  | Privilégios        | `DELETE /demo/privilege/1` |
+
+## 2.3. Authentication & Authorization
+
+```http
+# login and obtaining the JWT
+POST /demo/auth/login
+Content-Type: application/json
+{
+    "username": "12345678", 
+    "password": "P@ssword123"
+}
+
+# response
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "type": "Bearer ",
+    "expiration": "2024-12-11T10:30:00Z"
+}
+
+# use the token in subsequent requests
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
-## 1. Publishing to Maven Central
+## 2.4. Pagination
 
-This document describes the steps required to publish a library to Maven Central using the `dev.forgepack` namespace.
+```http
+# pagination
+GET /demo/user/search?page=2&size=5
 
-### 1.1. Create Sonatype Account
+# ordering
+GET /demo/user/search?sort=name,desc&sort=email,asc
 
-Create an account on Sonatype Central Portal.
-
-After creating the account:
-1. Claim your **groupId / namespace**
-2. Prove ownership of the namespace
-
-Example namespace:
-```
-dev.forgepack
+# custom filters  
+GET /demo/user/search?name=João&active=true&page=0&size=10
 ```
 
----
+## 3. ARTIFACT COORDINATES
 
-## 2. Prove Namespace Ownership
-
-Sonatype requires proof that you control the namespace.
-
-Common methods:
-### 2.1. Option A — DNS verification
-
-Create a **TXT DNS record** in the domain associated with your namespace.
-
-Example:
-```bash
-Type: TXT
-Name: dev.forgepack
-Value: <verification-key>
-```
-
-### 2.2. Option B — GitHub namespace
-
-You can also verify ownership using a GitHub repository under the same namespace.
-
-## 3. Create a GPG Key
-
-Maven Central requires all artifacts to be **cryptographically signed**.
-
-Generate or list your GPG key:
-```bash
-gpg --list-secret-keys --keyid-format LONG
-```
-
-Example output:
-
-```bash
-sec   rsa4096/ABCD1234EF567890 2026-03-05 [SC]
-      9A1B2C3D4E5F67890123456789ABCDEF12345678
-uid           Marcelo Gadelha <gadelha.ti@forgepack.dev>
-```
-
-The **fingerprint** is the long key:
-
-```
-9A1B2C3D4E5F67890123456789ABCDEF12345678
-```
-
-## 4. Publish the GPG Key
-
-Upload the public key to a public keyserver.
-```bash
-gpg --keyserver keyserver.ubuntu.com --send-keys SEU_FINGERPRINT
-```
-
-Example:
-```bash
-gpg --keyserver keyserver.ubuntu.com --send-keys 9A1B2C3D4E5F67890123456789ABCDEF12345678
-```
-
-Verify that the key is publicly available:
-```bash
-gpg --keyserver keyserver.ubuntu.com --recv-keys SEU_FINGERPRINT
-```
-
----
-
-## 5. Configure Maven Credentials
-
-Edit your Maven settings file:
-```bash
-~/.m2/settings.xml
-```
-
-Add your Sonatype credentials:
-```xml
-<servers>
-    <server>
-        <id>central</id>
-        <username>SEU_USUARIO</username>
-        <password>SEU_TOKEN</password>
-    </server>
-</servers>
-```
-
----
-
-## 6. Publish the Artifact
-
-Run the Maven deploy command:
-```bash
-mvn clean deploy
-```
-
-This will publish the following artifacts:
-```bash
-library-1.0.0.jar
-library-1.0.0.pom
-library-1.0.0-sources.jar
-library-1.0.0-javadoc.jar
-library-1.0.0.asc
-```
-
-## 7. Tag the Release
-
-After publishing, create a Git tag for the version.
-```bash
-git tag v1.0.0
-git push origin v1.0.0
-```
-
-## Versioning Strategy
-
-This project follows **Semantic Versioning**.
-```properties
-MAJOR.MINOR.PATCH
-```
-
-Examples:
-```txt
-1.0.0  → first stable release
-1.1.0  → new feature
-1.1.1  → bug fix
-2.0.0  → breaking change
-```
-
-| Change          | Version Type |
-| --------------- | ------------ |
-| Bug fix         | PATCH        |
-| New feature     | MINOR        |
-| Breaking change | MAJOR        |
-
-## 8. Artifact Coordinates
-
-### 8.1 Dependency declaration
+### 3.1. Dependency declaration
 ```xml
 
 <dependencies>
@@ -221,7 +164,7 @@ Examples:
 </dependencies>
 ```
 
-### 8.2. Custom application properties:
+### 3.2. Custom application properties:
 ```properties
 # ╔══════════════════════════════════════════════╗
 # ║  DATABASE CONFIGURATIONS - LOCAL POSTGRESQL  ║
@@ -241,14 +184,14 @@ spring.jpa.properties.hibernate.dialect = org.hibernate.spatial.dialect.postgis.
 spring.jpa.properties.hibernate.default_schema = demo
 spring.jpa.show-sql = true
 ```
-## Developers
+## DEVELOPERS
 
 ### Contributors
 > _[Gadelha TI](https://github.com/gadelhati)_ - *Architect & Lead Developer*
 
-## License
+## LICENCE
 
-This project is licensed under the **MIT License** - see the [MIT LICENSE]( https://choosealicense.com/licenses/mit/) file for details.
+This project is licensed under the __MIT License__ - see the [MIT LICENSE]( https://choosealicense.com/licenses/mit/) file for details.
 
 ```text
 MIT License
@@ -273,16 +216,15 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
----
 
 <div style="text-align: center;">
 
-**⭐ Did you like the project? Leave a star! ⭐**
+__⭐ Did you like the project? Leave a star! ⭐__
 
 [![GitHub stars](https://img.shields.io/github/stars/forgepack/library?style=social)](https://github.com/forgepack/library)
 [![GitHub forks](https://img.shields.io/github/forks/forgepack/library?style=social)](https://github.com/forgepack/library/fork)
 [![GitHub watchers](https://img.shields.io/github/watchers/forgepack/library?style=social)](https://github.com/forgepack/library)
 
-**Made by [Forgepack](https://github.com/forgepack)**
+__Made by [Forgepack](https://github.com/forgepack)__
 
 </div>
