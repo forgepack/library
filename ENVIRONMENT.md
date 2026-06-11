@@ -61,10 +61,10 @@ SPRING_PROFILES_ACTIVE=dev
 
 ```bash
 # clone the repository
-git clone https://github.com/gadelhati/maps-back
-cd maps-back
+git clone https://github.com/forgepack/library
+cd library
 # add remote repository
-git remote add upstream https://github.com/gadelhati/maps-back
+git remote add upstream https://github.com/forgepack/library
 # install dependencies
 mvn clean install
 # run tests
