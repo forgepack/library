@@ -41,7 +41,7 @@ public class ConfigurationCors {
         CorsConfiguration configuration = new CorsConfiguration();
 
         String allowedOriginsStr = environment.getProperty("application.cors",
-                "*");
+                "http://localhost:5173");
 
         List<String> allowedOriginsList = Arrays.asList(allowedOriginsStr.split(","));
         configuration.setAllowedOriginPatterns(allowedOriginsList);
