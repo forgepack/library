@@ -1,13 +1,12 @@
 package dev.forgepack.library.internal.configuration;
 
-import dev.forgepack.library.internal.utils.Information;
+import dev.forgepack.library.internal.configuration.filter.JWTProperties;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -20,15 +19,16 @@ import java.util.Date;
  * Component responsible for JWT generation, parsing, and validation.
  *
  * <p>Tokens are signed with {@code HmacSHA512} using the secret configured via
- * {@code application.jwtSecret}. If no secret is configured, a random in-memory
- * key is generated and a warning is logged (all tokens are invalidated on restart).</p>
+ * {@code forgepack.jwt.secret}. If no secret is configured, a random in-memory
+ * key is generated at startup and a warning is logged — all tokens are invalidated
+ * on restart.</p>
  *
- * <p>Configurable properties:</p>
+ * <p>Configurable properties under {@code forgepack.jwt}:</p>
  * <ul>
- *     <li>{@code application.jwtIssuer} – token issuer claim</li>
- *     <li>{@code application.jwtAudience} – token audience claim</li>
- *     <li>{@code application.jwtExpiration} – token lifetime in milliseconds</li>
- *     <li>{@code application.jwtSecret} – HMAC signing secret (min. 64 bytes recommended)</li>
+ *     <li>{@code issuer}     – token issuer claim</li>
+ *     <li>{@code audience}   – token audience claim</li>
+ *     <li>{@code expiration} – token lifetime in milliseconds</li>
+ *     <li>{@code secret}     – HMAC signing secret (min. 64 bytes recommended)</li>
  * </ul>
  *
  * @author Marcelo Ribeiro Gadelha
@@ -37,52 +37,35 @@ import java.util.Date;
 @Component
 public class ConfigurationJWT {
 
-    @Value("${application.jwtIssuer}")
-    private String issuer;
-    @Value("${application.jwtAudience}")
-    private String audience;
-    @Value("${application.jwtExpiration}")
-    private Integer expiration;
-    @Value("${application.jwtSecret}")
-    private String secretKey;
-    private static final Logger log = LoggerFactory.getLogger(Information.class);
+    private static final Logger log = LoggerFactory.getLogger(ConfigurationJWT.class);
 
-    /**
-     * Builds the {@link SecretKey} used to sign and verify JWT tokens.
-     *
-     * <p>Falls back to a random in-memory key when {@code application.jwtSecret}
-     * is not configured, logging a warning to alert about the insecure state.</p>
-     *
-     * @return the {@link SecretKey} for HMAC-SHA512 signing
-     */
-    private SecretKey getSigningKey() {
-        if (secretKey == null || secretKey.isBlank()) {
-            log.warn("JWT secret key not configured. Using random in-memory key");
-            byte[] randomKey = new byte[64];
-            new SecureRandom().nextBytes(randomKey);
-            return new SecretKeySpec(randomKey, "HmacSHA512");
-        }
-        return new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8), "HmacSHA512");
+    private final JWTProperties props;
+    private final SecretKey     signingKey;
+
+    public ConfigurationJWT(JWTProperties props) {
+        this.props      = props;
+        this.signingKey = buildSigningKey(props.secret());
     }
 
     /**
      * Generates a signed JWT for the given subject (username).
      *
-     * @param authentication the subject to embed in the token (typically the username)
+     * @param subject the subject to embed in the token (typically the username)
      * @return the compact serialized JWT string
      */
-    public String generateToken(String authentication) {
+    public String generateToken(String subject) {
         return Jwts.builder()
-                .audience().add(audience).and()
+                .audience().add(props.audience()).and()
                 .header().add("typ", "JWT").and()
-                .issuer(issuer)
-                .subject(authentication)
+                .issuer(props.issuer())
+                .subject(subject)
                 .notBefore(new Date())
                 .issuedAt(new Date())
-                .expiration(new Date(new Date().getTime() + expiration))
-                .signWith(getSigningKey())
+                .expiration(new Date(System.currentTimeMillis() + props.expiration()))
+                .signWith(signingKey)
                 .compact();
     }
+
     /**
      * Extracts the subject (username) from a signed JWT.
      *
@@ -91,11 +74,12 @@ public class ConfigurationJWT {
      */
     public String getUsernameFromJWT(String token) {
         return Jwts.parser()
-                .verifyWith(getSigningKey()).build()
+                .verifyWith(signingKey).build()
                 .parseSignedClaims(token)
                 .getPayload()
                 .getSubject();
     }
+
     /**
      * Validates a JWT by verifying its signature and claims.
      *
@@ -109,22 +93,40 @@ public class ConfigurationJWT {
     public boolean validateJWT(String token) {
         try {
             Jwts.parser()
-                    .verifyWith(getSigningKey()).build()
-                    .parseSignedClaims(token).getPayload();
+                    .verifyWith(signingKey).build()
+                    .parseSignedClaims(token)
+                    .getPayload();
             return true;
-        } catch (SecurityException e) {
-            log.error("Invalid JWT signature: {}", e.getMessage());
-        } catch (MalformedJwtException e) {
-            log.error("Invalid JWT token: {}", e.getMessage());
         } catch (ExpiredJwtException e) {
-            log.error("JWT token is expired: {}", e.getMessage());
+            log.warn("JWT token is expired: {}", e.getMessage());
+        } catch (SecurityException | MalformedJwtException e) {
+            log.error("Invalid JWT signature or token: {}", e.getMessage());
         } catch (UnsupportedJwtException e) {
             log.error("JWT token is unsupported: {}", e.getMessage());
         } catch (IllegalArgumentException e) {
             log.error("JWT claims string is empty: {}", e.getMessage());
         } catch (Exception e) {
-            log.error("validateToken, exception: {}", e.getMessage());
+            log.error("JWT validation failed: {}", e.getMessage());
         }
         return false;
+    }
+
+    /**
+     * Builds the {@link SecretKey} used to sign and verify JWT tokens.
+     *
+     * <p>Falls back to a random in-memory key when {@code forgepack.jwt.secret}
+     * is blank, logging a warning to alert about the insecure state.</p>
+     *
+     * @param secret the configured secret string
+     * @return the {@link SecretKey} for HMAC-SHA512 signing
+     */
+    private static SecretKey buildSigningKey(String secret) {
+        if (secret == null || secret.isBlank()) {
+            log.warn("JWT secret not configured (forgepack.jwt.secret). Using random in-memory key — all tokens will be invalidated on restart.");
+            byte[] randomKey = new byte[64];
+            new SecureRandom().nextBytes(randomKey);
+            return new SecretKeySpec(randomKey, "HmacSHA512");
+        }
+        return new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA512");
     }
 }
