@@ -25,7 +25,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @AutoConfiguration
 @ComponentScan(basePackages = {"dev.forgepack.library.api", "dev.forgepack.library.internal"})
 @EnableJpaRepositories(basePackages = {"dev.forgepack.library.api.repository", "dev.forgepack.library.internal.repository"})
-@EnableConfigurationProperties({SecurityHeadersProperties.class, CacheProperties.class, RateLimitProperties.class})
+@EnableConfigurationProperties({SecurityHeadersProperties.class, CacheProperties.class, RateLimitProperties.class, CorsProperties.class})
 public class ConfigurationJPAAuto implements BeanDefinitionRegistryPostProcessor {
 
     /**
