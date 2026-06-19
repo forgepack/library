@@ -164,7 +164,22 @@ GET /demo/user/search?name=João&active=true&page=0&size=10
 </dependencies>
 ```
 
-### 3.2. Custom application properties:
+### 3.2. Plugin declaration
+```xml
+<plugin>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-maven-plugin</artifactId>
+    <executions>
+        <execution>
+            <goals>
+                <goal>build-info</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
+```
+
+### 3.3. Custom application properties:
 ```properties
 # ╔══════════════════════════════════════════════╗
 # ║  DATABASE CONFIGURATIONS - LOCAL POSTGRESQL  ║

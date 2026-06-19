@@ -5,6 +5,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Servlet filter that applies HTTP security headers and Content Security Policy
@@ -29,9 +31,11 @@ public class FilterSecurityHeaders extends OncePerRequestFilter {
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     private final SecurityHeadersProperties props;
+    private final BuildProperties buildProperties;
 
-    public FilterSecurityHeaders(SecurityHeadersProperties props) {
+    public FilterSecurityHeaders(SecurityHeadersProperties props, Optional<BuildProperties> buildProperties) {
         this.props = props;
+        this.buildProperties = buildProperties.orElse(null);
     }
 
     @Override
@@ -50,6 +54,7 @@ public class FilterSecurityHeaders extends OncePerRequestFilter {
         response.setHeader("X-Frame-Options",        h.xFrameOptions());
         response.setHeader("X-XSS-Protection",       h.xXssProtection());
         response.setHeader("Referrer-Policy",         h.referrerPolicy());
+        response.setHeader("X-API-Version", resolveBuildVersion());
     }
 
     private void applyHsts(HttpServletResponse response) {
@@ -117,5 +122,10 @@ public class FilterSecurityHeaders extends OncePerRequestFilter {
         byte[] bytes = new byte[16];
         SECURE_RANDOM.nextBytes(bytes);
         return Base64.getEncoder().encodeToString(bytes);
+    }
+
+    private String resolveBuildVersion() {
+        if (buildProperties == null) return "unknown";
+        return buildProperties.getVersion();
     }
 }
