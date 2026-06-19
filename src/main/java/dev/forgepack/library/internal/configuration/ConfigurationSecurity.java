@@ -46,8 +46,8 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 @EnableMethodSecurity
 public class ConfigurationSecurity {
 
-    public final ConfigurationJwt configurationJwt;
-    public final ServiceCustomUserDetails serviceCustomUserDetails;
+    private final ConfigurationJwt configurationJwt;
+    private final ServiceCustomUserDetails serviceCustomUserDetails;
     @Value("${application.endpoints}")
     private String[] endpoints;
 
