@@ -1,6 +1,6 @@
 package dev.forgepack.library.internal.configuration;
 
-import dev.forgepack.library.internal.configuration.filter.PropertiesJWT;
+import dev.forgepack.library.internal.configuration.filter.PropertiesJwt;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
@@ -35,14 +35,14 @@ import java.util.Date;
  * @since 1.0
  */
 @Component
-public class ConfigurationJWT {
+public class ConfigurationJwt {
 
-    private static final Logger log = LoggerFactory.getLogger(ConfigurationJWT.class);
+    private static final Logger log = LoggerFactory.getLogger(ConfigurationJwt.class);
 
-    private final PropertiesJWT props;
+    private final PropertiesJwt props;
     private final SecretKey     signingKey;
 
-    public ConfigurationJWT(PropertiesJWT props) {
+    public ConfigurationJwt(PropertiesJwt props) {
         this.props      = props;
         this.signingKey = buildSigningKey(props.secret());
     }
@@ -72,7 +72,7 @@ public class ConfigurationJWT {
      * @param token the compact serialized JWT string
      * @return the username stored in the token's subject claim
      */
-    public String getUsernameFromJWT(String token) {
+    public String getUsernameFromJwt(String token) {
         return Jwts.parser()
                 .verifyWith(signingKey).build()
                 .parseSignedClaims(token)
@@ -90,7 +90,7 @@ public class ConfigurationJWT {
      * @param token the compact serialized JWT string
      * @return {@code true} if the token is valid; {@code false} otherwise
      */
-    public boolean validateJWT(String token) {
+    public boolean validateJwt(String token) {
         try {
             Jwts.parser()
                     .verifyWith(signingKey).build()

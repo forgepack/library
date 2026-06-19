@@ -1,6 +1,6 @@
 package dev.forgepack.library.internal.configuration;
 
-import dev.forgepack.library.internal.configuration.filter.FilterJWT;
+import dev.forgepack.library.internal.configuration.filter.FilterJwt;
 import dev.forgepack.library.internal.service.ServiceCustomUserDetails;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -31,27 +31,27 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
  *     <li>Public endpoints: {@code /auth/login}, {@code POST /user/**}, {@code /auth/resetPassword},
  *         actuator health/info, and Swagger UI paths</li>
  *     <li>All other requests require authentication</li>
- *     <li>{@link FilterJWT} inserted before {@link UsernamePasswordAuthenticationFilter}</li>
+ *     <li>{@link FilterJwt} inserted before {@link UsernamePasswordAuthenticationFilter}</li>
  *     <li>Role prefix removed via {@link GrantedAuthorityDefaults}</li>
  * </ul>
  *
  * @author Marcelo Ribeiro Gadelha
  * @since 1.0
  *
- * @see FilterJWT
- * @see ConfigurationJWT
+ * @see FilterJwt
+ * @see ConfigurationJwt
  */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class ConfigurationSecurity {
 
-    public final ConfigurationJWT configurationJwt;
+    public final ConfigurationJwt configurationJwt;
     public final ServiceCustomUserDetails serviceCustomUserDetails;
     @Value("${application.endpoints}")
     private String[] endpoints;
 
-    public ConfigurationSecurity(ConfigurationJWT configurationJwt, ServiceCustomUserDetails serviceCustomUserDetails) {
+    public ConfigurationSecurity(ConfigurationJwt configurationJwt, ServiceCustomUserDetails serviceCustomUserDetails) {
         this.configurationJwt = configurationJwt;
         this.serviceCustomUserDetails = serviceCustomUserDetails;
     }
@@ -125,13 +125,13 @@ public class ConfigurationSecurity {
         return new BCryptPasswordEncoder();
     }
     /**
-     * Creates and returns the {@link FilterJWT} bean responsible for
+     * Creates and returns the {@link FilterJwt} bean responsible for
      * extracting and validating JWTs on each request.
      *
-     * @return a new {@link FilterJWT} instance
+     * @return a new {@link FilterJwt} instance
      */
     @Bean
-    public FilterJWT jwtAuthenticationFilter() {
-        return new FilterJWT(configurationJwt, serviceCustomUserDetails);
+    public FilterJwt jwtAuthenticationFilter() {
+        return new FilterJwt(configurationJwt, serviceCustomUserDetails);
     }
 }

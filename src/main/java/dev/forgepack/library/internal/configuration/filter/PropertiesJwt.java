@@ -21,7 +21,7 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
  * @since 1.0
  */
 @ConfigurationProperties(prefix = "forgepack.jwt")
-public record PropertiesJWT(
+public record PropertiesJwt(
         @DefaultValue("forgepack")        String issuer,
         @DefaultValue("forgepack-client") String audience,
         @DefaultValue("3600000")          long   expiration,

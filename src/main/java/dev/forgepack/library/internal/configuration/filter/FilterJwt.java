@@ -1,7 +1,8 @@
 package dev.forgepack.library.internal.configuration.filter;
 
-import dev.forgepack.library.internal.configuration.ConfigurationJWT;
+import dev.forgepack.library.internal.configuration.ConfigurationJwt;
 import dev.forgepack.library.internal.service.ServiceCustomUserDetails;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,18 +34,18 @@ import java.util.Optional;
  * @author Marcelo Ribeiro Gadelha
  * @since 1.0
  *
- * @see ConfigurationJWT
+ * @see ConfigurationJwt
  * @see ServiceCustomUserDetails
  */
 @Component
-public class FilterJWT extends OncePerRequestFilter {
+public class FilterJwt extends OncePerRequestFilter {
 
-    private static final Logger log = LoggerFactory.getLogger(FilterJWT.class);
+    private static final Logger log = LoggerFactory.getLogger(FilterJwt.class);
 
-    private final ConfigurationJWT           configurationJwt;
+    private final ConfigurationJwt configurationJwt;
     private final ServiceCustomUserDetails   serviceCustomUserDetails;
 
-    public FilterJWT(ConfigurationJWT configurationJwt, ServiceCustomUserDetails serviceCustomUserDetails) {
+    public FilterJwt(ConfigurationJwt configurationJwt, ServiceCustomUserDetails serviceCustomUserDetails) {
         this.configurationJwt          = configurationJwt;
         this.serviceCustomUserDetails  = serviceCustomUserDetails;
     }
@@ -69,17 +70,17 @@ public class FilterJWT extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         try {
-            getJWTFromRequest(request)
-                    .filter(configurationJwt::validateJWT)
-                    .map(configurationJwt::getUsernameFromJWT)
+            getJwtFromRequest(request)
+                    .filter(configurationJwt::validateJwt)
+                    .map(configurationJwt::getUsernameFromJwt)
                     .ifPresent(username -> authenticateUser(username, request));
-        } catch (Exception ex) {
+        } catch (JwtException ex) {
             log.warn("Unable to authenticate user: {}", ex.getMessage());
         }
         filterChain.doFilter(request, response);
     }
 
-    private Optional<String> getJWTFromRequest(HttpServletRequest request) {
+    private Optional<String> getJwtFromRequest(HttpServletRequest request) {
         String token = request.getHeader("Authorization");
         if (StringUtils.hasText(token) && token.startsWith("Bearer ")) {
             return Optional.of(token.substring(7));

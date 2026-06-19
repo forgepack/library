@@ -2,7 +2,7 @@ package dev.forgepack.library.internal.service;
 
 import dev.forgepack.library.api.mapper.Mapper;
 import dev.forgepack.library.api.service.ServiceAuthentication;
-import dev.forgepack.library.internal.configuration.ConfigurationJWT;
+import dev.forgepack.library.internal.configuration.ConfigurationJwt;
 import dev.forgepack.library.internal.model.Token;
 import dev.forgepack.library.internal.model.User;
 import dev.forgepack.library.internal.payload.DTORequestToken;
@@ -41,14 +41,14 @@ public class ServiceAuthenticationImpl implements ServiceAuthentication {
 //    private final ServiceRecaptcha serviceRecaptcha;
     private final E2EE e2EE;
     private final AuthenticationManager authenticationManager;
-    private final ConfigurationJWT configurationJwt;
+    private final ConfigurationJwt configurationJwt;
     private final RepositoryToken repositoryToken;
     private final RepositoryUser repositoryUser;
     private final Mapper<Token, DTORequestToken, DTOResponseToken> mapper;
     private final ServiceCustomUserDetails serviceCustomUserDetails;
     private static final Logger log = LoggerFactory.getLogger(Information.class);
 
-    public ServiceAuthenticationImpl(E2EE e2EE, AuthenticationManager authenticationManager, ConfigurationJWT configurationJwt, RepositoryToken repositoryToken, RepositoryUser repositoryUser, Mapper<Token, DTORequestToken, DTOResponseToken> mapper, ServiceCustomUserDetails serviceCustomUserDetails) {
+    public ServiceAuthenticationImpl(E2EE e2EE, AuthenticationManager authenticationManager, ConfigurationJwt configurationJwt, RepositoryToken repositoryToken, RepositoryUser repositoryUser, Mapper<Token, DTORequestToken, DTOResponseToken> mapper, ServiceCustomUserDetails serviceCustomUserDetails) {
         this.e2EE = e2EE;
         this.authenticationManager = authenticationManager;
         this.configurationJwt = configurationJwt;
@@ -82,11 +82,11 @@ public class ServiceAuthenticationImpl implements ServiceAuthentication {
     @Override
     public DTOResponseToken refresh(DTORequestToken dtoRequestToken) {
         if (repositoryToken.existsByRefreshToken(dtoRequestToken.refreshToken()) &&
-                configurationJwt.validateJWT(dtoRequestToken.accessToken())) {
+                configurationJwt.validateJwt(dtoRequestToken.accessToken())) {
             UserDetails userDetails = serviceCustomUserDetails.loadUserByUsername(
-                    configurationJwt.getUsernameFromJWT(dtoRequestToken.accessToken())
+                    configurationJwt.getUsernameFromJwt(dtoRequestToken.accessToken())
             );
-            String tokenResponse = configurationJwt.generateToken(configurationJwt.getUsernameFromJWT(dtoRequestToken.accessToken()));
+            String tokenResponse = configurationJwt.generateToken(configurationJwt.getUsernameFromJwt(dtoRequestToken.accessToken()));
             Set<String> roles = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet());
             return new DTOResponseToken(tokenResponse, dtoRequestToken.refreshToken(), roles);
         } else {
