@@ -45,6 +45,7 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jjwt.version>0.13.0</jjwt.version>
+        <bucket4j.version>8.19.0</bucket4j.version>
         <caffeine.version>3.2.4</caffeine.version>
 	</properties>
     <dependencies>
@@ -127,6 +128,12 @@
             <groupId>com.google.zxing</groupId>
             <artifactId>core</artifactId>
             <version>3.5.4</version>
+        </dependency>
+        <!-- ===== RATE LIMITING ===== -->
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+            <version>${caffeine.version}</version>
         </dependency>
         <!-- ===== CACHING ===== -->
         <dependency>
