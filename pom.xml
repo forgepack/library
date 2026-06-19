@@ -45,6 +45,7 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jjwt.version>0.13.0</jjwt.version>
+        <caffeine.version>3.2.4</caffeine.version>
 	</properties>
     <dependencies>
         <!-- Spring Boot Starters -->
@@ -126,6 +127,12 @@
             <groupId>com.google.zxing</groupId>
             <artifactId>core</artifactId>
             <version>3.5.4</version>
+        </dependency>
+        <!-- ===== CACHING ===== -->
+        <dependency>
+            <groupId>com.bucket4j</groupId>
+            <artifactId>bucket4j_jdk17-core</artifactId>
+            <version>${bucket4j.version}</version>
         </dependency>
     </dependencies>
 	<build>
