@@ -1,4 +1,4 @@
-package dev.forgepack.library.internal.configuration;
+package dev.forgepack.library.internal.configuration.filter;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.bind.DefaultValue;
@@ -23,7 +23,7 @@ import java.util.List;
  * @since 1.0
  */
 @ConfigurationProperties(prefix = "forgepack.security")
-public record SecurityHeadersProperties(
+public record PropertiesSecurityHeaders(
         @DefaultValue Headers headers,
         @DefaultValue Routes  routes,
         @DefaultValue Csp     csp,

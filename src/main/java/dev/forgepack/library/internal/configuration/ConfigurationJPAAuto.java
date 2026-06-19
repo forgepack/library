@@ -1,7 +1,8 @@
 package dev.forgepack.library.internal.configuration;
 
-import dev.forgepack.library.internal.configuration.filter.JWTProperties;
-import dev.forgepack.library.internal.configuration.filter.RateLimitProperties;
+import dev.forgepack.library.internal.configuration.filter.PropertiesJWT;
+import dev.forgepack.library.internal.configuration.filter.PropertiesRateLimit;
+import dev.forgepack.library.internal.configuration.filter.PropertiesSecurityHeaders;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
@@ -26,7 +27,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @AutoConfiguration
 @ComponentScan(basePackages = {"dev.forgepack.library.api", "dev.forgepack.library.internal"})
 @EnableJpaRepositories(basePackages = {"dev.forgepack.library.api.repository", "dev.forgepack.library.internal.repository"})
-@EnableConfigurationProperties({SecurityHeadersProperties.class, CacheProperties.class, RateLimitProperties.class, CorsProperties.class, JWTProperties.class})
+@EnableConfigurationProperties({PropertiesSecurityHeaders.class, CacheProperties.class, PropertiesRateLimit.class, CorsProperties.class, PropertiesJWT.class})
 public class ConfigurationJPAAuto implements BeanDefinitionRegistryPostProcessor {
 
     /**

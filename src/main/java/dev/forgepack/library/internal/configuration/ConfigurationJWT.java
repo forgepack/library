@@ -1,6 +1,6 @@
 package dev.forgepack.library.internal.configuration;
 
-import dev.forgepack.library.internal.configuration.filter.JWTProperties;
+import dev.forgepack.library.internal.configuration.filter.PropertiesJWT;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
@@ -39,10 +39,10 @@ public class ConfigurationJWT {
 
     private static final Logger log = LoggerFactory.getLogger(ConfigurationJWT.class);
 
-    private final JWTProperties props;
+    private final PropertiesJWT props;
     private final SecretKey     signingKey;
 
-    public ConfigurationJWT(JWTProperties props) {
+    public ConfigurationJWT(PropertiesJWT props) {
         this.props      = props;
         this.signingKey = buildSigningKey(props.secret());
     }
