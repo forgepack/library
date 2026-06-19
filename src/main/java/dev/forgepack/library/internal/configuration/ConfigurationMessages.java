@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Description;
 import org.springframework.context.support.ResourceBundleMessageSource;
 
+import java.nio.charset.StandardCharsets;
+
 /**
  * Configures the {@link MessageSource} bean used for resolving validation messages
  * and internationalized strings.
@@ -31,7 +33,7 @@ public class ConfigurationMessages {
     public MessageSource messageSource() {
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
         messageSource.setBasename("ValidationMessages");
-        messageSource.setDefaultEncoding("UTF-8");
+        messageSource.setDefaultEncoding(StandardCharsets.UTF_8.name());
         return messageSource;
     }
 }
