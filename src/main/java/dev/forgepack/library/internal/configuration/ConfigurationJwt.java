@@ -127,6 +127,10 @@ public class ConfigurationJwt {
             new SecureRandom().nextBytes(randomKey);
             return new SecretKeySpec(randomKey, "HmacSHA512");
         }
+        if (secret.getBytes(StandardCharsets.UTF_8).length < 64) {
+            log.warn("JWT secret is shorter than the recommended 64 bytes (current: {} bytes). Consider using a stronger secret.",
+                    secret.getBytes(StandardCharsets.UTF_8).length);
+        }
         return new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA512");
     }
 }
