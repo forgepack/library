@@ -6,11 +6,8 @@ import io.github.bucket4j.Bucket;
 import io.github.bucket4j.ConsumptionProbe;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
-import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -18,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -55,16 +53,16 @@ import java.util.concurrent.TimeUnit;
  * @since 1.0
  */
 @Component
-public class FilterRateLimiting implements Filter {
+public class FilterRateLimiting extends OncePerRequestFilter {
 
     private static final Logger       log           = LoggerFactory.getLogger(FilterRateLimiting.class);
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    private final RateLimitProperties properties;
+    private final PropertiesRateLimit properties;
     private final ConcurrentMap<String, BucketEntry> cache = new ConcurrentHashMap<>();
     private ScheduledExecutorService scheduler;
 
-    public FilterRateLimiting(RateLimitProperties properties) {
+    public FilterRateLimiting(PropertiesRateLimit properties) {
         this.properties = properties;
     }
 
@@ -103,25 +101,19 @@ public class FilterRateLimiting implements Filter {
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-            throws IOException, ServletException {
-
-        if (!(request instanceof HttpServletRequest httpRequest)) {
-            chain.doFilter(request, response);
-            return;
-        }
-
-        String              clientId     = getClientIdentifier(httpRequest);
-        HttpServletResponse httpResponse = (HttpServletResponse) response;
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain chain) throws ServletException, IOException {
+        String clientId = getClientIdentifier(request);
 
         try {
             BucketEntry      entry = cache.computeIfAbsent(clientId, k -> new BucketEntry(createBucket()));
             ConsumptionProbe probe = entry.consume();
 
-            addRateLimitHeaders(httpResponse, probe);
+            addRateLimitHeaders(response, probe);
 
             if (probe.isConsumed()) chain.doFilter(request, response);
-            else                    handleRateLimitExceeded(httpResponse, probe);
+            else                    handleRateLimitExceeded(response, probe);
 
         } catch (Exception e) {
             log.error("Rate limiting error for {}: {}", clientId, e.getMessage(), e);
