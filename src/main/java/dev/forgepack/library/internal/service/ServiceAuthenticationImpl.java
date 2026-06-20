@@ -11,7 +11,6 @@ import dev.forgepack.library.internal.payload.DTOResponseToken;
 import dev.forgepack.library.internal.repository.RepositoryToken;
 import dev.forgepack.library.internal.repository.RepositoryUser;
 import dev.forgepack.library.internal.utils.E2EE;
-import dev.forgepack.library.internal.utils.Information;
 import org.apache.commons.codec.binary.Base32;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +45,7 @@ public class ServiceAuthenticationImpl implements ServiceAuthentication {
     private final RepositoryUser repositoryUser;
     private final Mapper<Token, DTORequestToken, DTOResponseToken> mapper;
     private final ServiceCustomUserDetails serviceCustomUserDetails;
-    private static final Logger log = LoggerFactory.getLogger(Information.class);
+    private static final Logger log = LoggerFactory.getLogger(ServiceAuthenticationImpl.class);
 
     public ServiceAuthenticationImpl(E2EE e2EE, AuthenticationManager authenticationManager, ConfigurationJwt configurationJwt, RepositoryToken repositoryToken, RepositoryUser repositoryUser, Mapper<Token, DTORequestToken, DTOResponseToken> mapper, ServiceCustomUserDetails serviceCustomUserDetails) {
         this.e2EE = e2EE;
@@ -141,7 +140,7 @@ public class ServiceAuthenticationImpl implements ServiceAuthentication {
             if (secretKey != null) {
                 try {
                     if (!verifyCode(secret, secretKey, 1)) {
-                        log.info("TOTP code {} was not valid for user {}", secretKey, userName);
+                        log.warn("TOTP code {} was not valid for user {}", secretKey, userName);
                         throw new BadCredentialsException("Invalid TOTP code");
                     }
                 } catch (InvalidKeyException | NoSuchAlgorithmException e) {

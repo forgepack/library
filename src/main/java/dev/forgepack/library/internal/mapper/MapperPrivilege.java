@@ -4,7 +4,6 @@ import dev.forgepack.library.api.mapper.Mapper;
 import dev.forgepack.library.internal.model.Privilege;
 import dev.forgepack.library.internal.payload.DTORequestPrivilege;
 import dev.forgepack.library.internal.payload.DTOResponsePrivilege;
-import dev.forgepack.library.internal.utils.Information;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -15,7 +14,7 @@ import java.util.stream.Collectors;
 @Component
 public final class MapperPrivilege implements Mapper<Privilege, DTORequestPrivilege, DTOResponsePrivilege> {
 
-    private static final Logger log = LoggerFactory.getLogger(Information.class);
+    private static final Logger log = LoggerFactory.getLogger(MapperPrivilege.class);
     private MapperPrivilege() {}
 
     @Override
