@@ -54,11 +54,8 @@ public class ServiceUser extends ServiceGenericImpl<User, DTORequestUser, DTORes
     @Override
     public DTOResponseUser create(DTORequestUser created){
         User user = mapper.toEntity(created);
-        System.out.println("Username: " + user.getUsername());
         String password = generateSecurePassword();
-        System.out.println("Password: " + password);
         String secret = serviceAuthenticationImpl.generateSecret();
-        System.out.println("Secret: " + secret);
         try {
             user.setPassword(passwordEncoder.encode(password));
             user.setSecret(e2EE.encrypt(secret));
@@ -88,7 +85,7 @@ public class ServiceUser extends ServiceGenericImpl<User, DTORequestUser, DTORes
             return repositoryUser.existsByUsernameIgnoreCase((String) value);
         }
         if ("email".equals(field)) {
-            return repositoryUser.existsByUsernameIgnoreCase((String) value);
+            return repositoryUser.existsByEmailIgnoreCase((String) value);
         }
         else {
             throw new IllegalArgumentException("Invalid argument");
@@ -167,8 +164,8 @@ public class ServiceUser extends ServiceGenericImpl<User, DTORequestUser, DTORes
         String currentUser = new Information().getCurrentUser().orElse("Unknown User");
         User user = repositoryUser.findById(id).orElseThrow(() -> new EntityNotFoundException("Resource not found"));
         User userCurrent = repositoryUser.findByUsername(currentUser).orElseThrow(() -> new EntityNotFoundException("Current user not found"));
-        if (userCurrent.getUsername() != null && user.getUsername() != null &&
-                userCurrent.getUsername().equals(user.getUsername()) ||
+        if ((userCurrent.getUsername() != null && user.getUsername() != null &&
+                userCurrent.getUsername().equals(user.getUsername())) ||
                 userCurrent.getRole().stream().anyMatch(role -> role.getName().equals("ADMIN"))) {
             return user;
         } else {
@@ -177,12 +174,12 @@ public class ServiceUser extends ServiceGenericImpl<User, DTORequestUser, DTORes
         }
     }
     public User isValidToChange(String username) {
+        User user = new User();
         try {
-            repositoryUser.findByUsername(username.trim()).orElseThrow(() -> new EntityNotFoundException("Resource not found"));
+            repositoryUser.findByUsername(username).orElseThrow(() -> new EntityNotFoundException("Resource not found"));
         } catch (Exception e) {
             throw new EntityNotFoundException("Resource not found");
         }
-        User user = repositoryUser.findByUsername(username).orElseThrow(() -> new EntityNotFoundException("Resource not found"));
         if (user.getUsername() != null) {
             return user;
         } else {

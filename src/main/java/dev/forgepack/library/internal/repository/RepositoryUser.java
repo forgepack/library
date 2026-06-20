@@ -12,5 +12,7 @@ public interface RepositoryUser extends RepositoryGeneric<User> {
     Optional<User> findByUsername(String name);
     boolean existsByUsernameIgnoreCase(String name);
     boolean existsByUsernameIgnoreCaseAndIdNot(String name, UUID id);
+    boolean existsByEmailIgnoreCase(String name);
+    boolean existsByEmailIgnoreCaseAndIdNot(String name, UUID id);
 }
 
