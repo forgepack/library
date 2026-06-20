@@ -1,25 +1,21 @@
 package dev.forgepack.library.internal.configuration;
 
 import dev.forgepack.library.internal.configuration.filter.FilterJwt;
-import dev.forgepack.library.internal.service.ServiceCustomUserDetails;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 
 /**
  * Spring Security configuration for the application.
@@ -27,7 +23,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
  * <p>Configures a stateless, JWT-based security model with the following characteristics:</p>
  * <ul>
  *     <li>CSRF disabled (REST API with stateless sessions)</li>
- *     <li>Strict security headers: {@code X-Frame-Options: DENY}, CSP, HSTS, and Referrer-Policy</li>
+ *     <li>Security headers delegated entirely to {@link dev.forgepack.library.internal.configuration.filter.FilterSecurityHeaders}</li>
  *     <li>Public endpoints: {@code /auth/login}, {@code POST /user/**}, {@code /auth/resetPassword},
  *         actuator health/info, and Swagger UI paths</li>
  *     <li>All other requests require authentication</li>
@@ -46,14 +42,10 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 @EnableMethodSecurity
 public class ConfigurationSecurity {
 
-    private final ConfigurationJwt configurationJwt;
-    private final ServiceCustomUserDetails serviceCustomUserDetails;
-    @Value("${application.endpoints}")
-    private String[] endpoints;
+    private final FilterJwt filterJwt;
 
-    public ConfigurationSecurity(ConfigurationJwt configurationJwt, ServiceCustomUserDetails serviceCustomUserDetails) {
-        this.configurationJwt = configurationJwt;
-        this.serviceCustomUserDetails = serviceCustomUserDetails;
+    public ConfigurationSecurity(FilterJwt filterJwt) {
+        this.filterJwt = filterJwt;
     }
     /**
      * Defines the main {@link SecurityFilterChain} with authorization rules,
@@ -67,31 +59,18 @@ public class ConfigurationSecurity {
     public SecurityFilterChain apiFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
                 .securityMatcher("/**")
-                .csrf(AbstractHttpConfigurer::disable) // Disable CSRF for REST APIs
+                .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .headers(headers -> headers
-                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::deny)
-                        .contentSecurityPolicy(csp -> csp
-                                .policyDirectives("default-src 'none'; frame-ancestors 'none'; connect-src 'self'")
-                        )
-                        .referrerPolicy(referrer -> referrer
-                                .policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
-                        )
-                        .httpStrictTransportSecurity(hsts -> hsts
-                                .maxAgeInSeconds(31536000)
-                                .includeSubDomains(true)
-                        )
-                )
+                .headers(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health", "/actuator/info").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/user/**").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/auth/resetPassword").permitAll()
                         .requestMatchers("/api/v1/auth/**", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
-                        .requestMatchers(endpoints).authenticated()
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(filterJwt, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
     /**
@@ -121,17 +100,7 @@ public class ConfigurationSecurity {
      * @return a {@link BCryptPasswordEncoder} instance
      */
     @Bean
-    PasswordEncoder passwordEncoder() {
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-    /**
-     * Creates and returns the {@link FilterJwt} bean responsible for
-     * extracting and validating JWTs on each request.
-     *
-     * @return a new {@link FilterJwt} instance
-     */
-    @Bean
-    public FilterJwt jwtAuthenticationFilter() {
-        return new FilterJwt(configurationJwt, serviceCustomUserDetails);
     }
 }
