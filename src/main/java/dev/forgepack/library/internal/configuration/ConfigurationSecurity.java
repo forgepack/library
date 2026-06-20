@@ -17,6 +17,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Spring Security configuration for the application.
  *
@@ -24,8 +27,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * <ul>
  *     <li>CSRF disabled (REST API with stateless sessions)</li>
  *     <li>Security headers delegated entirely to {@link dev.forgepack.library.internal.configuration.filter.FilterSecurityHeaders}</li>
- *     <li>Public endpoints: {@code /auth/login}, {@code POST /user/**}, {@code /auth/resetPassword},
- *         actuator health/info, and Swagger UI paths</li>
+ *     <li>Public endpoints driven by {@link PropertiesSecurityEndpoints} — configurable via
+ *         {@code forgepack.security.endpoints.*} properties</li>
  *     <li>All other requests require authentication</li>
  *     <li>{@link FilterJwt} inserted before {@link UsernamePasswordAuthenticationFilter}</li>
  *     <li>Role prefix removed via {@link GrantedAuthorityDefaults}</li>
@@ -42,10 +45,19 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 public class ConfigurationSecurity {
 
-    private final FilterJwt filterJwt;
+    private static final List<String> BUILT_IN_PERMIT_ALL  = List.of(
+            "/actuator/health", "/actuator/info",
+            "/api/v1/auth/**", "/v3/api-docs/**", "/swagger-ui/**"
+    );
+    private static final List<String> BUILT_IN_PERMIT_POST = List.of("/auth/login", "/user/**");
+    private static final List<String> BUILT_IN_PERMIT_PUT  = List.of("/auth/resetPassword");
 
-    public ConfigurationSecurity(FilterJwt filterJwt) {
-        this.filterJwt = filterJwt;
+    private final FilterJwt filterJwt;
+    private final PropertiesSecurityEndpoints endpointProps;
+
+    public ConfigurationSecurity(FilterJwt filterJwt, PropertiesSecurityEndpoints endpointProps) {
+        this.filterJwt      = filterJwt;
+        this.endpointProps  = endpointProps;
     }
     /**
      * Defines the main {@link SecurityFilterChain} with authorization rules,
@@ -62,14 +74,12 @@ public class ConfigurationSecurity {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .headers(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/health", "/actuator/info").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/user/**").permitAll()
-                        .requestMatchers(HttpMethod.PUT, "/auth/resetPassword").permitAll()
-                        .requestMatchers("/api/v1/auth/**", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
-                        .anyRequest().authenticated()
-                )
+                .authorizeHttpRequests(auth -> {
+                        toArray(merge(BUILT_IN_PERMIT_ALL,  endpointProps.permitAll())) .ifPresent(p -> auth.requestMatchers(p).permitAll());
+                        toArray(merge(BUILT_IN_PERMIT_POST, endpointProps.permitPost())).ifPresent(p -> auth.requestMatchers(HttpMethod.POST, p).permitAll());
+                        toArray(merge(BUILT_IN_PERMIT_PUT,  endpointProps.permitPut())) .ifPresent(p -> auth.requestMatchers(HttpMethod.PUT,  p).permitAll());
+                        auth.anyRequest().authenticated();
+                })
                 .addFilterBefore(filterJwt, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
@@ -102,5 +112,17 @@ public class ConfigurationSecurity {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    private static List<String> merge(List<String> builtIn, List<String> extra) {
+        if (extra == null || extra.isEmpty()) return builtIn;
+        List<String> merged = new ArrayList<>(builtIn);
+        merged.addAll(extra);
+        return merged;
+    }
+
+    private static java.util.Optional<String[]> toArray(List<String> list) {
+        if (list == null || list.isEmpty()) return java.util.Optional.empty();
+        return java.util.Optional.of(list.toArray(String[]::new));
     }
 }

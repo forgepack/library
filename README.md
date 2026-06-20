@@ -198,6 +198,10 @@ spring.jpa.hibernate.ddl-auto = create
 spring.jpa.properties.hibernate.dialect = org.hibernate.spatial.dialect.postgis.PostgisPG95Dialect
 spring.jpa.properties.hibernate.default_schema = demo
 spring.jpa.show-sql = true
+
+forgepack.security.endpoints.permitAll=/public/**, /health/custom
+forgepack.security.endpoints.permitPost=/api/register, /api/forgot-password
+forgepack.security.endpoints.permitPut=/api/confirm-email
 ```
 ## DEVELOPERS
 
