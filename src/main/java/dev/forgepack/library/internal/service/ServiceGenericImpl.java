@@ -7,8 +7,12 @@ import dev.forgepack.library.api.service.ServiceGeneric;
 import dev.forgepack.library.internal.model.GenericAuditEntity;
 import dev.forgepack.library.internal.utils.Information;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
-import org.springframework.data.domain.*;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.RepresentationModel;
@@ -47,7 +51,7 @@ public abstract class ServiceGenericImpl<Entity extends GenericAuditEntity, DTOR
     private final Class<Entity> entity;
     private final RepositoryGeneric<Entity> repositoryGeneric;
     private final Mapper<Entity, DTORequest, DTOResponse> mapper;
-    private static final Logger log = LoggerFactory.getLogger(ServiceGenericImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(Information.class);
 
     public ServiceGenericImpl(Class<Entity> entity, RepositoryGeneric<Entity> repositoryGeneric, Mapper<Entity, DTORequest, DTOResponse> mapper) {
         this.entity = entity;
@@ -64,7 +68,7 @@ public abstract class ServiceGenericImpl<Entity extends GenericAuditEntity, DTOR
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public Page<DTOResponse> findAll(Pageable pageable, String value, Class<Entity> entity) {
         String propertyName = pageable.getSort().stream()
                 .findFirst()
@@ -91,7 +95,6 @@ public abstract class ServiceGenericImpl<Entity extends GenericAuditEntity, DTOR
             Object convertedValue = ConvertUtils.convert(value, field.getType());
             setter.invoke(object, convertedValue);
             Example<Entity> example = Example.of(object, exampleMatcher);
-            addLog("find all", null, propertyName, value);
             return repositoryGeneric.findAll(example, pageable).map(this::addHateoas);
         } catch (Exception exception) {
             log.warn("Error searching {} by {}: {}", entity.getSimpleName(), propertyName, exception.getMessage());
@@ -100,7 +103,7 @@ public abstract class ServiceGenericImpl<Entity extends GenericAuditEntity, DTOR
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public DTOResponse findById(UUID id){
         Entity entity = existsEntity("find by ID", id);
         addLog("find by ID", id, null, null);
@@ -112,12 +115,13 @@ public abstract class ServiceGenericImpl<Entity extends GenericAuditEntity, DTOR
     public DTOResponse update(UUID id, DTORequest updated){
         Entity entity = existsEntity("update", id);
         mapper.updateEntity(updated, entity);
+        Entity ratified = repositoryGeneric.save(entity);
         addLog("update", id, null, null);
-        return addHateoas(repositoryGeneric.save(entity));
+        return addHateoas(ratified);
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = false)
     public DTOResponse softDelete(UUID id){
         Entity entity = existsEntity("soft delete", id);
         entity.setDeletedAt(LocalDateTime.now());
@@ -127,7 +131,7 @@ public abstract class ServiceGenericImpl<Entity extends GenericAuditEntity, DTOR
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = false)
     public DTOResponse restore(UUID id){
         Entity entity = existsEntity("restore", id);
         entity.setDeletedAt(null);
@@ -160,7 +164,7 @@ public abstract class ServiceGenericImpl<Entity extends GenericAuditEntity, DTOR
      * @param object entity instance
      * @return {@link DTOResponse} containing the entity data and HATEOAS self link
      */
-    public DTOResponse addHateoas(Entity object) {
+    protected DTOResponse addHateoas(Entity object) {
         String entityName = Character.toLowerCase(entity.getSimpleName().charAt(0))
                 + entity.getSimpleName().substring(1);
         String selfUri = ServletUriComponentsBuilder.fromCurrentContextPath()
@@ -181,8 +185,8 @@ public abstract class ServiceGenericImpl<Entity extends GenericAuditEntity, DTOR
      * @param propertyName name of the search property, or {@code null} for non-search operations
      * @param value        value used in the search, or {@code null} for non-search operations
      */
-    public void addLog(String action, UUID id, Object propertyName, Object value) {
-        String currentUser = new Information().getCurrentUser().orElse("Unknown User");
+    protected void addLog(String action, UUID id, Object propertyName, Object value) {
+        String currentUser = Information.getCurrentUser().orElse("Unknown User");
         if(propertyName != null){
             log.debug("Retrieving {} with property: {}, value: {}", entity.getSimpleName(), propertyName, value);
         } else {
@@ -201,8 +205,8 @@ public abstract class ServiceGenericImpl<Entity extends GenericAuditEntity, DTOR
      * @return the found {@link Entity}
      * @throws EntityNotFoundException if no active entity exists with the given {@code id}
      */
-    @Transactional
-    public Entity existsEntity(String action, UUID id) {
+    @Transactional(readOnly = true)
+    protected Entity existsEntity(String action, UUID id) {
         return repositoryGeneric.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new EntityNotFoundException(
                         String.format("Cannot %s: %s not found with ID %s", action, entity.getSimpleName(), id)));

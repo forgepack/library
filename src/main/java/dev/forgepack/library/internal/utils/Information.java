@@ -12,7 +12,7 @@ public class Information {
 
     private static final Logger log = LoggerFactory.getLogger(Information.class);
 
-    public Optional<String> getCurrentUser() {
+    public static Optional<String> getCurrentUser() {
         try {
             return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
                     .map(auth -> {

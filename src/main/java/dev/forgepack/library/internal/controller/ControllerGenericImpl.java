@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.UUID;
@@ -41,7 +42,7 @@ public abstract class ControllerGenericImpl<Entity extends GenericAuditEntity, D
 //    @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR', 'USER') and hasAnyAuthority('user:retrieve')")
     @GetMapping("")
     @Override
-    public ResponseEntity<Page<DTOResponse>> findAll(String value, Pageable pageable){
+    public ResponseEntity<Page<DTOResponse>> findAll(@RequestParam String value, Pageable pageable){
         return ResponseEntity.ok().body(serviceGeneric.findAll(pageable, value, entityClass));
     }
 

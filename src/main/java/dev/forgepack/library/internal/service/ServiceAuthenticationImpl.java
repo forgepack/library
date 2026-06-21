@@ -11,11 +11,13 @@ import dev.forgepack.library.internal.payload.DTOResponseToken;
 import dev.forgepack.library.internal.repository.RepositoryToken;
 import dev.forgepack.library.internal.repository.RepositoryUser;
 import dev.forgepack.library.internal.utils.E2EE;
+import jakarta.persistence.EntityNotFoundException;
 import org.apache.commons.codec.binary.Base32;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -90,7 +92,7 @@ public class ServiceAuthenticationImpl implements ServiceAuthentication {
             return new DTOResponseToken(tokenResponse, dtoRequestToken.refreshToken(), roles);
         } else {
             logout(dtoRequestToken.refreshToken());
-            return null;
+            throw new BadCredentialsException("Invalid or expired token. Please log in again.");
         }
     }
     @Override
@@ -101,7 +103,7 @@ public class ServiceAuthenticationImpl implements ServiceAuthentication {
                     return mapper.toResponse(token);
                 })
                 .orElseThrow(() ->
-                        new RuntimeException("Token not found.")
+                        new EntityNotFoundException("Token not found.")
                 );
     }
 //    @Override
@@ -117,7 +119,7 @@ public class ServiceAuthenticationImpl implements ServiceAuthentication {
         if(entity.getAttempt() > 4) {
             entity.setActive(false);
             repositoryUser.save(entity);
-            throw new RuntimeException("User blocked");
+            throw new DisabledException("User account has been disabled due to too many failed login attempts.");
         }
         repositoryUser.save(entity);
     }
@@ -140,7 +142,7 @@ public class ServiceAuthenticationImpl implements ServiceAuthentication {
             if (secretKey != null) {
                 try {
                     if (!verifyCode(secret, secretKey, 1)) {
-                        log.warn("TOTP code {} was not valid for user {}", secretKey, userName);
+//                        log.warn("TOTP code {} was not valid for user {}", secretKey, userName);
                         throw new BadCredentialsException("Invalid TOTP code");
                     }
                 } catch (InvalidKeyException | NoSuchAlgorithmException e) {

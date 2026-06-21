@@ -15,7 +15,7 @@ import dev.forgepack.library.internal.utils.E2EE;
 import dev.forgepack.library.internal.utils.Information;
 import dev.forgepack.library.internal.utils.QRCode;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mail.MailException;
@@ -74,12 +74,12 @@ public class ServiceUser extends ServiceGenericImpl<User, DTORequestUser, DTORes
             log.error("Error generating TOTP secret for {}: {}", created, e.getMessage(), e);
             throw new BadCredentialsException("Invalid secret");
         }
-        log.info("{} creating a new user", new Information().getCurrentUser().orElse("Unknown User"));
+        log.info("{} creating a new user", Information.getCurrentUser().orElse("Unknown User"));
         return mapper.toResponse(repositoryUser.save(user));
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public boolean existsByField(String field, Object value) {
         if ("username".equals(field)) {
             return repositoryUser.existsByUsernameIgnoreCase((String) value);
@@ -88,27 +88,27 @@ public class ServiceUser extends ServiceGenericImpl<User, DTORequestUser, DTORes
             return repositoryUser.existsByEmailIgnoreCase((String) value);
         }
         else {
-            throw new IllegalArgumentException("Invalid argument");
+            throw new IllegalArgumentException("Unsupported field: " + field);
         }
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public boolean existsByFieldAndIdNot(String field, Object value, UUID id) {
         if ("username".equals(field)){
             return repositoryUser.existsByUsernameIgnoreCaseAndIdNot((String) value, id);
         }
         if ("email".equals(field)){
-            return repositoryUser.existsByUsernameIgnoreCaseAndIdNot((String) value, id);
+            return repositoryUser.existsByEmailIgnoreCaseAndIdNot((String) value, id);
         } else {
-            throw new IllegalArgumentException("Field must not be null or empty.");
+            throw new IllegalArgumentException("Unsupported field: " + field);
         }
     }
     public DTOResponseUser changePassword(DTORequestUserAuth updated){
         User user = isValidToChange(updated.id());
         Objects.requireNonNull(user).setPassword(passwordEncoder.encode(updated.password()));
         repositoryUser.save(user);
-        log.info("{} changing user password with ID: {}", new Information().getCurrentUser().orElse("Unknown User"), user.getId());
+        log.info("{} changing user password with ID: {}", Information.getCurrentUser().orElse("Unknown User"), user.getId());
         return mapper.toResponse(user);
     }
     public DTOResponseUser resetSecret(String username) {
@@ -120,7 +120,7 @@ public class ServiceUser extends ServiceGenericImpl<User, DTORequestUser, DTORes
             byte[] qrCodeBytes = QRCode.generateQRCodeBytes(serviceAuthenticationImpl.buildSecretUri(user.getUsername(), user.getSecret()), 200);
             String emailContent = serviceEmail.buildWelcomeEmailContent(user.getUsername(), "Your password is the same as before", secret);
             serviceEmail.sendHtmlMessageWithAttachment(user.getEmail(), "Reset TOTP requested", emailContent, qrCodeBytes, "qrcode.png", "image/png");
-            log.info("{} resetting user secret with ID: {}", new Information().getCurrentUser().orElse("Unknown User"), user.getId());
+            log.info("{} resetting user secret with ID: {}", Information.getCurrentUser().orElse("Unknown User"), user.getId());
             return mapper.toResponse(user);
         } catch (Exception e) {
             throw new IllegalStateException("Failed to reset TOTP for user: " + user.getUsername());
@@ -131,7 +131,13 @@ public class ServiceUser extends ServiceGenericImpl<User, DTORequestUser, DTORes
         String password = generateSecurePassword();
         user.setPassword(passwordEncoder.encode(password));
         repositoryUser.save(user);
-        log.info("{} changing user password with ID: {}", new Information().getCurrentUser().orElse("Unknown User"), user.getId());
+        try {
+            serviceEmail.sendSimpleMessage(user.getEmail(), "Password Reset",
+                    "Hello " + user.getUsername() + ",\n\nYour password has been reset. Your new temporary password is:\n\n" + password + "\n\nPlease change it after logging in.");
+        } catch (Exception e) {
+            log.error("Failed to send password reset email to {}: {}", user.getEmail(), e.getMessage());
+        }
+        log.info("{} reset password for user with ID: {}", Information.getCurrentUser().orElse("Unknown User"), user.getId());
         return mapper.toResponse(user);
     }
     public String generateSecurePassword() {
@@ -161,8 +167,8 @@ public class ServiceUser extends ServiceGenericImpl<User, DTORequestUser, DTORes
         return new String(chars);
     }
     public User isValidToChange(UUID id) {
-        String currentUser = new Information().getCurrentUser().orElse("Unknown User");
-        User user = repositoryUser.findById(id).orElseThrow(() -> new EntityNotFoundException("Resource not found"));
+        String currentUser = Information.getCurrentUser().orElse("Unknown User");
+        User user = repositoryUser.findByIdAndDeletedAtIsNull(id).orElseThrow(() -> new EntityNotFoundException("Resource not found"));
         User userCurrent = repositoryUser.findByUsername(currentUser).orElseThrow(() -> new EntityNotFoundException("Current user not found"));
         if ((userCurrent.getUsername() != null && user.getUsername() != null &&
                 userCurrent.getUsername().equals(user.getUsername())) ||
@@ -174,17 +180,20 @@ public class ServiceUser extends ServiceGenericImpl<User, DTORequestUser, DTORes
         }
     }
     public User isValidToChange(String username) {
-        User user = new User();
-        try {
-            repositoryUser.findByUsername(username).orElseThrow(() -> new EntityNotFoundException("Resource not found"));
-        } catch (Exception e) {
-            throw new EntityNotFoundException("Resource not found");
-        }
-        if (user.getUsername() != null) {
+        User user = repositoryUser.findByUsername(username.trim())
+                .orElseThrow(() -> new EntityNotFoundException("Resource not found"));
+        String currentUsername = Information.getCurrentUser().orElse(null);
+        if (currentUsername == null) {
             return user;
-        } else {
-            log.warn("{} attempted unauthorized access to user with username: {}", new Information().getCurrentUser().orElse("Unknown User"), username);
-            throw new EntityNotFoundException("Resource not found");
         }
+        User currentUser = repositoryUser.findByUsername(currentUsername)
+                .orElseThrow(() -> new EntityNotFoundException("Current user not found"));
+        boolean isSameUser = currentUser.getUsername().equalsIgnoreCase(user.getUsername());
+        boolean isAdmin   = currentUser.getRole().stream().anyMatch(role -> role.getName().equals("ADMIN"));
+        if (isSameUser || isAdmin) {
+            return user;
+        }
+        log.warn("{} attempted unauthorized access to user with username: {}", currentUsername, username);
+        throw new EntityNotFoundException("Resource not found");
     }
 }

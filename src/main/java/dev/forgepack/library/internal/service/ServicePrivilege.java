@@ -7,7 +7,7 @@ import dev.forgepack.library.internal.model.Privilege;
 import dev.forgepack.library.internal.payload.DTORequestPrivilege;
 import dev.forgepack.library.internal.payload.DTOResponsePrivilege;
 import dev.forgepack.library.internal.repository.RepositoryPrivilege;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 import java.util.UUID;
 
@@ -22,23 +22,23 @@ public class ServicePrivilege extends ServiceGenericImpl<Privilege, DTORequestPr
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public boolean existsByField(String field, Object value) {
         if ("name".equals(field)) {
             return repositoryPrivilege.existsByNameIgnoreCase((String) value);
         }
         else {
-            throw new IllegalArgumentException("Invalid argument");
+            throw new IllegalArgumentException("Unsupported field: " + field);
         }
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public boolean existsByFieldAndIdNot(String field, Object value, UUID id) {
         if ("name".equals(field)){
             return repositoryPrivilege.existsByNameIgnoreCaseAndIdNot((String) value, id);
         } else {
-            throw new IllegalArgumentException("Field must not be null or empty.");
+            throw new IllegalArgumentException("Unsupported field: " + field);
         }
     }
 }
