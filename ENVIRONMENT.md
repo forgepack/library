@@ -4,7 +4,7 @@
 
 | Tool              | Minimum version |                                                          Download | Details                            |
 |:------------------|:---------------:|------------------------------------------------------------------:|:-----------------------------------|
-| __Java JDK__      |       17        |              [OpenJDK 17](https://adoptium.net/temurin/releases/) | Project's main runtime             |
+| __Java JDK__      |       25        |              [OpenJDK 25](https://adoptium.net/temurin/releases/) | Project's main runtime             |
 | __PostgreSQL__    |      17.5       |                [PostgreSQL](https://www.postgresql.org/download/) | Primary SGBD with PostGIS          |
 | __Maven__         |      3.8+       |             [Apache Maven](https://maven.apache.org/download.cgi) | Build tool e dependency management |
 | __IntelliJ IDEA__ |     2024.1+     |             [JetBrains](https://www.jetbrains.com/idea/download/) | IDE recommended                    |

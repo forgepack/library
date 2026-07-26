@@ -13,7 +13,7 @@
 ![PostGIS](https://img.shields.io/badge/PostGIS-3.5-blue?logo=postgis)
 
 ![IntelliJ IDEA](https://img.shields.io/badge/IntelliJ%20IDEA-2025.1.1.1-000000?logo=intellijidea)
-![Java](https://img.shields.io/badge/Java-17-orange?logo=openjdk)
+![Java](https://img.shields.io/badge/Java-25-orange?logo=openjdk)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.4-brightgreen?logo=springboot)
 ![Spring Security](https://img.shields.io/badge/Spring%20Security-6.2.2-brightgreen?logo=spring)
 ![Maven](https://img.shields.io/badge/Maven-3.12.1-blue?logo=apachemaven)
