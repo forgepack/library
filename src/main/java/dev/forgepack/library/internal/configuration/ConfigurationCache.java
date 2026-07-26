@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
  * database when it is not available in memory.</p>
  *
  * <p>Cache capacity, maximum size, and expiration policies are defined in
- * {@link CacheProperties}.</p>
+ * {@link PropertiesCache}.</p>
  *
  * @author Marcelo Ribeiro Gadelha
  * @since 1.0
@@ -34,9 +34,9 @@ import java.util.stream.Collectors;
 @EnableCaching
 public class ConfigurationCache {
     private final RepositoryUser repositoryUser;
-    private final CacheProperties cacheProperties;
+    private final PropertiesCache cacheProperties;
 
-    public ConfigurationCache(RepositoryUser repositoryUser, CacheProperties cacheProperties) {
+    public ConfigurationCache(RepositoryUser repositoryUser, PropertiesCache cacheProperties) {
         this.repositoryUser = repositoryUser;
         this.cacheProperties = cacheProperties;
     }
