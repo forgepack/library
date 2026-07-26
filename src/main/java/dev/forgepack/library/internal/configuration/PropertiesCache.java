@@ -27,20 +27,20 @@ import java.time.Duration;
  */
 @Validated
 @ConfigurationProperties(prefix = "forgepack.cache")
-public record CacheProperties(
+public record PropertiesCache(
         @NotNull Duration ttl,
         @NotNull Duration refresh,
         @Min(1)  int      initialCapacity,
         @Min(1)  int      maximumSize
 ) {
-    public CacheProperties {
+    public PropertiesCache {
         if (refresh.compareTo(ttl) >= 0) {
             throw new IllegalArgumentException(
                     "forgepack.cache.refresh (" + refresh + ") must be less than forgepack.cache.ttl (" + ttl + ")");
         }
     }
 
-    public CacheProperties() {
+    public PropertiesCache() {
         this(
                 Duration.ofHours(1),
                 Duration.ofMinutes(45),

@@ -32,7 +32,7 @@ The __ForgePack Library API__ is built on a layered architecture following the _
 
 | Category          | Tecnology / Padrão                            | Detalhes                                                      |
 |:------------------|:----------------------------------------------|:--------------------------------------------------------------|
-| __Framework__     | Java 17, Spring Boot 3.5.4                    | Modern and robust framework for RESTful APIs                  |
+| __Framework__     | Java 25, Spring Boot 3.5.4                    | Modern and robust framework for RESTful APIs                  |
 | __Persistence__   | PostgreSQL 17.5, PostGIS, Hibernate Spatial   | Native support for geospatial data and complex queries        |
 | __Security__      | Spring Security 6.2.2, JWT, @PreAuthorize     | Authentication via JWT and granular access control            |
 | __Design__        | ControllerGeneric, Java Records, HATEOAS      | Abstraction of CRUD operations, immutable DTOs                |

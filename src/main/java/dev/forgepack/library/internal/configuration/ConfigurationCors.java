@@ -10,7 +10,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
  * Configures CORS (Cross-Origin Resource Sharing) for the application.
  *
  * <p>All parameters are configurable via {@code application.properties} under the
- * {@code forgepack.cors} prefix. See {@link CorsProperties}.</p>
+ * {@code forgepack.cors} prefix. See {@link PropertiesCors}.</p>
  *
  * @author Marcelo Ribeiro Gadelha
  * @since 1.0
@@ -18,9 +18,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 public class ConfigurationCors {
 
-    private final CorsProperties props;
+    private final PropertiesCors props;
 
-    public ConfigurationCors(CorsProperties props) {
+    public ConfigurationCors(PropertiesCors props) {
         this.props = props;
     }
 
