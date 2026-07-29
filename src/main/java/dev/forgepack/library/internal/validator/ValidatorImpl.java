@@ -4,7 +4,7 @@ import dev.forgepack.library.api.validator.Validator;
 
 public final class ValidatorImpl implements Validator {
 
-    private ValidatorImpl() {
+    public ValidatorImpl() {
         throw new UnsupportedOperationException("Utility class");
     }
 
