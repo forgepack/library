@@ -10,7 +10,7 @@
     </parent>
 	<groupId>dev.forgepack</groupId>
 	<artifactId>library</artifactId>
-	<version>1.0.79</version>
+	<version>1.0.81</version>
     <packaging>jar</packaging>
 	<name>Maven Library</name>
 	<description>Project for Spring Boot library</description>
@@ -47,6 +47,7 @@
         <jjwt.version>0.13.0</jjwt.version>
         <bucket4j.version>8.19.0</bucket4j.version>
         <caffeine.version>3.2.4</caffeine.version>
+        <jacoco.version>0.8.15</jacoco.version>
 	</properties>
     <dependencies>
         <!-- Spring Boot Starters -->
@@ -70,6 +71,12 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>${jacoco.version}</version>
+            <scope>compile</scope>
         </dependency>
         <!-- Hibernate Envers: provides auditing -->
         <dependency>
@@ -199,6 +206,51 @@
                         <goals>
                             <goal>sign</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- JaCoCo Plugin (Code Coverage) -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>check</id>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <rule>
+                                    <element>BUNDLE</element>
+                                    <limits>
+                                        <limit>
+                                            <counter>LINE</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.15</minimum>
+                                        </limit>
+                                        <limit>
+                                            <counter>BRANCH</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.80</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
