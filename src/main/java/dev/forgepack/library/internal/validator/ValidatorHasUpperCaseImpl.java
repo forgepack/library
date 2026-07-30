@@ -6,7 +6,7 @@ import jakarta.validation.ConstraintValidatorContext;
 
 public class ValidatorHasUpperCaseImpl implements ValidatorHasUpperCase {
 
-    protected Validator validator;
+    private final Validator validator = ValidatorImpl.INSTANCE;
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
         return validator.hasUpperCase(value);

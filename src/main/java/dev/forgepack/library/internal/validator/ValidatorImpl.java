@@ -4,9 +4,9 @@ import dev.forgepack.library.api.validator.Validator;
 
 public final class ValidatorImpl implements Validator {
 
-    public ValidatorImpl() {
-        throw new UnsupportedOperationException("Utility class");
-    }
+    public static final Validator INSTANCE = new ValidatorImpl();
+
+    private ValidatorImpl() {}
 
     public boolean isNull(Object value) {
         return value == null;

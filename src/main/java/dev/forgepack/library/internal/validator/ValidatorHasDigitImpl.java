@@ -6,7 +6,7 @@ import jakarta.validation.ConstraintValidatorContext;
 
 public class ValidatorHasDigitImpl implements ValidatorHasDigit {
 
-    protected Validator validator;
+    private final Validator validator = ValidatorImpl.INSTANCE;
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
         if (value == null) return true;
