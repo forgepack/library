@@ -23,8 +23,7 @@ import java.util.Base64;
  * - Base64 encoding for safe text transmission
  *
  * @author Marcelo Ribeiro Gadelha
- * @email gadelha.ti@gmail.com
- * @website www.gadelha.eti.br
+ * Website: www.gadelha.eti.br
  **/
 
 @Service
