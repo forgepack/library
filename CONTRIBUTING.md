@@ -24,7 +24,7 @@ We use a __Simplified Gitflow__ workflow:
 
 * __Java:__ Follow the official Spring Boot coding standards and Java naming conventions.  
 * __Tests:__ Every new feature or bug fix must include relevant unit and/or integration tests.  
-* __Documentation:__ Update the `README.md` and Swagger documentation if any *endpoints* are changed.  
+* __Documentation:__ Update the `README.md`, Javadoc and Swagger (if exists) documentation if any *endpoints* are changed.  
 
 ## 3. COMMIT CONVENTION
 
