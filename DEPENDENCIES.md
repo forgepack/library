@@ -1,7 +1,7 @@
 # Árvore de dependências (sem ciclos)
 
 ```
-└─ [x] forgepack-security 					0.0.8 (dependência: forgepack-authentication)
+└─ [x] forgepack-security 					0.0.9 (dependência: forgepack-authentication)
 	└─ [x] forgepack-authentication			0.0.5 (dependência: forgepack-authorization)
 		└─ [x] forgepack-authorization 		0.0.8 (dependência: forgepack-core)
 			└─ [x] forgepack-core			0.0.23 (dependência: forgepack-validation, forgepack-utils)
