@@ -37,7 +37,7 @@ forgepack-core
 
 | Classe | Origem |
 |--------|--------|
-        | `ConfigurationSecurity` | `internal/configuration/` |
+| `ConfigurationSecurity` | `internal/configuration/` |
 | `ConfigurationCors` + `PropertiesCors` | `internal/configuration/` |
         | `ConfigurationJwt` | `internal/configuration/` |
 | `PropertiesSecurityEndpoints` | `internal/configuration/` |
